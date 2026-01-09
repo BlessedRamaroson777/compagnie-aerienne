@@ -2,6 +2,8 @@ package com.airline.airline_app.controller;
 
 import com.airline.airline_app.entity.Avion;
 import com.airline.airline_app.service.AvionService;
+import com.airline.airline_app.service.ModelAvionService;
+import com.airline.airline_app.service.EtatAvionService;
 import com.airline.airline_app.specification.AvionSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,6 +20,8 @@ import java.util.List;
 public class AvionController {
     
     private final AvionService avionService;
+    private final ModelAvionService modelAvionService;
+    private final EtatAvionService etatAvionService;
     
     @GetMapping
     public String list(@RequestParam(required = false) String codeAvion,
@@ -41,6 +45,8 @@ public class AvionController {
     @GetMapping("/new")
     public String newForm(Model model) {
         model.addAttribute("avion", new Avion());
+        model.addAttribute("modeles", modelAvionService.findAll());
+        model.addAttribute("etats", etatAvionService.findAll());
         return "avion/form";
     }
     
@@ -57,6 +63,8 @@ public class AvionController {
         Avion avion = avionService.findById(id)
             .orElseThrow(() -> new RuntimeException("Avion non trouvé"));
         model.addAttribute("avion", avion);
+        model.addAttribute("modeles", modelAvionService.findAll());
+        model.addAttribute("etats", etatAvionService.findAll());
         return "avion/form";
     }
     

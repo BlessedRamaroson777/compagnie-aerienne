@@ -4,6 +4,9 @@ import com.airline.airline_app.entity.Avion;
 import com.airline.airline_app.entity.Vol;
 import com.airline.airline_app.service.AvionService;
 import com.airline.airline_app.service.VolService;
+import com.airline.airline_app.service.AeroportService;
+import com.airline.airline_app.service.PrixVolService;
+import com.airline.airline_app.service.ClasseSiegeService;
 import com.airline.airline_app.specification.VolSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,6 +27,9 @@ public class VolController {
     
     private final VolService volService;
     private final AvionService avionService;
+    private final AeroportService aeroportService;
+    private final PrixVolService prixVolService;
+    private final ClasseSiegeService classeSiegeService;
     
     @GetMapping
     public String list(@RequestParam(required = false) String numeroVol,
@@ -58,6 +64,7 @@ public class VolController {
     public String newForm(Model model) {
         model.addAttribute("vol", new Vol());
         model.addAttribute("avions", avionService.findAll());
+        model.addAttribute("aeroports", aeroportService.findAll());
         return "vol/form";
     }
     
@@ -75,6 +82,7 @@ public class VolController {
             .orElseThrow(() -> new RuntimeException("Vol non trouvé"));
         model.addAttribute("vol", vol);
         model.addAttribute("avions", avionService.findAll());
+        model.addAttribute("aeroports", aeroportService.findAll());
         return "vol/form";
     }
     

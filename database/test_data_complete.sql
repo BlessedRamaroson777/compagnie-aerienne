@@ -44,11 +44,11 @@ INSERT INTO role_equipage (libelle, description) VALUES
 -- =====================================================
 -- 5) MÉTHODES DE PAIEMENT
 -- =====================================================
-INSERT INTO methode_paiement (libelle, description) VALUES 
-    ('CARTE', 'Carte bancaire Visa/Mastercard'),
-    ('CASH', 'Paiement en espèces'),
-    ('MOBILE_MONEY', 'Paiement mobile (MVola, Orange Money, etc.)'),
-    ('VIREMENT', 'Virement bancaire');
+INSERT INTO methode_paiement (libelle) VALUES 
+    ('CARTE'),
+    ('CASH'),
+    ('MOBILE_MONEY'),
+    ('VIREMENT');
 
 -- =====================================================
 -- 6) AVIONS (avec modèle et état)
