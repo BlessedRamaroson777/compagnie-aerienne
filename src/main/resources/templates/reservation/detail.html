@@ -93,8 +93,8 @@
                                 <td th:text="${billet.siegeVol.siege.numeroSiege}"></td>
                                 <td>
                                     <span class="badge" 
-                                          th:classappend="${billet.siegeVol.siege.classeSiege == T(com.airline.airline_app.entity.enums.ClasseSiege).BUSINESS ? 'bg-warning text-dark' : 'bg-info'}"
-                                          th:text="${billet.siegeVol.siege.classeSiege}"></span>
+                                          th:classappend="${billet.siegeVol.siege.classeSiege.libelle == 'BUSINESS' ? 'bg-warning text-dark' : 'bg-info'}"
+                                          th:text="${billet.siegeVol.siege.classeSiege.libelle}"></span>
                                 </td>
                                 <td th:text="${billet.prix + ' €'}"></td>
                                 <td>

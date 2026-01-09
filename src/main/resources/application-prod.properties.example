@@ -43,7 +43,7 @@ spring.thymeleaf.cache=true
 # ==============================================
 # SERVER CONFIGURATION
 # ==============================================
-server.port=8080
+server.port=8081
 server.compression.enabled=true
 server.compression.mime-types=text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
 

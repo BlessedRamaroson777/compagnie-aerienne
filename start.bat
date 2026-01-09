@@ -44,7 +44,7 @@ if %errorlevel% neq 0 (
 echo [OK] Compilation reussie
 echo.
 echo Demarrage de l'application...
-echo L'application sera accessible sur: http://localhost:8080
+echo L'application sera accessible sur: http://localhost:8081
 echo.
 
 call mvn spring-boot:run

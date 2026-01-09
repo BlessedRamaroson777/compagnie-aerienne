@@ -1,7 +1,7 @@
 package com.airline.airline_app.specification;
 
 import com.airline.airline_app.entity.Equipage;
-import com.airline.airline_app.entity.enums.RoleEquipage;
+import com.airline.airline_app.entity.RoleEquipage;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 

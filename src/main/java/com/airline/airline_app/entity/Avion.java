@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,18 +20,34 @@ public class Avion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(unique = true, nullable = false)
+    @Column(name = "code_avion", unique = true, nullable = false, length = 50)
     private String codeAvion;
     
-    @Column(nullable = false)
-    private String modele;
+    @ManyToOne
+    @JoinColumn(name = "model_avion_id", nullable = false)
+    private ModelAvion modelAvion;
     
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "etat_avion_id", nullable = false)
+    private EtatAvion etatAvion;
+    
+    @Column(name = "capacite_totale", nullable = false)
     private Integer capaciteTotale;
+    
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
     
     @OneToMany(mappedBy = "avion", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Siege> sieges = new ArrayList<>();
     
     @OneToMany(mappedBy = "avion")
     private List<Vol> vols = new ArrayList<>();
+    
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

@@ -41,7 +41,7 @@ fi
 echo "✓ Compilation réussie"
 echo ""
 echo "Démarrage de l'application..."
-echo "L'application sera accessible sur: http://localhost:8080"
+echo "L'application sera accessible sur: http://localhost:8081"
 echo ""
 
 mvn spring-boot:run

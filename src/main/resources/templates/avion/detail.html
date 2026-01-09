@@ -50,8 +50,8 @@
                                         <td th:text="${siege.numeroSiege}"></td>
                                         <td>
                                             <span class="badge" 
-                                                  th:classappend="${siege.classeSiege == T(com.airline.airline_app.entity.enums.ClasseSiege).BUSINESS ? 'bg-warning' : 'bg-info'}"
-                                                  th:text="${siege.classeSiege}"></span>
+                                                  th:classappend="${siege.classeSiege.libelle == 'BUSINESS' ? 'bg-warning' : 'bg-info'}"
+                                                  th:text="${siege.classeSiege.libelle}"></span>
                                         </td>
                                     </tr>
                                 </tbody>

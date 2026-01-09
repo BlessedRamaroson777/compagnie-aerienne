@@ -158,12 +158,12 @@ airline-app/
 
 | URL | Description | Controller |
 |-----|-------------|-----------|
-| http://localhost:8080 | Dashboard | HomeController |
-| http://localhost:8080/avions | Gestion Avions | AvionController |
-| http://localhost:8080/vols | Gestion Vols | VolController |
-| http://localhost:8080/clients | Gestion Clients | ClientController |
-| http://localhost:8080/reservations | Gestion Réservations | ReservationController |
-| http://localhost:8080/equipages | Gestion Équipage | EquipageController |
+| http://localhost:8081 | Dashboard | HomeController |
+| http://localhost:8081/avions | Gestion Avions | AvionController |
+| http://localhost:8081/vols | Gestion Vols | VolController |
+| http://localhost:8081/clients | Gestion Clients | ClientController |
+| http://localhost:8081/reservations | Gestion Réservations | ReservationController |
+| http://localhost:8081/equipages | Gestion Équipage | EquipageController |
 
 ## 📊 Flux de Données
 

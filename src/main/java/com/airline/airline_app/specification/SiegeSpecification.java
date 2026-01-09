@@ -1,7 +1,7 @@
 package com.airline.airline_app.specification;
 
 import com.airline.airline_app.entity.Siege;
-import com.airline.airline_app.entity.enums.ClasseSiege;
+import com.airline.airline_app.entity.ClasseSiege;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 

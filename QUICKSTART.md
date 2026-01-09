@@ -70,7 +70,7 @@ chmod +x start.sh
 
 Ouvrez votre navigateur et allez sur :
 
-🌐 **http://localhost:8080**
+🌐 **http://localhost:8081**
 
 ## ✅ Vérification de l'installation
 
@@ -108,7 +108,7 @@ L'application devrait :
 - ✅ Vérifiez les identifiants dans `application.properties`
 - ✅ Vérifiez que la base `airline_db` existe
 
-### Erreur : "Port 8080 already in use"
+### Erreur : "Port 8081 already in use"
 Modifiez le port dans `application.properties` :
 ```properties
 server.port=8081
@@ -142,12 +142,12 @@ Pour plus de détails, consultez le fichier [README.md](README.md)
 
 ## 🔗 URLs principales
 
-- 🏠 Accueil : http://localhost:8080
-- ✈️ Avions : http://localhost:8080/avions
-- 🛫 Vols : http://localhost:8080/vols
-- 👤 Clients : http://localhost:8080/clients
-- 📋 Réservations : http://localhost:8080/reservations
-- 👨‍✈️ Équipage : http://localhost:8080/equipages
+- 🏠 Accueil : http://localhost:8081
+- ✈️ Avions : http://localhost:8081/avions
+- 🛫 Vols : http://localhost:8081/vols
+- 👤 Clients : http://localhost:8081/clients
+- 📋 Réservations : http://localhost:8081/reservations
+- 👨‍✈️ Équipage : http://localhost:8081/equipages
 
 ## 💡 Astuces
 

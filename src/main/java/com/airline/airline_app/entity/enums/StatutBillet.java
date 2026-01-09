@@ -2,5 +2,7 @@ package com.airline.airline_app.entity.enums;
 
 public enum StatutBillet {
     EMIS,
-    ANNULE
+    ANNULE,
+    UTILISE,
+    REMBOURSE
 }

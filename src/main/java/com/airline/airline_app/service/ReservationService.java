@@ -4,6 +4,7 @@ import com.airline.airline_app.entity.*;
 import com.airline.airline_app.entity.enums.StatutBillet;
 import com.airline.airline_app.entity.enums.StatutReservation;
 import com.airline.airline_app.repository.BilletRepository;
+import com.airline.airline_app.repository.PrixVolRepository;
 import com.airline.airline_app.repository.ReservationRepository;
 import com.airline.airline_app.repository.SiegeVolRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class ReservationService extends GenericServiceImpl<Reservation, Long> {
     private final ReservationRepository reservationRepository;
     private final BilletRepository billetRepository;
     private final SiegeVolRepository siegeVolRepository;
+    private final PrixVolRepository prixVolRepository;
     
     @Override
     protected JpaRepository<Reservation, Long> getRepository() {
@@ -58,10 +60,16 @@ public class ReservationService extends GenericServiceImpl<Reservation, Long> {
             throw new RuntimeException("Ce siège est déjà occupé");
         }
         
+        // Récupérer le prix du vol pour la classe du siège
+        PrixVol prixVol = prixVolRepository.findByVolIdAndClasseSiegeId(
+            reservation.getVol().getId(),
+            siegeVol.getSiege().getClasseSiege().getId()
+        ).orElseThrow(() -> new RuntimeException("Prix non trouvé pour ce vol et cette classe"));
+        
         Billet billet = new Billet();
         billet.setReservation(reservation);
         billet.setSiegeVol(siegeVol);
-        billet.setPrix(reservation.getVol().getPrixBase());
+        billet.setPrix(prixVol.getPrix());
         billet.setStatut(StatutBillet.EMIS);
         
         siegeVol.setOccupe(true);

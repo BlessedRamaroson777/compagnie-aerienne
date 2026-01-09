@@ -125,7 +125,7 @@ mvn spring-boot:run
 
 3. Accéder à l'application :
 ```
-http://localhost:8080
+http://localhost:8081
 ```
 
 ## Fonctionnalités Métier

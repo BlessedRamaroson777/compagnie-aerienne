@@ -2,9 +2,10 @@ package com.airline.airline_app.service;
 
 import com.airline.airline_app.entity.Avion;
 import com.airline.airline_app.entity.Siege;
-import com.airline.airline_app.entity.enums.ClasseSiege;
+import com.airline.airline_app.entity.ClasseSiege;
 import com.airline.airline_app.repository.AvionRepository;
 import com.airline.airline_app.repository.SiegeRepository;
+import com.airline.airline_app.repository.ClasseSiegeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +22,7 @@ public class AvionService extends GenericServiceImpl<Avion, Long> {
     
     private final AvionRepository avionRepository;
     private final SiegeRepository siegeRepository;
+    private final ClasseSiegeRepository classeSiegeRepository;
     
     @Override
     protected JpaRepository<Avion, Long> getRepository() {
@@ -44,6 +46,12 @@ public class AvionService extends GenericServiceImpl<Avion, Long> {
      * Génère automatiquement les sièges pour un avion
      */
     private void genererSieges(Avion avion) {
+        // Récupérer les classes de siège depuis la base de données
+        ClasseSiege classeEconomy = classeSiegeRepository.findByLibelle("ECONOMY")
+            .orElseThrow(() -> new RuntimeException("Classe ECONOMY non trouvée"));
+        ClasseSiege classeBusiness = classeSiegeRepository.findByLibelle("BUSINESS")
+            .orElseThrow(() -> new RuntimeException("Classe BUSINESS non trouvée"));
+        
         List<Siege> sieges = new ArrayList<>();
         int capacite = avion.getCapaciteTotale();
         int siegesEconomy = (int) (capacite * 0.7); // 70% Economy
@@ -53,7 +61,7 @@ public class AvionService extends GenericServiceImpl<Avion, Long> {
         for (int i = 1; i <= siegesBusiness; i++) {
             Siege siege = new Siege();
             siege.setNumeroSiege(i + "A");
-            siege.setClasseSiege(ClasseSiege.BUSINESS);
+            siege.setClasseSiege(classeBusiness);
             siege.setAvion(avion);
             sieges.add(siege);
         }
@@ -62,7 +70,7 @@ public class AvionService extends GenericServiceImpl<Avion, Long> {
         for (int i = 1; i <= siegesEconomy; i++) {
             Siege siege = new Siege();
             siege.setNumeroSiege((siegesBusiness + i) + "A");
-            siege.setClasseSiege(ClasseSiege.ECONOMY);
+            siege.setClasseSiege(classeEconomy);
             siege.setAvion(avion);
             sieges.add(siege);
         }

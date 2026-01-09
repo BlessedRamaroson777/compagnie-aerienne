@@ -1,11 +1,11 @@
 package com.airline.airline_app.entity;
 
-import com.airline.airline_app.entity.enums.RoleEquipage;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,16 +20,27 @@ public class Equipage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String nom;
     
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String prenom;
     
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
     private RoleEquipage role;
+    
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
     
     @OneToMany(mappedBy = "equipage")
     private List<VolEquipage> vols = new ArrayList<>();
+    
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
