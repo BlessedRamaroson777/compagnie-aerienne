@@ -6,24 +6,63 @@
     <title>Système de Gestion - Compagnie Aérienne</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/modern-style.css}">
     <style>
         .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
-            padding: 60px 0;
-            margin-bottom: 40px;
+            padding: 80px 0;
+            margin-bottom: 50px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .hero h1 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .hero .lead {
+            font-size: 1.2rem;
+            opacity: 0.9;
         }
         .card-custom {
-            transition: transform 0.3s;
+            transition: all 0.3s ease;
             height: 100%;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
         }
         .card-custom:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            border-color: #4dabf7;
         }
         .icon-large {
-            font-size: 3rem;
-            color: #667eea;
+            font-size: 2.5rem;
+            color: #4dabf7;
+            margin-bottom: 1rem;
+        }
+        .module-section {
+            margin-bottom: 3rem;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .card-custom .card-body {
+            padding: 2rem;
+        }
+        .card-custom h5 {
+            color: #212529;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        .card-custom p {
+            color: #6c757d;
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -38,83 +77,167 @@
     </div>
 
     <div class="container">
-        <div class="row g-4">
-            <!-- Avions -->
-            <div class="col-md-4">
-                <div class="card card-custom">
-                    <div class="card-body text-center">
-                        <i class="bi bi-airplane icon-large mb-3"></i>
-                        <h5 class="card-title">Avions</h5>
-                        <p class="card-text">Gérer la flotte d'avions et les sièges</p>
-                        <a th:href="@{/avions}" class="btn btn-primary">Accéder</a>
+        <!-- Section Flotte -->
+        <div class="module-section">
+            <h2 class="section-title"><i class="bi bi-airplane"></i> Gestion de la Flotte</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card card-custom">
+                        <div class="card-body text-center">
+                            <i class="bi bi-airplane icon-large"></i>
+                            <h5 class="card-title">Avions</h5>
+                            <p class="card-text">Gérer la flotte d'avions et les sièges</p>
+                            <a th:href="@{/avions}" class="btn btn-primary">Accéder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom">
+                        <div class="card-body text-center">
+                            <i class="bi bi-journal-text icon-large"></i>
+                            <h5 class="card-title">Modèles d'Avion</h5>
+                            <p class="card-text">Gérer les modèles (Boeing, Airbus...)</p>
+                            <a th:href="@{/modeles-avion}" class="btn btn-primary">Accéder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom">
+                        <div class="card-body text-center">
+                            <i class="bi bi-tools icon-large"></i>
+                            <h5 class="card-title">États d'Avion</h5>
+                            <p class="card-text">Opérationnel, Maintenance...</p>
+                            <a th:href="@{/etats-avion}" class="btn btn-primary">Accéder</a>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Vols -->
-            <div class="col-md-4">
-                <div class="card card-custom">
-                    <div class="card-body text-center">
-                        <i class="bi bi-airplane-engines icon-large mb-3"></i>
-                        <h5 class="card-title">Vols</h5>
-                        <p class="card-text">Planifier et gérer les vols</p>
-                        <a th:href="@{/vols}" class="btn btn-primary">Accéder</a>
+        <!-- Section Vols -->
+        <div class="module-section">
+            <h2 class="section-title"><i class="bi bi-airplane-engines"></i> Gestion des Vols</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card card-custom">
+                        <div class="card-body text-center">
+                            <i class="bi bi-airplane-engines icon-large"></i>
+                            <h5 class="card-title">Vols</h5>
+                            <p class="card-text">Planifier et gérer les vols</p>
+                            <a th:href="@{/vols}" class="btn btn-primary">Accéder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom">
+                        <div class="card-body text-center">
+                            <i class="bi bi-pin-map icon-large"></i>
+                            <h5 class="card-title">Aéroports</h5>
+                            <p class="card-text">Référentiel des aéroports (IATA)</p>
+                            <a th:href="@{/aeroports}" class="btn btn-primary">Accéder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom">
+                        <div class="card-body text-center">
+                            <i class="bi bi-cash-stack icon-large"></i>
+                            <h5 class="card-title">Prix des Vols</h5>
+                            <p class="card-text">Tarifs par vol et par classe</p>
+                            <a th:href="@{/prix-vol}" class="btn btn-primary">Accéder</a>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Clients -->
-            <div class="col-md-4">
-                <div class="card card-custom">
-                    <div class="card-body text-center">
-                        <i class="bi bi-people icon-large mb-3"></i>
-                        <h5 class="card-title">Clients</h5>
-                        <p class="card-text">Gérer les clients et passagers</p>
-                        <a th:href="@{/clients}" class="btn btn-primary">Accéder</a>
+        <!-- Section Clients & Réservations -->
+        <div class="module-section">
+            <h2 class="section-title"><i class="bi bi-people"></i> Clients & Réservations</h2>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="card card-custom">
+                        <div class="card-body text-center">
+                            <i class="bi bi-people icon-large"></i>
+                            <h5 class="card-title">Clients</h5>
+                            <p class="card-text">Gérer les clients</p>
+                            <a th:href="@{/clients}" class="btn btn-primary">Accéder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-custom">
+                        <div class="card-body text-center">
+                            <i class="bi bi-calendar-check icon-large"></i>
+                            <h5 class="card-title">Réservations</h5>
+                            <p class="card-text">Gérer les réservations</p>
+                            <a th:href="@{/reservations}" class="btn btn-primary">Accéder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-custom">
+                        <div class="card-body text-center">
+                            <i class="bi bi-ticket-perforated icon-large"></i>
+                            <h5 class="card-title">Billets</h5>
+                            <p class="card-text">Gérer les billets</p>
+                            <a th:href="@{/billets}" class="btn btn-primary">Accéder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-custom">
+                        <div class="card-body text-center">
+                            <i class="bi bi-credit-card icon-large"></i>
+                            <h5 class="card-title">Paiements</h5>
+                            <p class="card-text">Gérer les paiements</p>
+                            <a th:href="@{/paiements}" class="btn btn-primary">Accéder</a>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Réservations -->
-            <div class="col-md-4">
-                <div class="card card-custom">
-                    <div class="card-body text-center">
-                        <i class="bi bi-calendar-check icon-large mb-3"></i>
-                        <h5 class="card-title">Réservations</h5>
-                        <p class="card-text">Gérer les réservations et billets</p>
-                        <a th:href="@{/reservations}" class="btn btn-primary">Accéder</a>
+        <!-- Section Équipage & Configuration -->
+        <div class="module-section">
+            <h2 class="section-title"><i class="bi bi-gear"></i> Équipage & Configuration</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card card-custom">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-badge icon-large"></i>
+                            <h5 class="card-title">Équipage</h5>
+                            <p class="card-text">Gérer les membres d'équipage</p>
+                            <a th:href="@{/equipages}" class="btn btn-primary">Accéder</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Équipage -->
-            <div class="col-md-4">
-                <div class="card card-custom">
-                    <div class="card-body text-center">
-                        <i class="bi bi-person-badge icon-large mb-3"></i>
-                        <h5 class="card-title">Équipage</h5>
-                        <p class="card-text">Gérer les membres d'équipage</p>
-                        <a th:href="@{/equipages}" class="btn btn-primary">Accéder</a>
+                <div class="col-md-4">
+                    <div class="card card-custom">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-workspace icon-large"></i>
+                            <h5 class="card-title">Rôles d'Équipage</h5>
+                            <p class="card-text">Pilote, Copilote, Hôtesse...</p>
+                            <a th:href="@{/roles-equipage}" class="btn btn-primary">Accéder</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Paiements -->
-            <div class="col-md-4">
-                <div class="card card-custom">
-                    <div class="card-body text-center">
-                        <i class="bi bi-credit-card icon-large mb-3"></i>
-                        <h5 class="card-title">Paiements</h5>
-                        <p class="card-text">Gérer les paiements multi-méthodes</p>
-                        <a href="#" class="btn btn-secondary disabled">Bientôt</a>
+                <div class="col-md-4">
+                    <div class="card card-custom">
+                        <div class="card-body text-center">
+                            <i class="bi bi-grid-3x3 icon-large"></i>
+                            <h5 class="card-title">Classes de Siège</h5>
+                            <p class="card-text">Economy, Business...</p>
+                            <a th:href="@{/classes-siege}" class="btn btn-primary">Accéder</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="mt-5 text-center text-muted">
-            <p>Système de Gestion de Compagnie Aérienne - Back Office</p>
-            <p><small>Spring Boot • Thymeleaf • PostgreSQL • JPA</small></p>
+            <p style="font-size: 1.1rem; font-weight: 600; color: #495057;">✈️ 13 Modules Complets</p>
+            <p><small>Spring Boot • Thymeleaf • PostgreSQL • JPA • Filtres Multi-Critères</small></p>
         </div>
     </div>
 

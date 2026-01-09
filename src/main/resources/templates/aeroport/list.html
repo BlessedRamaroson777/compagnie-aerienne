@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aéroports</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/modern-style.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar('aeroports')}"></div>
+
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="bi bi-pin-map"></i> Gestion des Aéroports</h1>
+                    <a th:href="@{/aeroports/new}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Nouvel Aéroport
+                    </a>
+                </div>
+
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Filtres -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Filtres Avancés</h5>
+                        <form th:action="@{/aeroports}" method="get" class="row g-3">
+                            <div class="col-md-2">
+                                <label class="form-label">Code IATA</label>
+                                <input type="text" name="codeAeroport" class="form-control" th:value="${codeAeroport}" placeholder="Ex: CDG">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Nom</label>
+                                <input type="text" name="nom" class="form-control" th:value="${nom}" placeholder="Ex: Charles de Gaulle">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Ville</label>
+                                <input type="text" name="ville" class="form-control" th:value="${ville}" placeholder="Ex: Paris">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Pays</label>
+                                <input type="text" name="pays" class="form-control" th:value="${pays}" placeholder="Ex: France">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="bi bi-search"></i> Filtrer
+                                </button>
+                                <a th:href="@{/aeroports}" class="btn btn-secondary">
+                                    <i class="bi bi-x-circle"></i> Réinitialiser
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Code IATA</th>
+                                    <th>Nom</th>
+                                    <th>Ville</th>
+                                    <th>Pays</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="aeroport : ${aeroports}">
+                                    <td th:text="${aeroport.id}"></td>
+                                    <td>
+                                        <span class="badge bg-primary" th:text="${aeroport.codeAeroport}"></span>
+                                    </td>
+                                    <td><strong th:text="${aeroport.nom}"></strong></td>
+                                    <td th:text="${aeroport.ville}"></td>
+                                    <td th:text="${aeroport.pays}"></td>
+                                    <td>
+                                        <a th:href="@{/aeroports/{id}(id=${aeroport.id})}" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye"></i> Voir
+                                        </a>
+                                        <a th:href="@{/aeroports/{id}/edit(id=${aeroport.id})}" class="btn btn-sm btn-warning">
+                                            <i class="bi bi-pencil"></i> Modifier
+                                        </a>
+                                        <a th:href="@{/aeroports/{id}/delete(id=${aeroport.id})}" 
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Supprimer cet aéroport ?')">
+                                            <i class="bi bi-trash"></i> Supprimer
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

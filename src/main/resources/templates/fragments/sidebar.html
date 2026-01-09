@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .modern-sidebar {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-header h4 {
+            color: #fff;
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin: 0;
+        }
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+        .sidebar-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-link:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            border-left-color: #4dabf7;
+        }
+        .sidebar-link.active {
+            background: rgba(77,171,247,0.15);
+            color: #fff;
+            border-left-color: #4dabf7;
+        }
+        .sidebar-link i {
+            width: 24px;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+        .sidebar-section {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav th:fragment="sidebar(activeMenu)" class="col-md-2 d-md-block modern-sidebar">
+        <div class="sidebar-header">
+            <h4>✈️ Airline System</h4>
+        </div>
+        <div class="sidebar-nav">
+            <a th:href="@{/}" class="sidebar-link" th:classappend="${activeMenu == 'home' ? 'active' : ''}">
+                <i class="bi bi-house-door"></i>
+                <span>Accueil</span>
+            </a>
+            
+            <div class="sidebar-section">Flotte</div>
+            <a th:href="@{/avions}" class="sidebar-link" th:classappend="${activeMenu == 'avions' ? 'active' : ''}">
+                <i class="bi bi-airplane"></i>
+                <span>Avions</span>
+            </a>
+            <a th:href="@{/modeles-avion}" class="sidebar-link" th:classappend="${activeMenu == 'modeles' ? 'active' : ''}">
+                <i class="bi bi-journal-text"></i>
+                <span>Modèles Avion</span>
+            </a>
+            <a th:href="@{/etats-avion}" class="sidebar-link" th:classappend="${activeMenu == 'etats' ? 'active' : ''}">
+                <i class="bi bi-tools"></i>
+                <span>États Avion</span>
+            </a>
+            
+            <div class="sidebar-section">Vols</div>
+            <a th:href="@{/vols}" class="sidebar-link" th:classappend="${activeMenu == 'vols' ? 'active' : ''}">
+                <i class="bi bi-airplane-engines"></i>
+                <span>Vols</span>
+            </a>
+            <a th:href="@{/aeroports}" class="sidebar-link" th:classappend="${activeMenu == 'aeroports' ? 'active' : ''}">
+                <i class="bi bi-pin-map"></i>
+                <span>Aéroports</span>
+            </a>
+            <a th:href="@{/prix-vol}" class="sidebar-link" th:classappend="${activeMenu == 'prix' ? 'active' : ''}">
+                <i class="bi bi-cash-stack"></i>
+                <span>Prix Vols</span>
+            </a>
+            
+            <div class="sidebar-section">Clients & Réservations</div>
+            <a th:href="@{/clients}" class="sidebar-link" th:classappend="${activeMenu == 'clients' ? 'active' : ''}">
+                <i class="bi bi-people"></i>
+                <span>Clients</span>
+            </a>
+            <a th:href="@{/reservations}" class="sidebar-link" th:classappend="${activeMenu == 'reservations' ? 'active' : ''}">
+                <i class="bi bi-calendar-check"></i>
+                <span>Réservations</span>
+            </a>
+            <a th:href="@{/billets}" class="sidebar-link" th:classappend="${activeMenu == 'billets' ? 'active' : ''}">
+                <i class="bi bi-ticket-perforated"></i>
+                <span>Billets</span>
+            </a>
+            <a th:href="@{/paiements}" class="sidebar-link" th:classappend="${activeMenu == 'paiements' ? 'active' : ''}">
+                <i class="bi bi-credit-card"></i>
+                <span>Paiements</span>
+            </a>
+            
+            <div class="sidebar-section">Équipage</div>
+            <a th:href="@{/equipages}" class="sidebar-link" th:classappend="${activeMenu == 'equipages' ? 'active' : ''}">
+                <i class="bi bi-person-badge"></i>
+                <span>Équipage</span>
+            </a>
+            <a th:href="@{/roles-equipage}" class="sidebar-link" th:classappend="${activeMenu == 'roles' ? 'active' : ''}">
+                <i class="bi bi-person-workspace"></i>
+                <span>Rôles Équipage</span>
+            </a>
+            
+            <div class="sidebar-section">Configuration</div>
+            <a th:href="@{/classes-siege}" class="sidebar-link" th:classappend="${activeMenu == 'classes' ? 'active' : ''}">
+                <i class="bi bi-grid-3x3"></i>
+                <span>Classes Siège</span>
+            </a>
+        </div>
+    </nav>
+</body>
+</html>

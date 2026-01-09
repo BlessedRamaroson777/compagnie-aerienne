@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails Aéroport</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h3>Détails de l'Aéroport</h3>
+                        <div>
+                            <a th:href="@{/aeroports/{id}/edit(id=${aeroport.id})}" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Modifier
+                            </a>
+                            <a th:href="@{/aeroports/{id}/delete(id=${aeroport.id})}" 
+                               class="btn btn-danger"
+                               onclick="return confirm('Supprimer cet aéroport ?')">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th width="40%">ID</th>
+                                        <td th:text="${aeroport.id}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Code IATA</th>
+                                        <td>
+                                            <span class="badge bg-primary fs-5" th:text="${aeroport.codeAeroport}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <td><strong th:text="${aeroport.nom}"></strong></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th width="40%">Ville</th>
+                                        <td th:text="${aeroport.ville}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Pays</th>
+                                        <td th:text="${aeroport.pays}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date Création</th>
+                                        <td th:text="${#temporals.format(aeroport.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <a th:href="@{/aeroports}" class="btn btn-secondary mt-3">
+                            <i class="bi bi-arrow-left"></i> Retour à la liste
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

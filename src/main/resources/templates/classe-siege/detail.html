@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails Classe</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h3>Détails de la Classe de Siège</h3>
+                        <div>
+                            <a th:href="@{/classes-siege/{id}/edit(id=${classeSiege.id})}" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Modifier
+                            </a>
+                            <a th:href="@{/classes-siege/{id}/delete(id=${classeSiege.id})}" 
+                               class="btn btn-danger"
+                               onclick="return confirm('Supprimer cette classe ?')">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th width="30%">ID</th>
+                                <td th:text="${classeSiege.id}"></td>
+                            </tr>
+                            <tr>
+                                <th>Libellé</th>
+                                <td><strong th:text="${classeSiege.libelle}"></strong></td>
+                            </tr>
+                            <tr>
+                                <th>Date de Création</th>
+                                <td th:text="${#temporals.format(classeSiege.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                            </tr>
+                            <tr>
+                                <th>Dernière Modification</th>
+                                <td th:text="${#temporals.format(classeSiege.updatedAt, 'dd/MM/yyyy HH:mm')}"></td>
+                            </tr>
+                        </table>
+
+                        <a th:href="@{/classes-siege}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour à la liste
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

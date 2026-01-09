@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails État Avion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h3>Détails de l'État Avion</h3>
+                        <div>
+                            <a th:href="@{/etats-avion/{id}/edit(id=${etatAvion.id})}" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Modifier
+                            </a>
+                            <a th:href="@{/etats-avion/{id}/delete(id=${etatAvion.id})}" 
+                               class="btn btn-danger"
+                               onclick="return confirm('Supprimer cet état ?')">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th width="30%">ID</th>
+                                <td th:text="${etatAvion.id}"></td>
+                            </tr>
+                            <tr>
+                                <th>Libellé</th>
+                                <td>
+                                    <span th:text="${etatAvion.libelle}" 
+                                          th:classappend="${etatAvion.libelle == 'OPERATIONNEL' ? 'badge bg-success' : 
+                                                          (etatAvion.libelle == 'EN_MAINTENANCE' ? 'badge bg-warning' : 
+                                                          (etatAvion.libelle == 'HORS_SERVICE' ? 'badge bg-danger' : 'badge bg-secondary'))}">
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Date de Création</th>
+                                <td th:text="${#temporals.format(etatAvion.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                            </tr>
+                            <tr>
+                                <th>Dernière Modification</th>
+                                <td th:text="${#temporals.format(etatAvion.updatedAt, 'dd/MM/yyyy HH:mm')}"></td>
+                            </tr>
+                        </table>
+
+                        <a th:href="@{/etats-avion}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour à la liste
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

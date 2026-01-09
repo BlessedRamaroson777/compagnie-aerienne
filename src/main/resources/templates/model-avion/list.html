@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modèles d'Avion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/modern-style.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar('modeles')}"></div>
+
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="bi bi-journal-text"></i> Modèles d'Avion</h1>
+                    <a th:href="@{/modeles-avion/new}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Nouveau Modèle
+                    </a>
+                </div>
+
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Filtres -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Filtres Avancés</h5>
+                        <form th:action="@{/modeles-avion}" method="get" class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Désignation</label>
+                                <input type="text" name="designation" class="form-control" th:value="${designation}" placeholder="Ex: Boeing 737">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Fabricant</label>
+                                <input type="text" name="fabricant" class="form-control" th:value="${fabricant}" placeholder="Ex: Boeing">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Capacité Min</label>
+                                <input type="number" name="capaciteMin" class="form-control" th:value="${capaciteMin}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Capacité Max</label>
+                                <input type="number" name="capaciteMax" class="form-control" th:value="${capaciteMax}">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="bi bi-search"></i> Filtrer
+                                </button>
+                                <a th:href="@{/modeles-avion}" class="btn btn-secondary">
+                                    <i class="bi bi-x-circle"></i> Réinitialiser
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Désignation</th>
+                                    <th>Fabricant</th>
+                                    <th>Capacité</th>
+                                    <th>Autonomie (km)</th>
+                                    <th>Vitesse (km/h)</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="modele : ${modelAvions}">
+                                    <td th:text="${modele.id}"></td>
+                                    <td><strong th:text="${modele.designation}"></strong></td>
+                                    <td th:text="${modele.fabricant}"></td>
+                                    <td>
+                                        <span class="badge bg-info" th:text="${modele.capacite} + ' passagers'"></span>
+                                    </td>
+                                    <td th:text="${#numbers.formatInteger(modele.autonomieKm, 0, 'COMMA')}"></td>
+                                    <td th:text="${#numbers.formatInteger(modele.vitesseKmH, 0, 'COMMA')}"></td>
+                                    <td>
+                                        <a th:href="@{/modeles-avion/{id}(id=${modele.id})}" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye"></i> Voir
+                                        </a>
+                                        <a th:href="@{/modeles-avion/{id}/edit(id=${modele.id})}" class="btn btn-sm btn-warning">
+                                            <i class="bi bi-pencil"></i> Modifier
+                                        </a>
+                                        <a th:href="@{/modeles-avion/{id}/delete(id=${modele.id})}" 
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Supprimer ce modèle ?')">
+                                            <i class="bi bi-trash"></i> Supprimer
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
