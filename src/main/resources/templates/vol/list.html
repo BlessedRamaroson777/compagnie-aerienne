@@ -81,9 +81,7 @@
                                 <td th:text="${vol.avion.codeAvion}"></td>
                                 <td>
                                     <a th:href="@{/vols/{id}(id=${vol.id})}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
-                                    <a th:href="@{/vols/{id}/edit(id=${vol.id})}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
-                                    <a th:href="@{/vols/{id}/delete(id=${vol.id})}" class="btn btn-sm btn-danger" 
-                                       onclick="return confirm('Supprimer ce vol?')"><i class="bi bi-trash"></i></a>
+                                    <a th:href="@{/vols/{id}/edit(id=${vol.id})}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil"></i></a>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(vols)}">

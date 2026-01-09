@@ -1,22 +1,27 @@
-/* Design moderne et professionnel - Couleurs subtiles */
+/* Design moderne et professionnel - Palette de bleus et blanc */
 :root {
-    --primary-color: #4dabf7;
-    --secondary-color: #495057;
-    --success-color: #51cf66;
-    --warning-color: #ffa94d;
-    --danger-color: #ff6b6b;
-    --info-color: #74c0fc;
-    --dark-bg: #1a1a2e;
-    --light-bg: #f8f9fa;
-    --border-color: #dee2e6;
+    /* Palette de 4 bleus + blanc */
+    --blue-dark: #1e3a5f;      /* Bleu foncé principal */
+    --blue-medium: #2d5f8d;    /* Bleu moyen */
+    --blue-light: #4a90c6;     /* Bleu clair */
+    --blue-pale: #e8f2f9;      /* Bleu très pâle */
+    --white: #ffffff;
+    
+    /* Couleurs fonctionnelles */
+    --text-dark: #1a2332;
+    --text-medium: #495057;
+    --text-light: #6c757d;
+    --border-color: #d4e1ed;
+    --bg-light: #f7f9fc;
 }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #f5f7fa;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
 }
 
-/* Badges modernes avec couleurs subtiles */
+/* Badges modernes - nuances de bleu uniquement */
 .badge {
     font-weight: 500;
     padding: 0.35em 0.75em;
@@ -25,77 +30,116 @@ body {
 }
 
 .badge.bg-primary {
-    background-color: #e7f5ff !important;
-    color: #1971c2 !important;
-    border: 1px solid #a5d8ff;
+    background-color: var(--blue-pale) !important;
+    color: var(--blue-dark) !important;
+    border: 1px solid var(--blue-light);
 }
 
 .badge.bg-success {
-    background-color: #ebfbee !important;
-    color: #2f9e44 !important;
-    border: 1px solid #8ce99a;
+    background-color: #e8f5f0 !important;
+    color: #2d5f4d !important;
+    border: 1px solid #7ec4a8;
 }
 
 .badge.bg-warning {
-    background-color: #fff4e6 !important;
-    color: #e67700 !important;
-    border: 1px solid #ffc078;
+    background-color: #fff8e8 !important;
+    color: #8d6d2d !important;
+    border: 1px solid #d4b77e;
 }
 
 .badge.bg-danger {
-    background-color: #ffe3e3 !important;
-    color: #c92a2a !important;
-    border: 1px solid #ffa8a8;
+    background-color: #fde8e8 !important;
+    color: #8d2d2d !important;
+    border: 1px solid #d47e7e;
 }
 
 .badge.bg-info {
-    background-color: #e7f5ff !important;
-    color: #1864ab !important;
-    border: 1px solid #a5d8ff;
+    background-color: var(--blue-pale) !important;
+    color: var(--blue-medium) !important;
+    border: 1px solid var(--blue-light);
 }
 
 .badge.bg-secondary {
     background-color: #f1f3f5 !important;
-    color: #495057 !important;
-    border: 1px solid #dee2e6;
+    color: var(--text-medium) !important;
+    border: 1px solid var(--border-color);
 }
 
 /* Cards modernes */
 .card {
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(30, 58, 95, 0.08);
     transition: box-shadow 0.3s ease;
+    background-color: var(--white);
 }
 
 .card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(30, 58, 95, 0.12);
 }
 
 .card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
+    background-color: var(--bg-light);
+    border-bottom: 1px solid var(--border-color);
     font-weight: 600;
+    color: var(--text-dark);
 }
 
-/* Boutons modernes */
+/* Boutons modernes - palette bleu uniquement */
 .btn {
     border-radius: 8px;
     font-weight: 500;
     padding: 0.5rem 1rem;
     transition: all 0.2s ease;
+    border: none;
 }
 
 .btn-primary {
-    background-color: #4dabf7;
-    border-color: #4dabf7;
+    background-color: var(--blue-medium);
+    color: var(--white);
 }
 
 .btn-primary:hover {
-    background-color: #339af0;
-    border-color: #339af0;
+    background-color: var(--blue-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(77, 171, 247, 0.3);
+    box-shadow: 0 4px 8px rgba(45, 95, 141, 0.25);
+}
+
+/* Boutons d'action - nuances de bleu subtiles */
+.btn-info {
+    background-color: var(--blue-pale);
+    color: var(--blue-dark);
+    border: 1px solid var(--blue-light);
+}
+
+.btn-info:hover {
+    background-color: var(--blue-light);
+    color: var(--white);
+    border-color: var(--blue-medium);
+}
+
+.btn-warning {
+    background-color: #f8f9fa;
+    color: var(--blue-medium);
+    border: 1px solid var(--border-color);
+}
+
+.btn-warning:hover {
+    background-color: var(--blue-pale);
+    color: var(--blue-dark);
+    border-color: var(--blue-light);
+}
+
+.btn-secondary {
+    background-color: var(--white);
+    color: var(--text-medium);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    border-color: var(--blue-light);
 }
 
 .btn-sm {
@@ -105,14 +149,14 @@ body {
 
 /* Tables modernes */
 .table {
-    background-color: white;
+    background-color: var(--white);
 }
 
 .table thead th {
-    background-color: #f8f9fa;
-    color: #495057;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
     font-weight: 600;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 2px solid var(--border-color);
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.5px;
@@ -123,30 +167,30 @@ body {
 }
 
 .table-hover tbody tr:hover {
-    background-color: #f8f9fa;
+    background-color: var(--blue-pale);
 }
 
 /* Formulaires modernes */
 .form-control, .form-select {
     border-radius: 8px;
-    border: 1px solid #ced4da;
+    border: 1px solid var(--border-color);
     padding: 0.625rem 0.875rem;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-control:focus, .form-select:focus {
-    border-color: #4dabf7;
-    box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.1);
+    border-color: var(--blue-light);
+    box-shadow: 0 0 0 3px rgba(74, 144, 198, 0.15);
 }
 
 .form-label {
     font-weight: 500;
-    color: #495057;
+    color: var(--text-dark);
     margin-bottom: 0.5rem;
     font-size: 0.875rem;
 }
 
-/* Alerts modernes */
+/* Alerts modernes - tons bleus */
 .alert {
     border-radius: 8px;
     border: none;
@@ -154,28 +198,92 @@ body {
 }
 
 .alert-success {
-    background-color: #ebfbee;
-    color: #2f9e44;
+    background-color: #e8f5f0;
+    color: #2d5f4d;
+    border-left: 4px solid #5fa88f;
 }
 
 .alert-danger {
-    background-color: #ffe3e3;
-    color: #c92a2a;
+    background-color: #fde8e8;
+    color: #8d2d2d;
+    border-left: 4px solid #c95f5f;
 }
 
 .alert-info {
-    background-color: #e7f5ff;
-    color: #1864ab;
+    background-color: var(--blue-pale);
+    color: var(--blue-dark);
+    border-left: 4px solid var(--blue-light);
 }
 
 /* Headers */
 .border-bottom {
-    border-bottom: 2px solid #e9ecef !important;
+    border-bottom: 2px solid var(--border-color) !important;
 }
 
 h1.h2 {
-    color: #212529;
+    color: var(--text-dark);
     font-weight: 600;
+}
+
+/* Sidebar moderne */
+.modern-sidebar {
+    background: linear-gradient(180deg, var(--blue-dark) 0%, #152840 100%);
+    min-height: 100vh;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-header h4 {
+    color: var(--white);
+    font-weight: 600;
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.sidebar-nav {
+    padding: 1rem 0;
+}
+
+.sidebar-link {
+    color: rgba(255,255,255,0.85);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-link:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--white);
+    border-left-color: var(--blue-light);
+}
+
+.sidebar-link.active {
+    background: rgba(74, 144, 198, 0.2);
+    color: var(--white);
+    border-left-color: var(--blue-light);
+}
+
+.sidebar-link i {
+    width: 24px;
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.sidebar-section {
+    padding: 0.5rem 1.5rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 600;
+    margin-top: 1rem;
 }
 
 /* Responsive improvements */
@@ -184,3 +292,4 @@ h1.h2 {
         min-height: auto;
     }
 }
+

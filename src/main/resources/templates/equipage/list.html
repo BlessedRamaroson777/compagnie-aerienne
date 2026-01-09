@@ -75,9 +75,7 @@
                                 <td th:text="${equipage.vols.size()}"></td>
                                 <td>
                                     <a th:href="@{/equipages/{id}(id=${equipage.id})}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
-                                    <a th:href="@{/equipages/{id}/edit(id=${equipage.id})}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
-                                    <a th:href="@{/equipages/{id}/delete(id=${equipage.id})}" class="btn btn-sm btn-danger" 
-                                       onclick="return confirm('Supprimer?')"><i class="bi bi-trash"></i></a>
+                                    <a th:href="@{/equipages/{id}/edit(id=${equipage.id})}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil"></i></a>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(equipages)}">

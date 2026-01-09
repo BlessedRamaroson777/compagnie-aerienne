@@ -66,16 +66,11 @@
                                         <strong th:text="${#numbers.formatDecimal(prix.prix, 0, 'COMMA', 2, 'POINT')} + ' €'"></strong>
                                     </td>
                                     <td>
-                                        <a th:href="@{/prix-vol/{id}(id=${prix.id})}" class="btn btn-sm btn-info">
+                                        <a th:href="@{/prix-vols/{id}(id=${prix.id})}" class="btn btn-sm btn-info">
                                             <i class="bi bi-eye"></i> Voir
                                         </a>
-                                        <a th:href="@{/prix-vol/{id}/edit(id=${prix.id})}" class="btn btn-sm btn-warning">
+                                        <a th:href="@{/prix-vols/{id}/edit(id=${prix.id})}" class="btn btn-sm btn-secondary">
                                             <i class="bi bi-pencil"></i> Modifier
-                                        </a>
-                                        <a th:href="@{/prix-vol/{id}/delete(id=${prix.id})}" 
-                                           class="btn btn-sm btn-danger"
-                                           onclick="return confirm('Supprimer ce prix ?')">
-                                            <i class="bi bi-trash"></i> Supprimer
                                         </a>
                                     </td>
                                 </tr>

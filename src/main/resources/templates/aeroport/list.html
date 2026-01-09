@@ -85,13 +85,8 @@
                                         <a th:href="@{/aeroports/{id}(id=${aeroport.id})}" class="btn btn-sm btn-info">
                                             <i class="bi bi-eye"></i> Voir
                                         </a>
-                                        <a th:href="@{/aeroports/{id}/edit(id=${aeroport.id})}" class="btn btn-sm btn-warning">
+                                        <a th:href="@{/aeroports/{id}/edit(id=${aeroport.id})}" class="btn btn-sm btn-secondary">
                                             <i class="bi bi-pencil"></i> Modifier
-                                        </a>
-                                        <a th:href="@{/aeroports/{id}/delete(id=${aeroport.id})}" 
-                                           class="btn btn-sm btn-danger"
-                                           onclick="return confirm('Supprimer cet aéroport ?')">
-                                            <i class="bi bi-trash"></i> Supprimer
                                         </a>
                                     </td>
                                 </tr>

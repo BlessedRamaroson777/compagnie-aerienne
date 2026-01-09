@@ -93,10 +93,8 @@
                                     <a th:href="@{/reservations/{id}(id=${reservation.id})}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
                                     <a th:if="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE}" 
                                        th:href="@{/reservations/{id}/annuler(id=${reservation.id})}" 
-                                       class="btn btn-sm btn-warning" 
+                                       class="btn btn-sm btn-secondary" 
                                        onclick="return confirm('Annuler cette réservation?')"><i class="bi bi-x-circle"></i> Annuler</a>
-                                    <a th:href="@{/reservations/{id}/delete(id=${reservation.id})}" class="btn btn-sm btn-danger" 
-                                       onclick="return confirm('Supprimer?')"><i class="bi bi-trash"></i></a>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(reservations)}">
