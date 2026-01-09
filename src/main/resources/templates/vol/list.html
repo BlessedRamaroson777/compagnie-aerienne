@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Vols</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 d-md-block bg-dark sidebar" style="min-height: 100vh;">
+                <div class="pt-3">
+                    <h4 class="text-white text-center mb-4">Airline System</h4>
+                    <ul class="nav flex-column">
+                        <li class="nav-item"><a class="nav-link text-white" th:href="@{/}"><i class="bi bi-house-door"></i> Accueil</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" th:href="@{/avions}"><i class="bi bi-airplane"></i> Avions</a></li>
+                        <li class="nav-item"><a class="nav-link text-white bg-primary" th:href="@{/vols}"><i class="bi bi-airplane-engines"></i> Vols</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" th:href="@{/clients}"><i class="bi bi-people"></i> Clients</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" th:href="@{/reservations}"><i class="bi bi-calendar-check"></i> Réservations</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" th:href="@{/equipages}"><i class="bi bi-person-badge"></i> Équipage</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="bi bi-airplane-engines"></i> Gestion des Vols</h1>
+                    <a th:href="@{/vols/new}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Nouveau Vol</a>
+                </div>
+
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Filtres</h5>
+                        <form th:action="@{/vols}" method="get" class="row g-3">
+                            <div class="col-md-2">
+                                <label class="form-label">Numéro Vol</label>
+                                <input type="text" name="numeroVol" class="form-control" th:value="${numeroVol}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Départ</label>
+                                <input type="text" name="depart" class="form-control" th:value="${depart}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Arrivée</label>
+                                <input type="text" name="arrivee" class="form-control" th:value="${arrivee}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Prix Min</label>
+                                <input type="number" step="0.01" name="prixMin" class="form-control" th:value="${prixMin}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Prix Max</label>
+                                <input type="number" step="0.01" name="prixMax" class="form-control" th:value="${prixMax}">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Filtrer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Numéro</th>
+                                <th>Départ</th>
+                                <th>Arrivée</th>
+                                <th>Date Départ</th>
+                                <th>Prix Base</th>
+                                <th>Avion</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="vol : ${vols}">
+                                <td th:text="${vol.numeroVol}"></td>
+                                <td th:text="${vol.depart}"></td>
+                                <td th:text="${vol.arrivee}"></td>
+                                <td th:text="${#temporals.format(vol.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${vol.prixBase} + ' €'"></td>
+                                <td th:text="${vol.avion.codeAvion}"></td>
+                                <td>
+                                    <a th:href="@{/vols/{id}(id=${vol.id})}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    <a th:href="@{/vols/{id}/edit(id=${vol.id})}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                    <a th:href="@{/vols/{id}/delete(id=${vol.id})}" class="btn btn-sm btn-danger" 
+                                       onclick="return confirm('Supprimer ce vol?')"><i class="bi bi-trash"></i></a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(vols)}">
+                                <td colspan="7" class="text-center">Aucun vol trouvé</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

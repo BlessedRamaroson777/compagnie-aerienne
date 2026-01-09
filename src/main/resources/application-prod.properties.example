@@ -1,0 +1,110 @@
+# Configuration de Production
+# Renommer ce fichier en application-prod.properties et personnaliser les valeurs
+
+# ==============================================
+# DATABASE CONFIGURATION
+# ==============================================
+spring.datasource.url=jdbc:postgresql://localhost:5432/airline_db
+spring.datasource.username=postgres
+spring.datasource.password=CHANGE_THIS_PASSWORD
+
+# Pool de connexions (HikariCP)
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.connection-timeout=30000
+spring.datasource.hikari.idle-timeout=600000
+spring.datasource.hikari.max-lifetime=1800000
+
+# ==============================================
+# JPA / HIBERNATE CONFIGURATION
+# ==============================================
+# IMPORTANT: Utiliser 'validate' en production pour éviter les modifications de schéma
+spring.jpa.hibernate.ddl-auto=validate
+
+# Désactiver l'affichage des requêtes SQL en production
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=false
+
+# Optimisations
+spring.jpa.properties.hibernate.jdbc.batch_size=20
+spring.jpa.properties.hibernate.order_inserts=true
+spring.jpa.properties.hibernate.order_updates=true
+spring.jpa.properties.hibernate.jdbc.batch_versioned_data=true
+
+# Dialecte PostgreSQL
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+# ==============================================
+# THYMELEAF CONFIGURATION
+# ==============================================
+# Activer le cache en production
+spring.thymeleaf.cache=true
+
+# ==============================================
+# SERVER CONFIGURATION
+# ==============================================
+server.port=8080
+server.compression.enabled=true
+server.compression.mime-types=text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+
+# Session timeout (30 minutes)
+server.servlet.session.timeout=30m
+
+# ==============================================
+# LOGGING CONFIGURATION
+# ==============================================
+# Niveau de log général
+logging.level.root=WARN
+
+# Niveau de log pour l'application
+logging.level.com.airline.airline_app=INFO
+
+# Niveau de log pour Spring
+logging.level.org.springframework.web=INFO
+logging.level.org.springframework.security=INFO
+
+# Fichier de log
+logging.file.name=logs/airline-app.log
+logging.file.max-size=10MB
+logging.file.max-history=10
+
+# Pattern de log
+logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+logging.pattern.file=%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+
+# ==============================================
+# ACTUATOR CONFIGURATION (si activé)
+# ==============================================
+# management.endpoints.web.exposure.include=health,info,metrics
+# management.endpoint.health.show-details=when-authorized
+# management.metrics.export.prometheus.enabled=true
+
+# ==============================================
+# SECURITY CONFIGURATION (si Spring Security est ajouté)
+# ==============================================
+# spring.security.user.name=admin
+# spring.security.user.password=CHANGE_THIS_PASSWORD
+
+# ==============================================
+# ERROR HANDLING
+# ==============================================
+server.error.include-message=always
+server.error.include-binding-errors=always
+server.error.include-stacktrace=never
+server.error.include-exception=false
+
+# ==============================================
+# INTERNATIONALIZATION
+# ==============================================
+spring.messages.basename=messages
+spring.messages.encoding=UTF-8
+
+# ==============================================
+# MAIL CONFIGURATION (pour les notifications)
+# ==============================================
+# spring.mail.host=smtp.gmail.com
+# spring.mail.port=587
+# spring.mail.username=your-email@gmail.com
+# spring.mail.password=your-app-password
+# spring.mail.properties.mail.smtp.auth=true
+# spring.mail.properties.mail.smtp.starttls.enable=true

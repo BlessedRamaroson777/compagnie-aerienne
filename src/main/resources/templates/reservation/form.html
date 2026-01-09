@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${reservation.id != null ? 'Modifier Réservation' : 'Nouvelle Réservation'}">Formulaire Réservation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 th:text="${reservation.id != null ? 'Modifier Réservation' : 'Nouvelle Réservation'}">Formulaire Réservation</h3>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/reservations}" th:object="${reservation}" method="post">
+                            <input type="hidden" th:field="*{id}">
+                            
+                            <div class="mb-3">
+                                <label for="clientId" class="form-label">Client *</label>
+                                <select class="form-select" id="clientId" name="clientId" required>
+                                    <option value="">Sélectionnez un client</option>
+                                    <option th:each="client : ${clients}" 
+                                            th:value="${client.id}"
+                                            th:text="${client.nom + ' ' + client.prenom + ' (' + client.email + ')'}"
+                                            th:selected="${reservation.client != null && reservation.client.id == client.id}"></option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="volId" class="form-label">Vol *</label>
+                                <select class="form-select" id="volId" name="volId" required>
+                                    <option value="">Sélectionnez un vol</option>
+                                    <option th:each="vol : ${vols}" 
+                                            th:value="${vol.id}"
+                                            th:text="${vol.numeroVol + ' - ' + vol.depart + ' → ' + vol.arrivee + ' (' + #temporals.format(vol.dateHeureDepart, 'dd/MM/yyyy') + ')'}"
+                                            th:selected="${reservation.vol != null && reservation.vol.id == vol.id}"></option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="statut" class="form-label">Statut *</label>
+                                <select class="form-select" id="statut" th:field="*{statut}" required>
+                                    <option th:each="s : ${statuts}" 
+                                            th:value="${s}"
+                                            th:text="${s}"></option>
+                                </select>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/reservations}" class="btn btn-secondary">Retour</a>
+                                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

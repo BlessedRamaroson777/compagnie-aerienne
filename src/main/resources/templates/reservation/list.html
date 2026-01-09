@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Réservations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 d-md-block bg-dark sidebar" style="min-height: 100vh;">
+                <div class="pt-3">
+                    <h4 class="text-white text-center mb-4">Airline System</h4>
+                    <ul class="nav flex-column">
+                        <li class="nav-item"><a class="nav-link text-white" th:href="@{/}"><i class="bi bi-house-door"></i> Accueil</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" th:href="@{/avions}"><i class="bi bi-airplane"></i> Avions</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" th:href="@{/vols}"><i class="bi bi-airplane-engines"></i> Vols</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" th:href="@{/clients}"><i class="bi bi-people"></i> Clients</a></li>
+                        <li class="nav-item"><a class="nav-link text-white bg-primary" th:href="@{/reservations}"><i class="bi bi-calendar-check"></i> Réservations</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" th:href="@{/equipages}"><i class="bi bi-person-badge"></i> Équipage</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="bi bi-calendar-check"></i> Gestion des Réservations</h1>
+                    <a th:href="@{/reservations/new}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Nouvelle Réservation</a>
+                </div>
+
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Filtres</h5>
+                        <form th:action="@{/reservations}" method="get" class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Client</label>
+                                <select name="clientId" class="form-select">
+                                    <option value="">Tous</option>
+                                    <option th:each="client : ${clients}" 
+                                            th:value="${client.id}"
+                                            th:text="${client.nom + ' ' + client.prenom}"
+                                            th:selected="${clientId != null && clientId == client.id}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Vol</label>
+                                <select name="volId" class="form-select">
+                                    <option value="">Tous</option>
+                                    <option th:each="vol : ${vols}" 
+                                            th:value="${vol.id}"
+                                            th:text="${vol.numeroVol}"
+                                            th:selected="${volId != null && volId == vol.id}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Statut</label>
+                                <select name="statut" class="form-select">
+                                    <option value="">Tous</option>
+                                    <option th:each="s : ${statuts}" 
+                                            th:value="${s}"
+                                            th:text="${s}"
+                                            th:selected="${statut != null && statut == s}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Filtrer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Client</th>
+                                <th>Vol</th>
+                                <th>Date Réservation</th>
+                                <th>Statut</th>
+                                <th>Billets</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="reservation : ${reservations}">
+                                <td th:text="${reservation.id}"></td>
+                                <td th:text="${reservation.client.nom + ' ' + reservation.client.prenom}"></td>
+                                <td th:text="${reservation.vol.numeroVol + ' (' + reservation.vol.depart + ' → ' + reservation.vol.arrivee + ')'}"></td>
+                                <td th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE ? 'bg-success' : 'bg-danger'}"
+                                          th:text="${reservation.statut}"></span>
+                                </td>
+                                <td th:text="${reservation.billets.size()}"></td>
+                                <td>
+                                    <a th:href="@{/reservations/{id}(id=${reservation.id})}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    <a th:if="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE}" 
+                                       th:href="@{/reservations/{id}/annuler(id=${reservation.id})}" 
+                                       class="btn btn-sm btn-warning" 
+                                       onclick="return confirm('Annuler cette réservation?')"><i class="bi bi-x-circle"></i> Annuler</a>
+                                    <a th:href="@{/reservations/{id}/delete(id=${reservation.id})}" class="btn btn-sm btn-danger" 
+                                       onclick="return confirm('Supprimer?')"><i class="bi bi-trash"></i></a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(reservations)}">
+                                <td colspan="7" class="text-center">Aucune réservation trouvée</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
