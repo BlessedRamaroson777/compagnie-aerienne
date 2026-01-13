@@ -72,8 +72,10 @@
                                 <th>Client</th>
                                 <th>Vol</th>
                                 <th>Date Réservation</th>
+                                <th>Classe</th>
+                                <th>Places</th>
+                                <th>Prix Total</th>
                                 <th>Statut</th>
-                                <th>Billets</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -81,24 +83,33 @@
                             <tr th:each="reservation : ${reservations}">
                                 <td th:text="${reservation.id}"></td>
                                 <td th:text="${reservation.client.nom + ' ' + reservation.client.prenom}"></td>
-                                <td th:text="${reservation.vol.numeroVol + ' (' + reservation.vol.depart + ' → ' + reservation.vol.arrivee + ')'}"></td>
+                                <td th:text="${reservation.vol.numeroVol + ' (' + reservation.vol.aeroportDepart.codeAeroport + ' → ' + reservation.vol.aeroportArrivee.codeAeroport + ')'}"></td>
                                 <td th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy HH:mm')}"></td>
                                 <td>
+                                    <span class="badge bg-info" th:text="${reservation.classeSiege?.libelle}">-</span>
+                                </td>
+                                <td th:text="${reservation.nombrePlaces}">1</td>
+                                <td th:text="${reservation.prixTotal != null ? #numbers.formatDecimal(reservation.prixTotal, 0, 'COMMA', 0, 'POINT') + ' Ar' : '-'}">0 Ar</td>
+                                <td>
                                     <span class="badge" 
-                                          th:classappend="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE ? 'bg-success' : 'bg-danger'}"
+                                          th:classappend="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE ? 'bg-success' : 
+                                                           (reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).EN_ATTENTE ? 'bg-warning text-dark' : 'bg-danger')}"
                                           th:text="${reservation.statut}"></span>
                                 </td>
-                                <td th:text="${reservation.billets.size()}"></td>
                                 <td>
                                     <a th:href="@{/reservations/{id}(id=${reservation.id})}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
-                                    <a th:if="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE}" 
+                                    <a th:if="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).EN_ATTENTE}" 
+                                       th:href="@{/reservations/paiement/{id}(id=${reservation.id})}" 
+                                       class="btn btn-sm btn-success" 
+                                       title="Payer"><i class="bi bi-credit-card"></i></a>
+                                    <a th:if="${reservation.statut != T(com.airline.airline_app.entity.enums.StatutReservation).ANNULEE}" 
                                        th:href="@{/reservations/{id}/annuler(id=${reservation.id})}" 
                                        class="btn btn-sm btn-secondary" 
-                                       onclick="return confirm('Annuler cette réservation?')"><i class="bi bi-x-circle"></i> Annuler</a>
+                                       onclick="return confirm('Annuler cette réservation?')"><i class="bi bi-x-circle"></i></a>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(reservations)}">
-                                <td colspan="7" class="text-center">Aucune réservation trouvée</td>
+                                <td colspan="9" class="text-center">Aucune réservation trouvée</td>
                             </tr>
                         </tbody>
                     </table>

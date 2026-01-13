@@ -25,14 +25,31 @@
                             </div>
                             
                             <div class="mb-3">
-                                <label for="modele" class="form-label">Modèle *</label>
-                                <input type="text" class="form-control" id="modele" th:field="*{modele}" required>
+                                <label for="modelAvion" class="form-label">Modèle d'Avion *</label>
+                                <select class="form-select" id="modelAvion" th:field="*{modelAvion}" required>
+                                    <option value="">-- Sélectionner un modèle --</option>
+                                    <option th:each="modele : ${modeles}" 
+                                            th:value="${modele.id}" 
+                                            th:text="${modele.designation + ' - ' + modele.fabricant}">
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="etatAvion" class="form-label">État de l'Avion *</label>
+                                <select class="form-select" id="etatAvion" th:field="*{etatAvion}" required>
+                                    <option value="">-- Sélectionner un état --</option>
+                                    <option th:each="etat : ${etats}" 
+                                            th:value="${etat.id}" 
+                                            th:text="${etat.libelle}">
+                                    </option>
+                                </select>
                             </div>
                             
                             <div class="mb-3">
                                 <label for="capaciteTotale" class="form-label">Capacité Totale *</label>
                                 <input type="number" class="form-control" id="capaciteTotale" th:field="*{capaciteTotale}" required min="1">
-                                <div class="form-text">Les sièges seront générés automatiquement (70% Economy, 30% Business)</div>
+                                <div class="form-text">Nombre total de sièges dans l'avion</div>
                             </div>
                             
                             <div class="d-flex justify-content-between">

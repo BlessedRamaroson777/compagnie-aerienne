@@ -25,12 +25,24 @@
                             
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="depart" class="form-label">Départ *</label>
-                                    <input type="text" class="form-control" id="depart" th:field="*{depart}" required>
+                                    <label for="aeroportDepart" class="form-label">Aéroport de Départ *</label>
+                                    <select class="form-select" id="aeroportDepart" th:field="*{aeroportDepart}" required>
+                                        <option value="">-- Sélectionner --</option>
+                                        <option th:each="aeroport : ${aeroports}" 
+                                                th:value="${aeroport.id}"
+                                                th:text="${aeroport.codeAeroport + ' - ' + aeroport.nom + ' (' + aeroport.ville + ')'}">
+                                        </option>
+                                    </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="arrivee" class="form-label">Arrivée *</label>
-                                    <input type="text" class="form-control" id="arrivee" th:field="*{arrivee}" required>
+                                    <label for="aeroportArrivee" class="form-label">Aéroport d'Arrivée *</label>
+                                    <select class="form-select" id="aeroportArrivee" th:field="*{aeroportArrivee}" required>
+                                        <option value="">-- Sélectionner --</option>
+                                        <option th:each="aeroport : ${aeroports}" 
+                                                th:value="${aeroport.id}"
+                                                th:text="${aeroport.codeAeroport + ' - ' + aeroport.nom + ' (' + aeroport.ville + ')'}">
+                                        </option>
+                                    </select>
                                 </div>
                             </div>
                             
@@ -45,22 +57,15 @@
                                 </div>
                             </div>
                             
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="prixBase" class="form-label">Prix de Base (€) *</label>
-                                    <input type="number" step="0.01" class="form-control" id="prixBase" th:field="*{prixBase}" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="avionId" class="form-label">Avion *</label>
-                                    <select class="form-select" id="avionId" name="avionId" required>
-                                        <option value="">Sélectionnez un avion</option>
-                                        <option th:each="avion : ${avions}" 
-                                                th:value="${avion.id}"
-                                                th:text="${avion.codeAvion + ' - ' + avion.modele}"
-                                                th:selected="${vol.avion != null && vol.avion.id == avion.id}"></option>
-                                    </select>
-                                    <div class="form-text">Les sièges seront générés automatiquement</div>
-                                </div>
+                            <div class="mb-3">
+                                <label for="avion" class="form-label">Avion *</label>
+                                <select class="form-select" id="avion" th:field="*{avion}" required>
+                                    <option value="">-- Sélectionner un avion --</option>
+                                    <option th:each="avion : ${avions}" 
+                                            th:value="${avion.id}"
+                                            th:text="${avion.codeAvion + ' - Capacité: ' + avion.capaciteTotale + ' places'}">
+                                    </option>
+                                </select>
                             </div>
                             
                             <div class="d-flex justify-content-between">

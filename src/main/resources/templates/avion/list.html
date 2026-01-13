@@ -78,7 +78,7 @@
                             <tr th:each="avion : ${avions}">
                                 <td th:text="${avion.id}"></td>
                                 <td th:text="${avion.codeAvion}"></td>
-                                <td th:text="${avion.modele}"></td>
+                                <td th:text="${avion.modelAvion.designation}"></td>
                                 <td th:text="${avion.capaciteTotale}"></td>
                                 <td th:text="${avion.sieges.size()}"></td>
                                 <td>

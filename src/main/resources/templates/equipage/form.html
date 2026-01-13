@@ -30,10 +30,10 @@
                             <div class="mb-3">
                                 <label for="role" class="form-label">Rôle *</label>
                                 <select class="form-select" id="role" th:field="*{role}" required>
-                                    <option value="">Sélectionnez un rôle</option>
+                                    <option value="">-- Sélectionnez un rôle --</option>
                                     <option th:each="r : ${roles}" 
-                                            th:value="${r}"
-                                            th:text="${r}"></option>
+                                            th:value="${r.id}"
+                                            th:text="${r.libelle}"></option>
                                 </select>
                             </div>
                             

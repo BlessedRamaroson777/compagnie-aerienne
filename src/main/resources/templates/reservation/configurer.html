@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurer la Réservation - Airline App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #2563eb;
+            --dark-blue: #1e40af;
+            --light-blue: #dbeafe;
+            --lighter-blue: #eff6ff;
+        }
+        body { background-color: #f8fafc; }
+        .navbar { background: white !important; }
+        .navbar-brand, .nav-link { color: var(--dark-blue) !important; }
+        .config-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);
+            padding: 30px;
+        }
+        .flight-summary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+        }
+        .class-option {
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--lighter-blue);
+        }
+        .class-option:hover {
+            border-color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+        .class-option.selected {
+            border-color: var(--primary-blue);
+            background: var(--light-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        .class-option input[type="radio"] {
+            display: none;
+        }
+        .price-tag {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+        .total-price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #16a34a;
+        }
+        .btn-book {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn-book:hover {
+            background: linear-gradient(135deg, #15803d, #166534);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(22, 163, 74, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/"><i class="bi bi-airplane-fill me-2"></i>Airline App</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/reservations/new"><i class="bi bi-arrow-left me-1"></i>Nouvelle recherche</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <!-- Résumé du vol -->
+        <div class="flight-summary mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <h6 class="mb-1 opacity-75">Vol</h6>
+                    <h4 th:text="${volProgramme.vol.numeroVol}">AF123</h4>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="mb-1 opacity-75">Départ</h6>
+                    <h5 th:text="${volProgramme.vol.aeroportDepart?.ville}">Paris</h5>
+                    <small th:text="${#temporals.format(volProgramme.dateHeureDepart, 'dd/MM/yyyy HH:mm')}">01/01/2024 08:00</small>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="mb-1 opacity-75">Arrivée</h6>
+                    <h5 th:text="${volProgramme.vol.aeroportArrivee?.ville}">New York</h5>
+                    <small th:text="${#temporals.format(volProgramme.dateHeureArrivee, 'dd/MM/yyyy HH:mm')}">01/01/2024 15:00</small>
+                </div>
+                <div class="col-md-3 text-end">
+                    <h6 class="mb-1 opacity-75">Avion</h6>
+                    <h5 th:text="${volProgramme.avion?.modelAvion?.designation}">Boeing 777</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Formulaire de configuration -->
+            <div class="col-lg-8">
+                <form th:action="@{/reservations/confirmer}" method="post" id="reservationForm">
+                    <input type="hidden" name="volProgrammeId" th:value="${volProgramme.id}">
+                    
+                    <!-- Sélection du client -->
+                    <div class="config-card mb-4">
+                        <h5 class="mb-3" style="color: var(--primary-blue);"><i class="bi bi-person-fill me-2"></i>Passager</h5>
+                        <select name="clientId" class="form-select form-select-lg" required id="clientSelect">
+                            <option value="">Sélectionner un passager</option>
+                            <option th:each="client : ${clients}" 
+                                    th:value="${client.id}"
+                                    th:text="${client.prenom + ' ' + client.nom + ' (' + client.email + ')'}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Sélection de la classe -->
+                    <div class="config-card mb-4">
+                        <h5 class="mb-3" style="color: var(--primary-blue);"><i class="bi bi-star-fill me-2"></i>Classe de voyage</h5>
+                        
+                        <div th:if="${#lists.isEmpty(prixVols)}" class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Aucun prix défini pour ce vol. Veuillez contacter l'administrateur.
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div th:each="prixVol, stat : ${prixVols}" class="col-md-6">
+                                <label class="class-option w-100" th:classappend="${stat.first ? 'selected' : ''}">
+                                    <input type="radio" name="classeSiegeId" 
+                                           th:value="${prixVol.classeSiege.id}" 
+                                           th:checked="${stat.first}"
+                                           th:data-prix="${prixVol.prix}"
+                                           onclick="updateTotal()">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1 fw-bold" th:text="${prixVol.classeSiege.libelle}">ECONOMY</h6>
+                                            <small class="text-muted" th:text="${prixVol.classeSiege.description}">Classe économique</small>
+                                        </div>
+                                        <div class="price-tag" th:text="${#numbers.formatDecimal(prixVol.prix, 0, 'COMMA', 0, 'POINT')} + ' Ar'">150000 Ar</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nombre de places -->
+                    <div class="config-card mb-4">
+                        <h5 class="mb-3" style="color: var(--primary-blue);"><i class="bi bi-people-fill me-2"></i>Nombre de places</h5>
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <input type="number" name="nombrePlaces" id="nombrePlaces" 
+                                       class="form-control form-control-lg" 
+                                       value="1" min="1" max="10" required
+                                       onchange="updateTotal()">
+                            </div>
+                            <div class="col-md-6 text-muted">
+                                <i class="bi bi-info-circle me-1"></i>Maximum 10 places par réservation
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Récapitulatif -->
+            <div class="col-lg-4">
+                <div class="config-card sticky-top" style="top: 20px;">
+                    <h5 class="mb-4" style="color: var(--primary-blue);"><i class="bi bi-receipt me-2"></i>Récapitulatif</h5>
+                    
+                    <div class="mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Prix unitaire</span>
+                            <span id="prixUnitaire" class="fw-bold">0 Ar</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Nombre de places</span>
+                            <span id="displayNombrePlaces" class="fw-bold">1</span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fw-bold fs-5">Total</span>
+                        <span class="total-price" id="totalPrice">0 Ar</span>
+                    </div>
+                    
+                    <button type="submit" form="reservationForm" class="btn btn-success btn-book w-100">
+                        <i class="bi bi-check-circle me-2"></i>Réserver maintenant
+                    </button>
+                    
+                    <div class="text-center mt-3 small text-muted">
+                        <i class="bi bi-shield-check me-1"></i>Paiement sécurisé
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateTotal() {
+            const selectedClass = document.querySelector('input[name="classeSiegeId"]:checked');
+            const nombrePlaces = parseInt(document.getElementById('nombrePlaces').value) || 1;
+            
+            if (selectedClass) {
+                const prixUnitaire = parseFloat(selectedClass.dataset.prix) || 0;
+                const total = prixUnitaire * nombrePlaces;
+                
+                document.getElementById('prixUnitaire').textContent = formatNumber(prixUnitaire) + ' Ar';
+                document.getElementById('displayNombrePlaces').textContent = nombrePlaces;
+                document.getElementById('totalPrice').textContent = formatNumber(total) + ' Ar';
+                
+                // Update selected class styling
+                document.querySelectorAll('.class-option').forEach(opt => opt.classList.remove('selected'));
+                selectedClass.closest('.class-option').classList.add('selected');
+            }
+        }
+        
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTotal();
+        });
+    </script>
+</body>
+</html>

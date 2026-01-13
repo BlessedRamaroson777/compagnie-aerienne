@@ -20,11 +20,11 @@
                             <dt class="col-sm-4">Numéro:</dt>
                             <dd class="col-sm-8" th:text="${vol.numeroVol}"></dd>
                             
-                            <dt class="col-sm-4">Départ:</dt>
-                            <dd class="col-sm-8" th:text="${vol.depart}"></dd>
+                            <dt class="col-sm-4">Aéroport Départ:</dt>
+                            <dd class="col-sm-8" th:text="${vol.aeroportDepart.codeAeroport + ' - ' + vol.aeroportDepart.nom + ' (' + vol.aeroportDepart.ville + ')'}"></dd>
                             
-                            <dt class="col-sm-4">Arrivée:</dt>
-                            <dd class="col-sm-8" th:text="${vol.arrivee}"></dd>
+                            <dt class="col-sm-4">Aéroport Arrivée:</dt>
+                            <dd class="col-sm-8" th:text="${vol.aeroportArrivee.codeAeroport + ' - ' + vol.aeroportArrivee.nom + ' (' + vol.aeroportArrivee.ville + ')'}"></dd>
                             
                             <dt class="col-sm-4">Date Départ:</dt>
                             <dd class="col-sm-8" th:text="${#temporals.format(vol.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></dd>

@@ -2,97 +2,80 @@
 -- 1) TYPES ENUM
 -- =====================================================
 
-CREATE TYPE statut_reservation_enum AS ENUM ('EN_ATTENTE', 'CONFIRMEE', 'ANNULEA','REMBOURSEE');
-CREATE TYPE statut_billet_enum AS ENUM ('EMIS', 'ANNULE','UTILISE','REMBOURSE');
+CREATE TYPE statut_reservation_enum AS ENUM ('EN_ATTENTE', 'CONFIRMEE', 'ANNULEE', 'REMBOURSEE');
+CREATE TYPE statut_billet_enum AS ENUM ('EMIS', 'ANNULE', 'UTILISE', 'REMBOURSE');
 CREATE TYPE statut_paiement_enum AS ENUM ('EN_ATTENTE', 'VALIDE', 'REFUSE');
 CREATE TYPE status_vol_enum AS ENUM ('PLANIFIE', 'DECOLLE', 'EN_VOL', 'ATTERRI', 'ANNULE', 'RETARDE');
 
 -- =====================================================
--- 2) TABLE CLASSE_SIEGE
+-- 2) CLASSE_SIEGE
 -- =====================================================
 
 CREATE TABLE classe_siege (
     id SERIAL PRIMARY KEY,
-    libelle VARCHAR(50) NOT NULL UNIQUE,
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    libelle VARCHAR(50) UNIQUE NOT NULL,
+    description TEXT
 );
 
 -- =====================================================
--- 3) TABLE ROLE_EQUIPAGE
+-- 3) ROLE_EQUIPAGE
 -- =====================================================
 
 CREATE TABLE role_equipage (
     id SERIAL PRIMARY KEY,
-    libelle VARCHAR(50) NOT NULL UNIQUE,
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    libelle VARCHAR(50) UNIQUE NOT NULL
 );
 
 -- =====================================================
--- 4) TABLE MODEL_AVION
+-- 4) MODEL_AVION
 -- =====================================================
 
 CREATE TABLE model_avion (
     id SERIAL PRIMARY KEY,
-    designation VARCHAR(100) NOT NULL UNIQUE,
+    designation VARCHAR(100) UNIQUE NOT NULL,
     fabricant VARCHAR(100) NOT NULL,
-    capacite INT NOT NULL CHECK (capacite > 0),
-    autonomie_km INT,
-    vitesse_km_h INT,
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    capacite INT NOT NULL CHECK (capacite > 0)
 );
 
 -- =====================================================
--- 5) TABLE ETAT_AVION
+-- 5) ETAT_AVION
 -- =====================================================
 
 CREATE TABLE etat_avion (
     id SERIAL PRIMARY KEY,
-    libelle VARCHAR(50) NOT NULL UNIQUE,
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    libelle VARCHAR(50) UNIQUE NOT NULL
 );
 
 -- =====================================================
--- 6) TABLE AVION
+-- 6) AVION
 -- =====================================================
 
 CREATE TABLE avion (
     id SERIAL PRIMARY KEY,
-    code_avion VARCHAR(50) NOT NULL UNIQUE,
+    code_avion VARCHAR(50) UNIQUE NOT NULL,
     model_avion_id INT NOT NULL,
     etat_avion_id INT NOT NULL,
-    capacite_totale INT NOT NULL CHECK (capacite_totale > 0),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (model_avion_id) REFERENCES model_avion(id) ON DELETE RESTRICT,
-    FOREIGN KEY (etat_avion_id) REFERENCES etat_avion(id) ON DELETE RESTRICT
+    capacite_totale INT NOT NULL,
+    FOREIGN KEY (model_avion_id) REFERENCES model_avion(id),
+    FOREIGN KEY (etat_avion_id) REFERENCES etat_avion(id)
 );
 
 -- =====================================================
--- 7) TABLE SIEGE
+-- 7) SIEGE
 -- =====================================================
 
 CREATE TABLE siege (
     id SERIAL PRIMARY KEY,
     numero_siege VARCHAR(10) NOT NULL,
-    classe_siege_id INT NOT NULL,
     avion_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (classe_siege_id) REFERENCES classe_siege(id) ON DELETE RESTRICT,
+    classe_siege_id INT NOT NULL,
     FOREIGN KEY (avion_id) REFERENCES avion(id) ON DELETE CASCADE,
+    FOREIGN KEY (classe_siege_id) REFERENCES classe_siege(id),
     UNIQUE (avion_id, numero_siege)
 );
 
 -- =====================================================
--- 😎 TABLE EQUIPAGE
+-- 8) EQUIPAGE
 -- =====================================================
 
 CREATE TABLE equipage (
@@ -100,183 +83,172 @@ CREATE TABLE equipage (
     nom VARCHAR(100) NOT NULL,
     prenom VARCHAR(100) NOT NULL,
     role_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (role_id) REFERENCES role_equipage(id) ON DELETE RESTRICT
+    FOREIGN KEY (role_id) REFERENCES role_equipage(id)
 );
 
 -- =====================================================
--- 9) TABLE AEROPORT
+-- 9) AEROPORT
 -- =====================================================
 
 CREATE TABLE aeroport (
     id SERIAL PRIMARY KEY,
-    code_aeroport VARCHAR(10) NOT NULL UNIQUE,
+    code_aeroport VARCHAR(10) UNIQUE NOT NULL,
     nom VARCHAR(150) NOT NULL,
     ville VARCHAR(100) NOT NULL,
-    pays VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    pays VARCHAR(100) NOT NULL
 );
 
 -- =====================================================
--- 10) TABLE VOL
+-- 10) VOL (TRAJET)
 -- =====================================================
 
 CREATE TABLE vol (
     id SERIAL PRIMARY KEY,
-    numero_vol VARCHAR(50) NOT NULL UNIQUE,
+    numero_vol VARCHAR(50) NOT NULL,
     aeroport_depart_id INT NOT NULL,
     aeroport_arrivee_id INT NOT NULL,
-    date_heure_depart TIMESTAMP NOT NULL,
-    date_heure_arrivee TIMESTAMP NOT NULL,
-    avion_id INT NOT NULL,
-    status status_vol_enum DEFAULT 'PLANIFIE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (aeroport_depart_id) REFERENCES aeroport(id) ON DELETE RESTRICT,
-    FOREIGN KEY (aeroport_arrivee_id) REFERENCES aeroport(id) ON DELETE RESTRICT,
-    FOREIGN KEY (avion_id) REFERENCES avion(id) ON DELETE RESTRICT,
-    CHECK (date_heure_depart < date_heure_arrivee),
-    CHECK (aeroport_depart_id != aeroport_arrivee_id)
+    FOREIGN KEY (aeroport_depart_id) REFERENCES aeroport(id),
+    FOREIGN KEY (aeroport_arrivee_id) REFERENCES aeroport(id),
+    CHECK (aeroport_depart_id <> aeroport_arrivee_id),
+    UNIQUE (numero_vol, aeroport_depart_id, aeroport_arrivee_id)
 );
 
 -- =====================================================
--- 11) TABLE PRIX_VOL
+-- 11) VOL_PROGRAMME (DATE + HEURE + AVION)
+-- =====================================================
+
+CREATE TABLE vol_programme (
+    id SERIAL PRIMARY KEY,
+    vol_id INT NOT NULL,
+    avion_id INT NOT NULL,
+    date_heure_depart TIMESTAMP NOT NULL,
+    date_heure_arrivee TIMESTAMP NOT NULL,
+    status status_vol_enum DEFAULT 'PLANIFIE',
+    FOREIGN KEY (vol_id) REFERENCES vol(id) ON DELETE CASCADE,
+    FOREIGN KEY (avion_id) REFERENCES avion(id),
+    CHECK (date_heure_depart < date_heure_arrivee)
+);
+
+-- =====================================================
+-- 12) PRIX_VOL
 -- =====================================================
 
 CREATE TABLE prix_vol (
     id SERIAL PRIMARY KEY,
-    vol_id INT NOT NULL,
+    vol_programme_id INT NOT NULL,
     classe_siege_id INT NOT NULL,
-    prix DECIMAL(10, 2) NOT NULL CHECK (prix >= 0),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vol_id) REFERENCES vol(id) ON DELETE CASCADE,
-    FOREIGN KEY (classe_siege_id) REFERENCES classe_siege(id) ON DELETE RESTRICT,
-    UNIQUE (vol_id, classe_siege_id)
+    prix DECIMAL(10,2) NOT NULL CHECK (prix >= 0),
+    FOREIGN KEY (vol_programme_id) REFERENCES vol_programme(id) ON DELETE CASCADE,
+    FOREIGN KEY (classe_siege_id) REFERENCES classe_siege(id),
+    UNIQUE (vol_programme_id, classe_siege_id)
 );
 
 -- =====================================================
--- 12) TABLE SIEGE_VOL
+-- 13) SIEGE_VOL
 -- =====================================================
 
 CREATE TABLE siege_vol (
     id SERIAL PRIMARY KEY,
-    vol_id INT NOT NULL,
+    vol_programme_id INT NOT NULL,
     siege_id INT NOT NULL,
     occupe BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vol_id) REFERENCES vol(id) ON DELETE CASCADE,
-    FOREIGN KEY (siege_id) REFERENCES siege(id) ON DELETE CASCADE,
-    UNIQUE (vol_id, siege_id)
+    FOREIGN KEY (vol_programme_id) REFERENCES vol_programme(id) ON DELETE CASCADE,
+    FOREIGN KEY (siege_id) REFERENCES siege(id),
+    UNIQUE (vol_programme_id, siege_id)
 );
 
 -- =====================================================
--- 13) TABLE VOL_EQUIPAGE
+-- 14) VOL_EQUIPAGE
 -- =====================================================
 
 CREATE TABLE vol_equipage (
     id SERIAL PRIMARY KEY,
-    vol_id INT NOT NULL,
+    vol_programme_id INT NOT NULL,
     equipage_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vol_id) REFERENCES vol(id) ON DELETE CASCADE,
-    FOREIGN KEY (equipage_id) REFERENCES equipage(id) ON DELETE CASCADE,
-    UNIQUE (vol_id, equipage_id)
+    FOREIGN KEY (vol_programme_id) REFERENCES vol_programme(id) ON DELETE CASCADE,
+    FOREIGN KEY (equipage_id) REFERENCES equipage(id),
+    UNIQUE (vol_programme_id, equipage_id)
 );
 
 -- =====================================================
--- 14) TABLE CLIENT
+-- 15) CLIENT
 -- =====================================================
 
 CREATE TABLE client (
     id SERIAL PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
     prenom VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    telephone VARCHAR(20),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    email VARCHAR(100) UNIQUE NOT NULL
 );
 
 -- =====================================================
--- 15) TABLE RESERVATION
+-- 16) RESERVATION
 -- =====================================================
 
 CREATE TABLE reservation (
     id SERIAL PRIMARY KEY,
     client_id INT NOT NULL,
-    vol_id INT NOT NULL,
-    date_reservation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    statut statut_reservation_enum DEFAULT 'CONFIRMEE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE RESTRICT,
-    FOREIGN KEY (vol_id) REFERENCES vol(id) ON DELETE RESTRICT
+    vol_programme_id INT NOT NULL,
+    classe_siege_id INT NOT NULL, 
+    nombre_places INT NOT NULL CHECK (nombre_places > 0),
+    prix_total DECIMAL(10,2),
+    statut statut_reservation_enum DEFAULT 'EN_ATTENTE',
+    FOREIGN KEY (client_id) REFERENCES client(id),
+    FOREIGN KEY (vol_programme_id) REFERENCES vol_programme(id),
+    FOREIGN KEY (classe_siege_id) REFERENCES classe_siege(id)
 );
 
 -- =====================================================
--- 16) TABLE BILLET
+-- 17) BILLET
 -- =====================================================
 
 CREATE TABLE billet (
     id SERIAL PRIMARY KEY,
     reservation_id INT NOT NULL,
     siege_vol_id INT NOT NULL,
-    prix DECIMAL(10, 2) NOT NULL CHECK (prix >= 0),
+    prix DECIMAL(10,2) NOT NULL,
     statut statut_billet_enum DEFAULT 'EMIS',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (reservation_id) REFERENCES reservation(id) ON DELETE CASCADE,
-    FOREIGN KEY (siege_vol_id) REFERENCES siege_vol(id) ON DELETE RESTRICT
+    FOREIGN KEY (siege_vol_id) REFERENCES siege_vol(id)
 );
 
 -- =====================================================
--- 17) TABLE METHODE_PAIEMENT
+-- 18) METHODE_PAIEMENT
 -- =====================================================
 
 CREATE TABLE methode_paiement (
     id SERIAL PRIMARY KEY,
-    libelle VARCHAR(50) NOT NULL UNIQUE,
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    libelle VARCHAR(50) UNIQUE NOT NULL
 );
 
 -- =====================================================
--- 18) TABLE PAIEMENT
+-- 19) PAIEMENT
 -- =====================================================
 
 CREATE TABLE paiement (
     id SERIAL PRIMARY KEY,
     reservation_id INT NOT NULL,
-    montant DECIMAL(10, 2) NOT NULL CHECK (montant > 0),
-    date_paiement TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    montant DECIMAL(10,2) NOT NULL CHECK (montant > 0),
     statut statut_paiement_enum DEFAULT 'EN_ATTENTE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (reservation_id) REFERENCES reservation(id) ON DELETE CASCADE
 );
 
 -- =====================================================
--- 19) TABLE PAIEMENT_METHODE
+-- 20) PAIEMENT_METHODE
 -- =====================================================
 
 CREATE TABLE paiement_methode (
     id SERIAL PRIMARY KEY,
     paiement_id INT NOT NULL,
     methode_paiement_id INT NOT NULL,
-    montant DECIMAL(10, 2) NOT NULL CHECK (montant > 0),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (paiement_id) REFERENCES paiement(id) ON DELETE CASCADE,
-    FOREIGN KEY (methode_paiement_id) REFERENCES methode_paiement(id) ON DELETE RESTRICT,
+    montant DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (paiement_id) REFERENCES paiement(id),
+    FOREIGN KEY (methode_paiement_id) REFERENCES methode_paiement(id),
     UNIQUE (paiement_id, methode_paiement_id)
 );
 
 -- =====================================================
--- 20) INDEXES
+-- 21) INDEXES
 -- =====================================================
 
 -- Index sur les recherches fréquentes
@@ -311,7 +283,7 @@ CREATE INDEX idx_paiement_methode_paiement ON paiement_methode(paiement_id);
 CREATE INDEX idx_voléquipage_vol ON vol_equipage(vol_id);
 
 -- =====================================================
--- 21) DONNEES PAR DEFAUT
+-- 22) DONNEES PAR DEFAUT
 -- =====================================================
 
 -- Insertion des états d'avion

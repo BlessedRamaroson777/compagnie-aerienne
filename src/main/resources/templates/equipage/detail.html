@@ -42,7 +42,7 @@
                         <tbody>
                             <tr th:each="volEquipage : ${equipage.vols}">
                                 <td th:text="${volEquipage.vol.numeroVol}"></td>
-                                <td th:text="${volEquipage.vol.depart + ' → ' + volEquipage.vol.arrivee}"></td>
+                                <td th:text="${volEquipage.vol.aeroportDepart.codeAeroport + ' → ' + volEquipage.vol.aeroportArrivee.codeAeroport}"></td>
                                 <td th:text="${#temporals.format(volEquipage.vol.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></td>
                             </tr>
                         </tbody>

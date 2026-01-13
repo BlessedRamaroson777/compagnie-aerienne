@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Paiements</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/modern-style.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar('paiements')}"></div>
+
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="bi bi-credit-card"></i> Gestion des Paiements</h1>
+                    <a th:href="@{/paiements/new}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Nouveau Paiement</a>
+                </div>
+
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Filtres</h5>
+                        <form th:action="@{/paiements}" method="get" class="row g-3">
+                            <div class="col-md-5">
+                                <label class="form-label">Réservation</label>
+                                <select name="reservationId" class="form-select">
+                                    <option value="">Toutes</option>
+                                    <option th:each="reservation : ${reservations}" 
+                                            th:value="${reservation.id}"
+                                            th:text="${'Réservation #' + reservation.id + ' - ' + reservation.client.nom}"
+                                            th:selected="${reservationId != null && reservationId == reservation.id}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Statut</label>
+                                <select name="statut" class="form-select">
+                                    <option value="">Tous</option>
+                                    <option th:each="s : ${statuts}" 
+                                            th:value="${s}"
+                                            th:text="${s}"
+                                            th:selected="${statut != null && statut == s}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Filtrer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Réservation</th>
+                                <th>Client</th>
+                                <th>Montant</th>
+                                <th>Date Paiement</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="paiement : ${paiements}">
+                                <td th:text="${paiement.id}"></td>
+                                <td th:text="${'#' + paiement.reservation.id}"></td>
+                                <td th:text="${paiement.reservation.client.nom + ' ' + paiement.reservation.client.prenom}"></td>
+                                <td th:text="${paiement.montant + ' €'}"></td>
+                                <td th:text="${#temporals.format(paiement.datePaiement, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${paiement.statut == T(com.airline.airline_app.entity.enums.StatutPaiement).VALIDE ? 'bg-success' : (paiement.statut == T(com.airline.airline_app.entity.enums.StatutPaiement).REFUSE ? 'bg-danger' : 'bg-warning')}"
+                                          th:text="${paiement.statut}"></span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/paiements/{id}(id=${paiement.id})}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                                    <a th:href="@{/paiements/{id}/edit(id=${paiement.id})}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil"></i></a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(paiements)}">
+                                <td colspan="7" class="text-center">Aucun paiement trouvé</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

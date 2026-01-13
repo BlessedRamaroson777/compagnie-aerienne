@@ -1,141 +1,183 @@
 package com.airline.airline_app.controller;
 
-import com.airline.airline_app.entity.Reservation;
+import com.airline.airline_app.entity.*;
+import com.airline.airline_app.entity.enums.StatutPaiement;
 import com.airline.airline_app.entity.enums.StatutReservation;
-import com.airline.airline_app.service.ClientService;
-import com.airline.airline_app.service.ReservationService;
-import com.airline.airline_app.service.SiegeVolService;
-import com.airline.airline_app.service.VolService;
-import com.airline.airline_app.specification.ReservationSpecification;
+import com.airline.airline_app.service.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Controller
 @RequestMapping("/reservations")
 @RequiredArgsConstructor
 public class ReservationController {
-    
+
     private final ReservationService reservationService;
     private final ClientService clientService;
     private final VolService volService;
-    private final SiegeVolService siegeVolService;
-    
+    private final VolProgrammeService volProgrammeService;
+    private final ClasseSiegeService classeSiegeService;
+    private final PrixVolService prixVolService;
+    private final PaiementService paiementService;
+    private final AeroportService aeroportService;
+
     @GetMapping
-    public String list(@RequestParam(required = false) Long clientId,
-                      @RequestParam(required = false) Long volId,
-                      @RequestParam(required = false) StatutReservation statut,
-                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateMin,
-                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateMax,
-                      Model model) {
-        
-        Specification<Reservation> spec = ReservationSpecification.filterBy(clientId, volId, statut, dateMin, dateMax);
-        List<Reservation> reservations = reservationService.findAll(spec);
-        
+    public String list(Model model) {
+        List<Reservation> reservations = reservationService.findAll();
         model.addAttribute("reservations", reservations);
-        model.addAttribute("clients", clientService.findAll());
-        model.addAttribute("vols", volService.findAll());
-        model.addAttribute("statuts", StatutReservation.values());
-        model.addAttribute("clientId", clientId);
-        model.addAttribute("volId", volId);
-        model.addAttribute("statut", statut);
-        model.addAttribute("dateMin", dateMin);
-        model.addAttribute("dateMax", dateMax);
-        
         return "reservation/list";
     }
-    
+
+    // Étape 1: Recherche de vols
     @GetMapping("/new")
-    public String newForm(Model model) {
-        model.addAttribute("reservation", new Reservation());
+    public String rechercheVol(Model model) {
+        model.addAttribute("aeroports", aeroportService.findAll());
+        return "reservation/recherche-vol";
+    }
+
+    // Étape 2: Liste des vols programmés disponibles
+    @GetMapping("/vols-disponibles")
+    public String volsDisponibles(@RequestParam Long aeroportDepartId,
+            @RequestParam Long aeroportArriveeId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateVol,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime heureVol,
+            Model model) {
+        // Rechercher les vols programmés pour cette route et date
+        List<VolProgramme> volsProgrammes = volProgrammeService.findByAeroportsAndDate(
+                aeroportDepartId, aeroportArriveeId, dateVol);
+
+        // Filtrer par heure si spécifiée
+        if (heureVol != null) {
+            volsProgrammes = volsProgrammes.stream()
+                    .filter(vp -> vp.getDateHeureDepart().toLocalTime().equals(heureVol))
+                    .toList();
+        }
+
+        model.addAttribute("volsProgrammes", volsProgrammes);
+        model.addAttribute("aeroportDepart", aeroportService.findById(aeroportDepartId).orElse(null));
+        model.addAttribute("aeroportArrivee", aeroportService.findById(aeroportArriveeId).orElse(null));
+        model.addAttribute("dateVol", dateVol);
+        model.addAttribute("heureVol", heureVol);
+        return "reservation/vols-disponibles";
+    }
+
+    // Étape 3: Configuration de la réservation
+    @GetMapping("/configurer/{volProgrammeId}")
+    public String configurerReservation(@PathVariable Long volProgrammeId, Model model) {
+        VolProgramme volProgramme = volProgrammeService.findById(volProgrammeId)
+                .orElseThrow(() -> new RuntimeException("Vol programmé non trouvé"));
+
+        List<PrixVol> prixVols = prixVolService.findByVolProgrammeId(volProgrammeId);
+
+        model.addAttribute("volProgramme", volProgramme);
+        model.addAttribute("prixVols", prixVols);
         model.addAttribute("clients", clientService.findAll());
-        model.addAttribute("vols", volService.findAll());
-        model.addAttribute("statuts", StatutReservation.values());
-        return "reservation/form";
+        return "reservation/configurer";
     }
-    
-    @GetMapping("/{id}")
-    public String detail(@PathVariable Long id, Model model) {
-        Reservation reservation = reservationService.findById(id)
-            .orElseThrow(() -> new RuntimeException("Réservation non trouvée"));
-        model.addAttribute("reservation", reservation);
-        model.addAttribute("siegesLibres", siegeVolService.findSiegesLibres(reservation.getVol().getId()));
-        return "reservation/detail";
+
+    // API pour obtenir le prix
+    @GetMapping("/prix/{volProgrammeId}/{classeSiegeId}")
+    @ResponseBody
+    public BigDecimal getPrix(@PathVariable Long volProgrammeId, @PathVariable Long classeSiegeId) {
+        return prixVolService.findByVolProgrammeIdAndClasseSiegeId(volProgrammeId, classeSiegeId)
+                .map(PrixVol::getPrix)
+                .orElse(BigDecimal.ZERO);
     }
-    
-    @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable Long id, Model model) {
-        Reservation reservation = reservationService.findById(id)
-            .orElseThrow(() -> new RuntimeException("Réservation non trouvée"));
-        model.addAttribute("reservation", reservation);
-        model.addAttribute("clients", clientService.findAll());
-        model.addAttribute("vols", volService.findAll());
-        model.addAttribute("statuts", StatutReservation.values());
-        return "reservation/form";
-    }
-    
-    @PostMapping
-    public String save(@ModelAttribute Reservation reservation, 
-                      @RequestParam Long clientId,
-                      @RequestParam Long volId,
-                      RedirectAttributes redirectAttributes) {
+
+    // Étape 4: Confirmation
+    @PostMapping("/confirmer")
+    public String confirmerReservation(@RequestParam Long volProgrammeId,
+            @RequestParam Long clientId,
+            @RequestParam Long classeSiegeId,
+            @RequestParam Integer nombrePlaces,
+            RedirectAttributes redirectAttributes) {
         try {
-            reservation.setClient(clientService.findById(clientId)
-                .orElseThrow(() -> new RuntimeException("Client non trouvé")));
-            reservation.setVol(volService.findById(volId)
-                .orElseThrow(() -> new RuntimeException("Vol non trouvé")));
-            
-            if (reservation.getId() == null) {
-                reservationService.save(reservation);
-                redirectAttributes.addFlashAttribute("success", "Réservation créée avec succès");
-            } else {
-                reservationService.update(reservation.getId(), reservation);
-                redirectAttributes.addFlashAttribute("success", "Réservation modifiée avec succès");
-            }
-            return "redirect:/reservations";
+            VolProgramme volProgramme = volProgrammeService.findById(volProgrammeId)
+                    .orElseThrow(() -> new RuntimeException("Vol programmé non trouvé"));
+            Client client = clientService.findById(clientId)
+                    .orElseThrow(() -> new RuntimeException("Client non trouvé"));
+            ClasseSiege classeSiege = classeSiegeService.findById(classeSiegeId)
+                    .orElseThrow(() -> new RuntimeException("Classe de siège non trouvée"));
+
+            PrixVol prixVol = prixVolService.findByVolProgrammeIdAndClasseSiegeId(volProgrammeId, classeSiegeId)
+                    .orElseThrow(() -> new RuntimeException("Prix non défini pour ce vol et cette classe"));
+
+            BigDecimal prixTotal = prixVol.getPrix().multiply(BigDecimal.valueOf(nombrePlaces));
+
+            Reservation reservation = new Reservation();
+            reservation.setClient(client);
+            reservation.setVolProgramme(volProgramme);
+            reservation.setClasseSiege(classeSiege);
+            reservation.setNombrePlaces(nombrePlaces);
+            reservation.setPrixTotal(prixTotal);
+            reservation.setStatut(StatutReservation.EN_ATTENTE);
+
+            Reservation savedReservation = reservationService.save(reservation);
+
+            return "redirect:/reservations/paiement/" + savedReservation.getId();
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur: " + e.getMessage());
             return "redirect:/reservations/new";
         }
     }
-    
-    @PostMapping("/{id}/billet")
-    public String creerBillet(@PathVariable Long id, @RequestParam Long siegeVolId, RedirectAttributes redirectAttributes) {
+
+    // Étape 5: Paiement
+    @GetMapping("/paiement/{id}")
+    public String pagePaiement(@PathVariable Long id, Model model) {
+        Reservation reservation = reservationService.findById(id)
+                .orElseThrow(() -> new RuntimeException("Réservation non trouvée"));
+        model.addAttribute("reservation", reservation);
+        return "reservation/paiement";
+    }
+
+    @PostMapping("/paiement/{id}")
+    public String effectuerPaiement(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             Reservation reservation = reservationService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Réservation non trouvée"));
-            reservationService.creerBillet(reservation, siegeVolId);
-            redirectAttributes.addFlashAttribute("success", "Billet créé avec succès");
+                    .orElseThrow(() -> new RuntimeException("Réservation non trouvée"));
+
+            Paiement paiement = new Paiement();
+            paiement.setReservation(reservation);
+            paiement.setMontant(reservation.getPrixTotal());
+            paiement.setStatut(StatutPaiement.VALIDE);
+            paiementService.save(paiement);
+
+            reservation.setStatut(StatutReservation.CONFIRMEE);
+            reservationService.update(reservation.getId(), reservation);
+
+            redirectAttributes.addFlashAttribute("success", "Réservation confirmée et paiement effectué!");
             return "redirect:/reservations/" + id;
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur: " + e.getMessage());
-            return "redirect:/reservations/" + id;
+            return "redirect:/reservations/paiement/" + id;
         }
     }
-    
+
+    @GetMapping("/{id}")
+    public String detail(@PathVariable Long id, Model model) {
+        Reservation reservation = reservationService.findById(id)
+                .orElseThrow(() -> new RuntimeException("Réservation non trouvée"));
+        model.addAttribute("reservation", reservation);
+        return "reservation/detail";
+    }
+
     @GetMapping("/{id}/annuler")
     public String annuler(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            reservationService.annulerReservation(id);
+            Reservation reservation = reservationService.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Réservation non trouvée"));
+            reservation.setStatut(StatutReservation.ANNULEE);
+            reservationService.update(id, reservation);
             redirectAttributes.addFlashAttribute("success", "Réservation annulée avec succès");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Erreur: " + e.getMessage());
-        }
-        return "redirect:/reservations";
-    }
-    
-    @GetMapping("/{id}/delete")
-    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        try {
-            reservationService.delete(id);
-            redirectAttributes.addFlashAttribute("success", "Réservation supprimée avec succès");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur: " + e.getMessage());
         }
