@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
@@ -34,7 +35,11 @@ public class ChiffreAffaireController {
     @GetMapping("/par-vol-programme")
     public String parVolProgramme(Model model) {
         List<ChiffreAffaireDTO> caList = chiffreAffaireService.getCAParVolProgramme();
+        BigDecimal total = caList.stream()
+            .map(ChiffreAffaireDTO::getMontantTotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
         model.addAttribute("caList", caList);
+        model.addAttribute("total", total);
         model.addAttribute("type", "VOL_PROGRAMME");
         model.addAttribute("titre", "Chiffre d'affaires par vol programmé");
         return "chiffre-affaire/list";
@@ -56,7 +61,11 @@ public class ChiffreAffaireController {
     @GetMapping("/par-avion")
     public String parAvion(Model model) {
         List<ChiffreAffaireDTO> caList = chiffreAffaireService.getCAParAvion();
+        BigDecimal total = caList.stream()
+            .map(ChiffreAffaireDTO::getMontantTotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
         model.addAttribute("caList", caList);
+        model.addAttribute("total", total);
         model.addAttribute("type", "AVION");
         model.addAttribute("titre", "Chiffre d'affaires par avion");
         return "chiffre-affaire/list";
@@ -78,7 +87,11 @@ public class ChiffreAffaireController {
     @GetMapping("/par-vol")
     public String parVol(Model model) {
         List<ChiffreAffaireDTO> caList = chiffreAffaireService.getCAParVol();
+        BigDecimal total = caList.stream()
+            .map(ChiffreAffaireDTO::getMontantTotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
         model.addAttribute("caList", caList);
+        model.addAttribute("total", total);
         model.addAttribute("type", "VOL");
         model.addAttribute("titre", "Chiffre d'affaires par trajet");
         return "chiffre-affaire/list";

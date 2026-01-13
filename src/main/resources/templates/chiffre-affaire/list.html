@@ -18,7 +18,7 @@
                     <i class="fas fa-info-circle me-2"></i>
                     <strong th:text="${caList.size()}">0</strong> résultat(s) trouvé(s)
                     <span th:if="${!caList.isEmpty()}">
-                        - Total: <strong th:text="${#numbers.formatDecimal(caList.stream().map(ca -> ca.montantTotal).reduce(0, (a, b) -> a + b), 0, 'COMMA', 2, 'POINT')}">0.00</strong> Ar
+                        - Total: <strong th:text="${#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}">0.00</strong> Ar
                     </span>
                 </div>
 
@@ -36,9 +36,11 @@
                                         <th th:if="${type == 'VOL_PROGRAMME'}">Avion</th>
                                         
                                         <th th:if="${type == 'AVION'}">Immatriculation</th>
+                                        <th th:if="${type == 'AVION'}">Période</th>
                                         
                                         <th th:if="${type == 'VOL'}">Numéro de vol</th>
                                         <th th:if="${type == 'VOL'}">Trajet</th>
+                                        <th th:if="${type == 'VOL'}">Période</th>
                                         
                                         <th class="text-end">Montant (Ar)</th>
                                         <th class="text-center">Réservations</th>
@@ -64,6 +66,9 @@
                                         
                                         <!-- Avion -->
                                         <td th:if="${type == 'AVION'}" th:text="${ca.immatriculation}">F-ABCD</td>
+                                        <td th:if="${type == 'AVION'}">
+                                            <small class="text-muted">Tous les vols</small>
+                                        </td>
                                         
                                         <!-- Vol (trajet) -->
                                         <td th:if="${type == 'VOL'}" th:text="${ca.numeroVol}">AF001</td>
@@ -71,6 +76,9 @@
                                             <span th:text="${ca.aeroportDepart}">CDG</span>
                                             <i class="fas fa-arrow-right mx-2"></i>
                                             <span th:text="${ca.aeroportArrivee}">JFK</span>
+                                        </td>
+                                        <td th:if="${type == 'VOL'}">
+                                            <small class="text-muted">Toutes les dates</small>
                                         </td>
                                         
                                         <td class="text-end">

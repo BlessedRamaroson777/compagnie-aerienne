@@ -66,7 +66,7 @@ public class ChiffreAffaireService {
                 dto.setDateHeureVol(vp.getDateHeureDepart());
                 dto.setAeroportDepart(vp.getVol().getAeroportDepart().getNom());
                 dto.setAeroportArrivee(vp.getVol().getAeroportArrivee().getNom());
-                dto.setImmatriculation(vp.getAvion().getImmatriculation());
+                dto.setImmatriculation(vp.getAvion().getCodeAvion());
                 
                 // Compter les billets
                 Long nombreBillets = reservationRepository.countBilletsByVolProgramme(volProgrammeId);
@@ -102,7 +102,7 @@ public class ChiffreAffaireService {
         dto.setDateHeureVol(vp.getDateHeureDepart());
         dto.setAeroportDepart(vp.getVol().getAeroportDepart().getNom());
         dto.setAeroportArrivee(vp.getVol().getAeroportArrivee().getNom());
-        dto.setImmatriculation(vp.getAvion().getImmatriculation());
+        dto.setImmatriculation(vp.getAvion().getCodeAvion());
         
         return dto;
     }
@@ -124,8 +124,8 @@ public class ChiffreAffaireService {
                 ChiffreAffaireDTO dto = new ChiffreAffaireDTO();
                 dto.setId(avionId);
                 dto.setType("AVION");
-                dto.setDesignation("Avion: " + avion.getImmatriculation());
-                dto.setImmatriculation(avion.getImmatriculation());
+                dto.setDesignation("Avion: " + avion.getCodeAvion());
+                dto.setImmatriculation(avion.getCodeAvion());
                 dto.setMontantTotal(montant);
                 dto.setNombreReservations(nombreReservations.intValue());
                 
@@ -151,8 +151,8 @@ public class ChiffreAffaireService {
         ChiffreAffaireDTO dto = new ChiffreAffaireDTO();
         dto.setId(avionId);
         dto.setType("AVION");
-        dto.setDesignation("Avion: " + avion.getImmatriculation());
-        dto.setImmatriculation(avion.getImmatriculation());
+        dto.setDesignation("Avion: " + avion.getCodeAvion());
+        dto.setImmatriculation(avion.getCodeAvion());
         dto.setMontantTotal(montant);
         
         return dto;
