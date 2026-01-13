@@ -1,6 +1,7 @@
 package com.airline.airline_app.controller;
 
 import com.airline.airline_app.entity.ModelAvion;
+import com.airline.airline_app.service.ClasseSiegeService;
 import com.airline.airline_app.service.ModelAvionService;
 import com.airline.airline_app.specification.ModelAvionSpecification;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 public class ModelAvionController {
     
     private final ModelAvionService modelAvionService;
+    private final ClasseSiegeService classeSiegeService;
     
     @GetMapping
     public String list(@RequestParam(required = false) String designation,
@@ -41,6 +43,7 @@ public class ModelAvionController {
     @GetMapping("/new")
     public String newForm(Model model) {
         model.addAttribute("modele", new ModelAvion());
+        model.addAttribute("toutesClasses", classeSiegeService.findAll());
         return "model-avion/form";
     }
     
@@ -57,12 +60,25 @@ public class ModelAvionController {
         ModelAvion modele = modelAvionService.findById(id)
             .orElseThrow(() -> new RuntimeException("Modèle d'avion non trouvé"));
         model.addAttribute("modele", modele);
+        model.addAttribute("toutesClasses", classeSiegeService.findAll());
         return "model-avion/form";
     }
     
     @PostMapping
-    public String save(@ModelAttribute ModelAvion modele, RedirectAttributes redirectAttributes) {
+    public String save(@ModelAttribute ModelAvion modele, 
+                      @RequestParam(required = false) List<Long> classeSiegeIds,
+                      RedirectAttributes redirectAttributes) {
         try {
+            // Associer les classes de sièges sélectionnées
+            if (classeSiegeIds != null && !classeSiegeIds.isEmpty()) {
+                modele.setClassesDisponibles(
+                    classeSiegeIds.stream()
+                        .map(id -> classeSiegeService.findById(id).orElse(null))
+                        .filter(c -> c != null)
+                        .toList()
+                );
+            }
+            
             if (modele.getId() == null) {
                 modelAvionService.save(modele);
                 redirectAttributes.addFlashAttribute("success", "Modèle d'avion créé avec succès");

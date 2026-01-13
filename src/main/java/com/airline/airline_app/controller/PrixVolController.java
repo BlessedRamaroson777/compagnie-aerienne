@@ -2,10 +2,10 @@ package com.airline.airline_app.controller;
 
 import com.airline.airline_app.entity.ClasseSiege;
 import com.airline.airline_app.entity.PrixVol;
-import com.airline.airline_app.entity.Vol;
+import com.airline.airline_app.entity.VolProgramme;
 import com.airline.airline_app.service.ClasseSiegeService;
 import com.airline.airline_app.service.PrixVolService;
-import com.airline.airline_app.service.VolService;
+import com.airline.airline_app.service.VolProgrammeService;
 import com.airline.airline_app.specification.PrixVolSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,12 +18,12 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
-@RequestMapping("/prix-vol")
+@RequestMapping({"/prix-vol", "/prix-vols"})
 @RequiredArgsConstructor
 public class PrixVolController {
     
     private final PrixVolService prixVolService;
-    private final VolService volService;
+    private final VolProgrammeService volProgrammeService;
     private final ClasseSiegeService classeSiegeService;
     
     @GetMapping
@@ -37,7 +37,7 @@ public class PrixVolController {
         List<PrixVol> prixVols = prixVolService.findAll(spec);
         
         model.addAttribute("prixVols", prixVols);
-        model.addAttribute("vols", volService.findAll());
+        model.addAttribute("volsProgrammes", volProgrammeService.findAll());
         model.addAttribute("classes", classeSiegeService.findAll());
         model.addAttribute("volId", volId);
         model.addAttribute("classeSiegeId", classeSiegeId);
@@ -50,7 +50,7 @@ public class PrixVolController {
     @GetMapping("/new")
     public String newForm(Model model) {
         model.addAttribute("prixVol", new PrixVol());
-        model.addAttribute("vols", volService.findAll());
+        model.addAttribute("volsProgrammes", volProgrammeService.findAll());
         model.addAttribute("classes", classeSiegeService.findAll());
         return "prix-vol/form";
     }
@@ -68,23 +68,23 @@ public class PrixVolController {
         PrixVol prixVol = prixVolService.findById(id)
             .orElseThrow(() -> new RuntimeException("Prix de vol non trouvé"));
         model.addAttribute("prixVol", prixVol);
-        model.addAttribute("vols", volService.findAll());
+        model.addAttribute("volsProgrammes", volProgrammeService.findAll());
         model.addAttribute("classes", classeSiegeService.findAll());
         return "prix-vol/form";
     }
     
     @PostMapping
     public String save(@ModelAttribute PrixVol prixVol,
-                      @RequestParam Long volId,
+                      @RequestParam Long volProgrammeId,
                       @RequestParam Long classeSiegeId,
                       RedirectAttributes redirectAttributes) {
         try {
-            Vol vol = volService.findById(volId)
-                .orElseThrow(() -> new RuntimeException("Vol non trouvé"));
+            VolProgramme volProgramme = volProgrammeService.findById(volProgrammeId)
+                .orElseThrow(() -> new RuntimeException("Vol programmé non trouvé"));
             ClasseSiege classeSiege = classeSiegeService.findById(classeSiegeId)
                 .orElseThrow(() -> new RuntimeException("Classe de siège non trouvée"));
             
-            prixVol.setVol(vol);
+            prixVol.setVolProgramme(volProgramme);
             prixVol.setClasseSiege(classeSiege);
             
             if (prixVol.getId() == null) {

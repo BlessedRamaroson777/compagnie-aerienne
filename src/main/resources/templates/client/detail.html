@@ -43,8 +43,8 @@
                         </thead>
                         <tbody>
                             <tr th:each="reservation : ${client.reservations}">
-                                <td th:text="${reservation.vol.numeroVol}"></td>
-                                <td th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${reservation.volProgramme.vol.numeroVol}"></td>
+                                <td th:text="${#temporals.format(reservation.volProgramme.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></td>
                                 <td>
                                     <span class="badge" 
                                           th:classappend="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE ? 'bg-success' : 'bg-danger'}"

@@ -65,9 +65,6 @@
                                 <th>Numéro</th>
                                 <th>Départ</th>
                                 <th>Arrivée</th>
-                                <th>Date Départ</th>
-                                <th>Avion</th>
-                                <th>Statut</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -76,16 +73,13 @@
                                 <td th:text="${vol.numeroVol}"></td>
                                 <td th:text="${vol.aeroportDepart.codeAeroport + ' - ' + vol.aeroportDepart.ville}"></td>
                                 <td th:text="${vol.aeroportArrivee.codeAeroport + ' - ' + vol.aeroportArrivee.ville}"></td>
-                                <td th:text="${#temporals.format(vol.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></td>
-                                <td th:text="${vol.avion.codeAvion}"></td>
-                                <td th:text="${vol.status}"></td>
                                 <td>
                                     <a th:href="@{/vols/{id}(id=${vol.id})}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
                                     <a th:href="@{/vols/{id}/edit(id=${vol.id})}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil"></i></a>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(vols)}">
-                                <td colspan="7" class="text-center">Aucun vol trouvé</td>
+                                <td colspan="4" class="text-center">Aucun vol trouvé</td>
                             </tr>
                         </tbody>
                     </table>

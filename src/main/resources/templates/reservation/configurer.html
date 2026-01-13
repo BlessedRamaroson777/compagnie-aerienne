@@ -8,14 +8,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         :root {
-            --primary-blue: #2563eb;
-            --dark-blue: #1e40af;
+            --primary-blue: #4dabf7;
+            --dark-blue: #1a1a2e;
+            --medium-blue: #16213e;
             --light-blue: #dbeafe;
             --lighter-blue: #eff6ff;
         }
         body { background-color: #f8fafc; }
-        .navbar { background: white !important; }
-        .navbar-brand, .nav-link { color: var(--dark-blue) !important; }
+        .navbar { background: white !important; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar-brand, .nav-link { color: var(--dark-blue) !important; font-weight: 600; }
         .config-card {
             background: white;
             border-radius: 15px;
@@ -23,30 +24,26 @@
             padding: 30px;
         }
         .flight-summary {
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            background: linear-gradient(135deg, var(--dark-blue), var(--medium-blue));
             color: white;
             border-radius: 15px;
             padding: 25px;
         }
-        .class-option {
+        .class-option-multi {
             border: 2px solid #e5e7eb;
             border-radius: 15px;
             padding: 20px;
-            cursor: pointer;
             transition: all 0.3s ease;
             background: var(--lighter-blue);
+            margin-bottom: 10px;
         }
-        .class-option:hover {
+        .class-option-multi:hover {
             border-color: var(--primary-blue);
             background: var(--light-blue);
         }
-        .class-option.selected {
+        .class-option-multi .places-input:focus {
             border-color: var(--primary-blue);
-            background: var(--light-blue);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-        }
-        .class-option input[type="radio"] {
-            display: none;
         }
         .price-tag {
             font-size: 1.5rem;
@@ -127,9 +124,14 @@
                         </select>
                     </div>
 
-                    <!-- Sélection de la classe -->
+                    <!-- Sélection des classes et places -->
                     <div class="config-card mb-4">
-                        <h5 class="mb-3" style="color: var(--primary-blue);"><i class="bi bi-star-fill me-2"></i>Classe de voyage</h5>
+                        <h5 class="mb-3" style="color: var(--primary-blue);"><i class="bi bi-star-fill me-2"></i>Sélection des places par classe</h5>
+                        
+                        <div class="alert alert-info mb-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Vous pouvez réserver plusieurs places de différentes classes. Exemple: 7 Economy + 2 Business
+                        </div>
                         
                         <div th:if="${#lists.isEmpty(prixVols)}" class="alert alert-warning">
                             <i class="bi bi-exclamation-triangle me-2"></i>
@@ -137,38 +139,41 @@
                         </div>
                         
                         <div class="row g-3">
-                            <div th:each="prixVol, stat : ${prixVols}" class="col-md-6">
-                                <label class="class-option w-100" th:classappend="${stat.first ? 'selected' : ''}">
-                                    <input type="radio" name="classeSiegeId" 
-                                           th:value="${prixVol.classeSiege.id}" 
-                                           th:checked="${stat.first}"
-                                           th:data-prix="${prixVol.prix}"
-                                           onclick="updateTotal()">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
+                            <div th:each="prixVol : ${prixVols}" class="col-md-12">
+                                <div class="class-option-multi">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-5">
                                             <h6 class="mb-1 fw-bold" th:text="${prixVol.classeSiege.libelle}">ECONOMY</h6>
                                             <small class="text-muted" th:text="${prixVol.classeSiege.description}">Classe économique</small>
                                         </div>
-                                        <div class="price-tag" th:text="${#numbers.formatDecimal(prixVol.prix, 0, 'COMMA', 0, 'POINT')} + ' Ar'">150000 Ar</div>
+                                        <div class="col-md-3">
+                                            <div class="price-tag" th:text="${#numbers.formatDecimal(prixVol.prix, 0, 'COMMA', 0, 'POINT')} + ' Ar'">150000 Ar</div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-people-fill"></i></span>
+                                                <input type="number" 
+                                                       th:name="'places_' + ${prixVol.classeSiege.id}"
+                                                       th:id="'places_' + ${prixVol.classeSiege.id}"
+                                                       th:data-classeid="${prixVol.classeSiege.id}"
+                                                       th:data-prix="${prixVol.prix}"
+                                                       class="form-control places-input" 
+                                                       value="0" min="0" max="20"
+                                                       onchange="updateTotal()"
+                                                       placeholder="Nombre">
+                                                <span class="input-group-text">places</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </label>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Nombre de places -->
-                    <div class="config-card mb-4">
-                        <h5 class="mb-3" style="color: var(--primary-blue);"><i class="bi bi-people-fill me-2"></i>Nombre de places</h5>
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <input type="number" name="nombrePlaces" id="nombrePlaces" 
-                                       class="form-control form-control-lg" 
-                                       value="1" min="1" max="10" required
-                                       onchange="updateTotal()">
-                            </div>
-                            <div class="col-md-6 text-muted">
-                                <i class="bi bi-info-circle me-1"></i>Maximum 10 places par réservation
-                            </div>
+                        
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="bi bi-lightning-fill text-warning me-1"></i>
+                                Note : Vous pouvez mélanger différentes classes dans une seule réservation
+                            </small>
                         </div>
                     </div>
                 </form>
@@ -179,23 +184,21 @@
                 <div class="config-card sticky-top" style="top: 20px;">
                     <h5 class="mb-4" style="color: var(--primary-blue);"><i class="bi bi-receipt me-2"></i>Récapitulatif</h5>
                     
-                    <div class="mb-3 pb-3 border-bottom">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Prix unitaire</span>
-                            <span id="prixUnitaire" class="fw-bold">0 Ar</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Nombre de places</span>
-                            <span id="displayNombrePlaces" class="fw-bold">1</span>
-                        </div>
+                    <div id="detailClasses" class="mb-3 pb-3 border-bottom">
+                        <!-- Détail des classes sera ajouté ici dynamiquement -->
                     </div>
                     
-                    <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Total des places</span>
+                        <span id="displayNombrePlaces" class="fw-bold">0</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4 pt-3 border-top">
                         <span class="fw-bold fs-5">Total</span>
                         <span class="total-price" id="totalPrice">0 Ar</span>
                     </div>
                     
-                    <button type="submit" form="reservationForm" class="btn btn-success btn-book w-100">
+                    <button type="submit" form="reservationForm" class="btn btn-success btn-book w-100" id="btnReserver">
                         <i class="bi bi-check-circle me-2"></i>Réserver maintenant
                     </button>
                     
@@ -210,20 +213,44 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function updateTotal() {
-            const selectedClass = document.querySelector('input[name="classeSiegeId"]:checked');
-            const nombrePlaces = parseInt(document.getElementById('nombrePlaces').value) || 1;
+            const placesInputs = document.querySelectorAll('.places-input');
+            let totalPlaces = 0;
+            let totalPrix = 0;
+            let detailHTML = '';
             
-            if (selectedClass) {
-                const prixUnitaire = parseFloat(selectedClass.dataset.prix) || 0;
-                const total = prixUnitaire * nombrePlaces;
-                
-                document.getElementById('prixUnitaire').textContent = formatNumber(prixUnitaire) + ' Ar';
-                document.getElementById('displayNombrePlaces').textContent = nombrePlaces;
-                document.getElementById('totalPrice').textContent = formatNumber(total) + ' Ar';
-                
-                // Update selected class styling
-                document.querySelectorAll('.class-option').forEach(opt => opt.classList.remove('selected'));
-                selectedClass.closest('.class-option').classList.add('selected');
+            placesInputs.forEach(input => {
+                const nbPlaces = parseInt(input.value) || 0;
+                if (nbPlaces > 0) {
+                    const prix = parseFloat(input.dataset.prix) || 0;
+                    const subtotal = prix * nbPlaces;
+                    totalPlaces += nbPlaces;
+                    totalPrix += subtotal;
+                    
+                    // Récupérer le libellé de la classe
+                    const classeLabel = input.closest('.class-option-multi').querySelector('h6').textContent;
+                    
+                    detailHTML += `
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">${classeLabel} × ${nbPlaces}</span>
+                            <span class="fw-bold">${formatNumber(subtotal)} Ar</span>
+                        </div>
+                    `;
+                }
+            });
+            
+            // Mettre à jour l'affichage
+            document.getElementById('detailClasses').innerHTML = detailHTML || '<p class="text-muted text-center">Aucune place sélectionnée</p>';
+            document.getElementById('displayNombrePlaces').textContent = totalPlaces;
+            document.getElementById('totalPrice').textContent = formatNumber(totalPrix) + ' Ar';
+            
+            // Activer/désactiver le bouton réserver
+            const btnReserver = document.getElementById('btnReserver');
+            if (totalPlaces > 0) {
+                btnReserver.disabled = false;
+                btnReserver.classList.remove('disabled');
+            } else {
+                btnReserver.disabled = true;
+                btnReserver.classList.add('disabled');
             }
         }
         

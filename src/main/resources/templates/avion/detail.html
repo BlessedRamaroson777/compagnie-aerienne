@@ -24,16 +24,24 @@
                             <dd class="col-sm-9" th:text="${avion.codeAvion}"></dd>
                             
                             <dt class="col-sm-3">Modèle:</dt>
-                            <dd class="col-sm-9" th:text="${avion.modele}"></dd>
+                            <dd class="col-sm-9" th:text="${avion.modelAvion != null ? avion.modelAvion.designation : 'N/A'}"></dd>
+                            
+                            <dt class="col-sm-3">Fabricant:</dt>
+                            <dd class="col-sm-9" th:text="${avion.modelAvion != null ? avion.modelAvion.fabricant : 'N/A'}"></dd>
                             
                             <dt class="col-sm-3">Capacité Totale:</dt>
                             <dd class="col-sm-9" th:text="${avion.capaciteTotale}"></dd>
                             
-                            <dt class="col-sm-3">Nombre de Sièges:</dt>
-                            <dd class="col-sm-9" th:text="${avion.sieges.size()}"></dd>
+                            <dt class="col-sm-3">État:</dt>
+                            <dd class="col-sm-9">
+                                <span class="badge bg-success" th:text="${avion.etatAvion != null ? avion.etatAvion.libelle : 'N/A'}"></span>
+                            </dd>
                             
-                            <dt class="col-sm-3">Nombre de Vols:</dt>
-                            <dd class="col-sm-9" th:text="${avion.vols.size()}"></dd>
+                            <dt class="col-sm-3">Nombre de Sièges:</dt>
+                            <dd class="col-sm-9" th:text="${avion.sieges != null ? avion.sieges.size() : 0}"></dd>
+                            
+                            <dt class="col-sm-3">Vols Programmés:</dt>
+                            <dd class="col-sm-9" th:text="${avion.volsProgrammes != null ? avion.volsProgrammes.size() : 0}"></dd>
                         </dl>
 
                         <h5 class="mt-4">Sièges</h5>

@@ -46,26 +46,8 @@
                                 </div>
                             </div>
                             
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="dateHeureDepart" class="form-label">Date/Heure Départ *</label>
-                                    <input type="datetime-local" class="form-control" id="dateHeureDepart" th:field="*{dateHeureDepart}" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="dateHeureArrivee" class="form-label">Date/Heure Arrivée *</label>
-                                    <input type="datetime-local" class="form-control" id="dateHeureArrivee" th:field="*{dateHeureArrivee}" required>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="avion" class="form-label">Avion *</label>
-                                <select class="form-select" id="avion" th:field="*{avion}" required>
-                                    <option value="">-- Sélectionner un avion --</option>
-                                    <option th:each="avion : ${avions}" 
-                                            th:value="${avion.id}"
-                                            th:text="${avion.codeAvion + ' - Capacité: ' + avion.capaciteTotale + ' places'}">
-                                    </option>
-                                </select>
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> Un vol est une route (numéro de vol + aéroports). Les dates, heures et avions seront configurés dans les vols programmés.
                             </div>
                             
                             <div class="d-flex justify-content-between">

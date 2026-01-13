@@ -2,9 +2,19 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${modelAvion.id != null ? 'Modifier Modèle' : 'Nouveau Modèle'}">Modèle Avion</title>
+    <title th:text="${modele.id != null ? 'Modifier Modèle' : 'Nouveau Modèle'}">Modèle Avion</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-blue: #4dabf7;
+            --dark-blue: #1a1a2e;
+        }
+        body { background-color: #f8fafc; }
+        .card { border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 15px; }
+        .card-header { background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue)); color: white; border-radius: 15px 15px 0 0 !important; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary-blue), #339af0); border: none; }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
@@ -12,11 +22,11 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
-                        <h3 th:text="${modelAvion.id != null ? 'Modifier Modèle d\'Avion' : 'Nouveau Modèle d\'Avion'}"></h3>
+                        <h3 th:text="${modele.id != null ? 'Modifier Modèle d''Avion' : 'Nouveau Modèle d''Avion'}"></h3>
                     </div>
                     <div class="card-body">
-                        <form th:action="@{${modelAvion.id != null ? '/modeles-avion/' + modelAvion.id : '/modeles-avion'}}" 
-                              th:object="${modelAvion}" method="post">
+                        <form th:action="@{${modele.id != null ? '/modeles-avion/' + modele.id : '/modeles-avion'}}" 
+                              th:object="${modele}" method="post">
                             
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -34,18 +44,19 @@
 
                             <div class="row">
                                 <div class="col-md-4 mb-3">
-                                    <label for="capacite" class="form-label">Capacité (passagers) *</label>
-                                    <input type="number" class="form-control" id="capacite" th:field="*{capacite}" required min="1">
+                                    <label for="capacite" class="form-label">Capacité (passagers)</label>
+                                    <input type="number" class="form-control" id="capacite" th:field="*{capacite}" min="0">
+                                    <div class="form-text">Optionnel</div>
                                 </div>
                                 
                                 <div class="col-md-4 mb-3">
-                                    <label for="autonomieKm" class="form-label">Autonomie (km) *</label>
-                                    <input type="number" class="form-control" id="autonomieKm" th:field="*{autonomieKm}" required min="1">
+                                    <label for="autonomieKm" class="form-label">Autonomie (km)</label>
+                                    <input type="number" class="form-control" id="autonomieKm" th:field="*{autonomieKm}" min="0">
                                 </div>
                                 
                                 <div class="col-md-4 mb-3">
-                                    <label for="vitesseKmH" class="form-label">Vitesse (km/h) *</label>
-                                    <input type="number" class="form-control" id="vitesseKmH" th:field="*{vitesseKmH}" required min="1">
+                                    <label for="vitesseKmH" class="form-label">Vitesse (km/h)</label>
+                                    <input type="number" class="form-control" id="vitesseKmH" th:field="*{vitesseKmH}" min="0">
                                 </div>
                             </div>
 
@@ -53,6 +64,31 @@
                                 <label for="description" class="form-label">Description</label>
                                 <textarea class="form-control" id="description" th:field="*{description}" rows="4"></textarea>
                                 <div class="form-text">Informations complémentaires sur le modèle</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Classes de sièges disponibles *</label>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div th:if="${#lists.isEmpty(toutesClasses)}" class="alert alert-warning">
+                                            Aucune classe de siège disponible. <a th:href="@{/classes-siege}">Créer une classe</a>
+                                        </div>
+                                        <div th:if="${!#lists.isEmpty(toutesClasses)}">
+                                            <div th:each="classe : ${toutesClasses}" class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" 
+                                                       th:id="'classe_' + ${classe.id}" 
+                                                       name="classeSiegeIds"
+                                                       th:value="${classe.id}"
+                                                       th:checked="${modele.classesDisponibles != null && #lists.contains(#lists.toList(modele.classesDisponibles.![id]), classe.id)}">
+                                                <label class="form-check-label" th:for="'classe_' + ${classe.id}">
+                                                    <span class="badge bg-primary" th:text="${classe.libelle}"></span>
+                                                    <span th:if="${classe.description}" class="text-muted ms-2" th:text="${classe.description}"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="form-text">Sélectionnez les classes de sièges que ce modèle peut proposer</div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="d-flex justify-content-between">

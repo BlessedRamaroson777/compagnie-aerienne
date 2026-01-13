@@ -14,10 +14,10 @@
                     <div class="card-header d-flex justify-content-between">
                         <h3>Détails de l'État Avion</h3>
                         <div>
-                            <a th:href="@{/etats-avion/{id}/edit(id=${etatAvion.id})}" class="btn btn-warning">
+                            <a th:href="@{/etats-avion/{id}/edit(id=${etat.id})}" class="btn btn-warning">
                                 <i class="bi bi-pencil"></i> Modifier
                             </a>
-                            <a th:href="@{/etats-avion/{id}/delete(id=${etatAvion.id})}" 
+                            <a th:href="@{/etats-avion/{id}/delete(id=${etat.id})}" 
                                class="btn btn-danger"
                                onclick="return confirm('Supprimer cet état ?')">
                                 <i class="bi bi-trash"></i> Supprimer
@@ -28,25 +28,25 @@
                         <table class="table table-bordered">
                             <tr>
                                 <th width="30%">ID</th>
-                                <td th:text="${etatAvion.id}"></td>
+                                <td th:text="${etat.id}"></td>
                             </tr>
                             <tr>
                                 <th>Libellé</th>
                                 <td>
-                                    <span th:text="${etatAvion.libelle}" 
-                                          th:classappend="${etatAvion.libelle == 'OPERATIONNEL' ? 'badge bg-success' : 
-                                                          (etatAvion.libelle == 'EN_MAINTENANCE' ? 'badge bg-warning' : 
-                                                          (etatAvion.libelle == 'HORS_SERVICE' ? 'badge bg-danger' : 'badge bg-secondary'))}">
+                                    <span th:text="${etat.libelle}" 
+                                          th:classappend="${etat.libelle == 'OPERATIONNEL' ? 'badge bg-success' : 
+                                                          (etat.libelle == 'EN_MAINTENANCE' ? 'badge bg-warning' : 
+                                                          (etat.libelle == 'HORS_SERVICE' ? 'badge bg-danger' : 'badge bg-secondary'))}">
                                     </span>
                                 </td>
                             </tr>
                             <tr>
                                 <th>Date de Création</th>
-                                <td th:text="${#temporals.format(etatAvion.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${#temporals.format(etat.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
                             </tr>
                             <tr>
                                 <th>Dernière Modification</th>
-                                <td th:text="${#temporals.format(etatAvion.updatedAt, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${#temporals.format(etat.updatedAt, 'dd/MM/yyyy HH:mm')}"></td>
                             </tr>
                         </table>
 

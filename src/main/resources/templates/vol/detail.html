@@ -25,42 +25,12 @@
                             
                             <dt class="col-sm-4">Aéroport Arrivée:</dt>
                             <dd class="col-sm-8" th:text="${vol.aeroportArrivee.codeAeroport + ' - ' + vol.aeroportArrivee.nom + ' (' + vol.aeroportArrivee.ville + ')'}"></dd>
-                            
-                            <dt class="col-sm-4">Date Départ:</dt>
-                            <dd class="col-sm-8" th:text="${#temporals.format(vol.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></dd>
-                            
-                            <dt class="col-sm-4">Date Arrivée:</dt>
-                            <dd class="col-sm-8" th:text="${#temporals.format(vol.dateHeureArrivee, 'dd/MM/yyyy HH:mm')}"></dd>
-                            
-                            <dt class="col-sm-4">Prix Base:</dt>
-                            <dd class="col-sm-8" th:text="${vol.prixBase + ' €'}"></dd>
                         </dl>
                     </div>
                     
                     <div class="col-md-6">
-                        <h5>Avion</h5>
-                        <dl class="row">
-                            <dt class="col-sm-4">Code:</dt>
-                            <dd class="col-sm-8" th:text="${vol.avion.codeAvion}"></dd>
-                            
-                            <dt class="col-sm-4">Modèle:</dt>
-                            <dd class="col-sm-8" th:text="${vol.avion.modele}"></dd>
-                            
-                            <dt class="col-sm-4">Capacité:</dt>
-                            <dd class="col-sm-8" th:text="${vol.avion.capaciteTotale}"></dd>
-                        </dl>
-
-                        <h5 class="mt-3">Statistiques</h5>
-                        <dl class="row">
-                            <dt class="col-sm-6">Sièges Totaux:</dt>
-                            <dd class="col-sm-6" th:text="${vol.siegesVol.size()}"></dd>
-                            
-                            <dt class="col-sm-6">Réservations:</dt>
-                            <dd class="col-sm-6" th:text="${vol.reservations.size()}"></dd>
-                            
-                            <dt class="col-sm-6">Membres Équipage:</dt>
-                            <dd class="col-sm-6" th:text="${vol.equipages.size()}"></dd>
-                        </dl>
+                        <h5 class="mt-3">Vols Programmés</h5>
+                        <p><span th:text="${vol.volsProgrammes != null ? vol.volsProgrammes.size() : 0}"></span> programmations</p>
                     </div>
                 </div>
 

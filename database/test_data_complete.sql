@@ -285,22 +285,22 @@ INSERT INTO paiement (reservation_id, montant, date_paiement, statut) VALUES
 
 -- Répartition paiement multi-méthodes (Carte + Mobile Money)
 INSERT INTO paiement_methode (paiement_id, methode_paiement_id, montant) VALUES
-    (1, 1, 2000.00),   -- Carte: 2000€
-    (1, 3, 500.00);    -- Mobile Money: 500€
+    (1, 1, 2000.00),   -- Carte: 2000Ar
+    (1, 3, 500.00);    -- Mobile Money: 500Ar
 
 -- Paiement pour réservation 2 (Sophie Martin)
 INSERT INTO paiement (reservation_id, montant, date_paiement, statut) VALUES
     (2, 85.00, '2026-01-06 10:20:00', 'VALIDE');
 
 INSERT INTO paiement_methode (paiement_id, methode_paiement_id, montant) VALUES
-    (2, 1, 85.00);     -- Carte: 85€
+    (2, 1, 85.00);     -- Carte: 85Ar
 
 -- Paiement pour réservation 3 (Pierre Bernard)
 INSERT INTO paiement (reservation_id, montant, date_paiement, statut) VALUES
     (3, 4500.00, '2026-01-07 16:50:00', 'VALIDE');
 
 INSERT INTO paiement_methode (paiement_id, methode_paiement_id, montant) VALUES
-    (3, 4, 4500.00);   -- Virement: 4500€
+    (3, 4, 4500.00);   -- Virement: 4500Ar
 
 -- =====================================================
 -- VÉRIFICATIONS
@@ -357,7 +357,7 @@ ORDER BY v.date_heure_depart;
 SELECT 
     v.numero_vol,
     cs.libelle as classe,
-    pv.prix || ' €' as prix
+    pv.prix || ' Ar' as prix
 FROM prix_vol pv
 JOIN vol v ON pv.vol_id = v.id
 JOIN classe_siege cs ON pv.classe_siege_id = cs.id
@@ -381,7 +381,7 @@ SELECT
     v.numero_vol,
     ad.ville || ' → ' || aa.ville as trajet,
     r.statut,
-    COALESCE(p.montant, 0) || ' €' as montant_paye
+    COALESCE(p.montant, 0) || ' Ar' as montant_paye
 FROM reservation r
 JOIN client c ON r.client_id = c.id
 JOIN vol v ON r.vol_id = v.id

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::body}, 'vols-programmes')}">
+<head>
+    <title>Gérer Équipages du Vol</title>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2><i class="bi bi-people me-2"></i>Gérer Équipages du Vol</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong><i class="bi bi-airplane me-2"></i>Vol:</strong> <span class="badge bg-primary" th:text="${volProgramme.vol.numeroVol}">AF001</span></p>
+                                <p class="mb-1"><strong><i class="bi bi-geo-alt me-2"></i>Trajet:</strong> 
+                                    <span th:text="${volProgramme.vol.aeroportDepart.ville}">Paris</span> (<span th:text="${volProgramme.vol.aeroportDepart.codeAeroport}">CDG</span>) → 
+                                    <span th:text="${volProgramme.vol.aeroportArrivee.ville}">New York</span> (<span th:text="${volProgramme.vol.aeroportArrivee.codeAeroport}">JFK</span>)
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong><i class="bi bi-airplane-engines me-2"></i>Avion:</strong> 
+                                    <span th:text="${volProgramme.avion.codeAvion}">A320</span> - 
+                                    <span class="text-muted" th:text="${volProgramme.avion.modelAvion.designation}">Airbus A320</span>
+                                </p>
+                                <p class="mb-1"><strong><i class="bi bi-clock me-2"></i>Départ:</strong> 
+                                    <span class="badge bg-success" th:text="${#temporals.format(volProgramme.dateHeureDepart, 'dd/MM/yyyy HH:mm')}">13/01/2026 14:30</span>
+                                </p>
+                                <p class="mb-0"><strong><i class="bi bi-clock-history me-2"></i>Arrivée:</strong> 
+                                    <span class="badge bg-info" th:text="${#temporals.format(volProgramme.dateHeureArrivee, 'dd/MM/yyyy HH:mm')}">13/01/2026 18:30</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a th:href="@{/vols-programmes}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Retour aux vols
+            </a>
+        </div>
+
+        <!-- Messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row">
+            <!-- Équipages assignés -->
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>Équipages assignés (<span th:text="${#lists.size(equipagesAssignes)}">0</span>)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(equipagesAssignes)}" class="text-center text-muted py-5">
+                            <i class="bi bi-people display-1 mb-3"></i>
+                            <p>Aucun équipage assigné pour ce vol</p>
+                            <p class="small">Utilisez le formulaire ci-contre pour ajouter des membres d'équipage</p>
+                        </div>
+
+                        <div th:unless="${#lists.isEmpty(equipagesAssignes)}" class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Prénom</th>
+                                        <th>Rôle</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="ve : ${equipagesAssignes}">
+                                        <td th:text="${ve.equipage.nom}">Dupont</td>
+                                        <td th:text="${ve.equipage.prenom}">Jean</td>
+                                        <td>
+                                            <span class="badge bg-info" 
+                                                  th:text="${ve.equipage.role != null ? ve.equipage.role.libelle : 'N/A'}">
+                                                Pilote
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <a th:href="@{/vols-programmes/{volId}/equipages/{equipageId}/retirer(volId=${volProgramme.id}, equipageId=${ve.equipage.id})}" 
+                                               class="btn btn-sm btn-danger"
+                                               onclick="return confirm('Retirer cet équipage du vol ?')">
+                                                <i class="bi bi-trash"></i> Retirer
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulaire pour ajouter un équipage -->
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Ajouter un équipage</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/vols-programmes/{id}/equipages/ajouter(id=${volProgramme.id})}" method="post">
+                            <div class="mb-3">
+                                <label for="roleFilter" class="form-label">Filtrer par rôle</label>
+                                <select class="form-select" id="roleFilter" onchange="filtrerParRole()">
+                                    <option value="">-- Tous les rôles --</option>
+                                    <option th:each="role : ${roles}" 
+                                            th:value="${role.id}"
+                                            th:text="${role.libelle}">PILOTE</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="equipageId" class="form-label">Sélectionner un membre d'équipage <span class="text-danger">*</span></label>
+                                <select class="form-select" id="equipageId" name="equipageId" required>
+                                    <option value="">-- Sélectionner --</option>
+                                    <option th:each="equipage : ${tousEquipages}" 
+                                            th:value="${equipage.id}"
+                                            th:data-role="${equipage.role.id}"
+                                            th:text="${equipage.nom + ' ' + equipage.prenom + ' (' + equipage.role.libelle + ')'}"
+                                            th:disabled="${equipagesAssignes.![equipage.id].contains(equipage.id)}"
+                                            th:classappend="${equipagesAssignes.![equipage.id].contains(equipage.id)} ? 'text-muted' : ''">
+                                    </option>
+                                </select>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>Les membres déjà assignés sont grisés et désactivés
+                                </div>
+                            </div>
+                            
+                            <script>
+                                function filtrerParRole() {
+                                    const roleFilter = document.getElementById('roleFilter').value;
+                                    const equipageSelect = document.getElementById('equipageId');
+                                    const options = equipageSelect.getElementsByTagName('option');
+                                    
+                                    for (let i = 1; i < options.length; i++) {
+                                        const option = options[i];
+                                        const roleId = option.getAttribute('data-role');
+                                        
+                                        if (roleFilter === '' || roleId === roleFilter) {
+                                            option.style.display = '';
+                                        } else {
+                                            option.style.display = 'none';
+                                        }
+                                    }
+                                    
+                                    // Réinitialiser la sélection si l'option n'est plus visible
+                                    const selectedOption = equipageSelect.options[equipageSelect.selectedIndex];
+                                    if (selectedOption && selectedOption.style.display === 'none') {
+                                        equipageSelect.value = '';
+                                    }
+                                }
+                            </script>
+
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <small>
+                                    <strong>Conseil :</strong> Assurez-vous d'assigner tous les rôles nécessaires 
+                                    (pilote, copilote, hôtesses, etc.) avant le départ du vol.
+                                </small>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="bi bi-plus-circle me-1"></i>Ajouter à l'équipage
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Statistiques -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Statistiques</h6>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-7">Équipages assignés:</dt>
+                            <dd class="col-sm-5 text-end">
+                                <span class="badge bg-primary fs-6" th:text="${#lists.size(equipagesAssignes)}">0</span>
+                            </dd>
+                            
+                            <dt class="col-sm-7">Équipages disponibles:</dt>
+                            <dd class="col-sm-5 text-end">
+                                <span class="badge bg-secondary fs-6" 
+                                      th:text="${#lists.size(tousEquipages) - #lists.size(equipagesAssignes)}">0</span>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -20,7 +20,7 @@ public class RoleEquipageController {
     @GetMapping
     public String list(Model model) {
         List<RoleEquipage> roles = roleEquipageService.findAll();
-        model.addAttribute("roles", roles);
+        model.addAttribute("roleEquipages", roles);
         return "role-equipage/list";
     }
     

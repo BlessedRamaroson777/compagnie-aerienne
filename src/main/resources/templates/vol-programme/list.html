@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Vols Programmés</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/modern-style.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar('vols-programmes')}"></div>
+
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="bi bi-calendar-check"></i> Vols Programmés</h1>
+                    <a th:href="@{/vols-programmes/new}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Nouveau Vol Programmé
+                    </a>
+                </div>
+
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Filtres</h5>
+                        <form th:action="@{/vols-programmes}" method="get" class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Vol (Route)</label>
+                                <select name="volId" class="form-select">
+                                    <option value="">-- Tous --</option>
+                                    <option th:each="vol : ${vols}" 
+                                            th:value="${vol.id}"
+                                            th:selected="${volId != null && volId == vol.id}"
+                                            th:text="${vol.numeroVol + ' (' + vol.aeroportDepart.codeAeroport + ' → ' + vol.aeroportArrivee.codeAeroport + ')'}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Statut</label>
+                                <select name="status" class="form-select">
+                                    <option value="">-- Tous --</option>
+                                    <option th:each="s : ${statuts}" 
+                                            th:value="${s}"
+                                            th:selected="${status != null && status == s}"
+                                            th:text="${s}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Date Min</label>
+                                <input type="datetime-local" name="dateMin" class="form-control" 
+                                       th:value="${dateMin != null ? #temporals.format(dateMin, 'yyyy-MM-dd''T''HH:mm') : ''}">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Date Max</label>
+                                <input type="datetime-local" name="dateMax" class="form-control"
+                                       th:value="${dateMax != null ? #temporals.format(dateMax, 'yyyy-MM-dd''T''HH:mm') : ''}">
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Filtrer
+                                </button>
+                                <a th:href="@{/vols-programmes}" class="btn btn-secondary">
+                                    <i class="bi bi-x-circle"></i> Réinitialiser
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Vol</th>
+                                <th>Route</th>
+                                <th>Départ</th>
+                                <th>Arrivée</th>
+                                <th>Avion</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="volProg : ${volsProgrammes}">
+                                <td th:text="${volProg.vol.numeroVol}"></td>
+                                <td th:text="${volProg.vol.aeroportDepart.codeAeroport + ' → ' + volProg.vol.aeroportArrivee.codeAeroport}"></td>
+                                <td th:text="${#temporals.format(volProg.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${#temporals.format(volProg.dateHeureArrivee, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${volProg.avion.codeAvion}"></td>
+                                <td>
+                                    <span th:text="${volProg.status}"
+                                          th:classappend="${volProg.status.name() == 'PLANIFIE' ? 'badge bg-info' :
+                                                          (volProg.status.name() == 'EN_VOL' ? 'badge bg-primary' :
+                                                          (volProg.status.name() == 'TERMINE' ? 'badge bg-success' :
+                                                          (volProg.status.name() == 'ANNULE' ? 'badge bg-danger' : 'badge bg-warning')))}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/vols-programmes/{id}(id=${volProg.id})}" class="btn btn-info" title="Détails">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a th:href="@{/vols-programmes/{id}/equipages(id=${volProg.id})}" class="btn btn-success" title="Gérer équipages">
+                                            <i class="bi bi-people"></i>
+                                        </a>
+                                        <a th:href="@{/vols-programmes/{id}/edit(id=${volProg.id})}" class="btn btn-secondary" title="Modifier">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a th:href="@{/vols-programmes/{id}/delete(id=${volProg.id})}" 
+                                           class="btn btn-danger"
+                                           title="Supprimer"
+                                           onclick="return confirm('Supprimer ce vol programmé ?')">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(volsProgrammes)}">
+                                <td colspan="7" class="text-center">Aucun vol programmé trouvé</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

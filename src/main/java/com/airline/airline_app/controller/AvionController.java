@@ -92,6 +92,11 @@ public class AvionController {
     @PostMapping
     public String save(@ModelAttribute Avion avion, RedirectAttributes redirectAttributes) {
         try {
+            // Auto-set capacity from ModelAvion
+            if (avion.getModelAvion() != null && avion.getModelAvion().getCapacite() != null) {
+                avion.setCapaciteTotale(avion.getModelAvion().getCapacite());
+            }
+            
             if (avion.getId() == null) {
                 avionService.save(avion);
                 redirectAttributes.addFlashAttribute("success", "Avion créé avec succès");

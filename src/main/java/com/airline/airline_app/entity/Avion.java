@@ -44,7 +44,7 @@ public class Avion {
     private List<Siege> sieges = new ArrayList<>();
     
     @OneToMany(mappedBy = "avion")
-    private List<Vol> vols = new ArrayList<>();
+    private List<VolProgramme> volsProgrammes = new ArrayList<>();
     
     @PreUpdate
     public void preUpdate() {

@@ -13,13 +13,17 @@ import java.util.List;
 public interface VolProgrammeRepository
         extends JpaRepository<VolProgramme, Long>, JpaSpecificationExecutor<VolProgramme> {
 
-    List<VolProgramme> findByVolId(Long volId);
+    List<VolProgramme> findByVol_Id(Long volId);
 
-    List<VolProgramme> findByVolIdAndDateHeureDepartBetween(Long volId, LocalDateTime start, LocalDateTime end);
+    List<VolProgramme> findByVol_IdAndDateHeureDepartBetween(Long volId, LocalDateTime start, LocalDateTime end);
 
-    List<VolProgramme> findByVolAeroportDepartIdAndVolAeroportArriveeIdAndDateHeureDepartBetween(
+    List<VolProgramme> findByVol_AeroportDepart_IdAndVol_AeroportArrivee_IdAndDateHeureDepartBetween(
             Long aeroportDepartId,
             Long aeroportArriveeId,
             LocalDateTime start,
             LocalDateTime end);
+    
+    List<VolProgramme> findByVol_AeroportDepart_IdAndVol_AeroportArrivee_Id(
+            Long aeroportDepartId,
+            Long aeroportArriveeId);
 }

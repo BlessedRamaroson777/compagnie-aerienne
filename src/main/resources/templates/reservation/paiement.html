@@ -72,21 +72,21 @@
                     
                     <div class="info-item d-flex justify-content-between">
                         <span class="opacity-75">Vol</span>
-                        <span class="fw-bold" th:text="${reservation.vol.numeroVol}">AF123</span>
+                        <span class="fw-bold" th:text="${reservation.volProgramme.vol.numeroVol}">AF123</span>
                     </div>
                     
                     <div class="info-item d-flex justify-content-between">
                         <span class="opacity-75">Trajet</span>
                         <span class="fw-bold">
-                            <span th:text="${reservation.vol.aeroportDepart?.codeAeroport}">CDG</span>
+                            <span th:text="${reservation.volProgramme.vol.aeroportDepart?.codeAeroport}">CDG</span>
                             <i class="bi bi-arrow-right mx-2"></i>
-                            <span th:text="${reservation.vol.aeroportArrivee?.codeAeroport}">JFK</span>
+                            <span th:text="${reservation.volProgramme.vol.aeroportArrivee?.codeAeroport}">JFK</span>
                         </span>
                     </div>
                     
                     <div class="info-item d-flex justify-content-between">
                         <span class="opacity-75">Date et heure</span>
-                        <span class="fw-bold" th:text="${#temporals.format(reservation.vol.dateHeureDepart, 'dd/MM/yyyy HH:mm')}">01/01/2024 08:00</span>
+                        <span class="fw-bold" th:text="${#temporals.format(reservation.volProgramme.dateHeureDepart, 'dd/MM/yyyy HH:mm')}">01/01/2024 08:00</span>
                     </div>
                     
                     <div class="info-item d-flex justify-content-between">

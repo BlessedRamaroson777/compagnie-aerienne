@@ -47,6 +47,9 @@ public class Reservation {
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
     private List<Billet> billets = new ArrayList<>();
 
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReservationDetail> details = new ArrayList<>();
+
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
     private List<Paiement> paiements = new ArrayList<>();
 }

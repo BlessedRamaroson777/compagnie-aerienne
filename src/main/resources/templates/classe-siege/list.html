@@ -38,7 +38,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="classe : ${classeSieges}">
+                                <tr th:each="classe : ${classes}">
                                     <td th:text="${classe.id}"></td>
                                     <td><strong th:text="${classe.libelle}"></strong></td>
                                     <td th:text="${#temporals.format(classe.createdAt, 'dd/MM/yyyy HH:mm')}"></td>

@@ -30,7 +30,11 @@
             <div class="sidebar-section">Vols</div>
             <a th:href="@{/vols}" class="sidebar-link" th:classappend="${activeMenu == 'vols' ? 'active' : ''}">
                 <i class="bi bi-airplane-engines"></i>
-                <span>Vols</span>
+                <span>Vols (Routes)</span>
+            </a>
+            <a th:href="@{/vols-programmes}" class="sidebar-link" th:classappend="${activeMenu == 'vols-programmes' ? 'active' : ''}">
+                <i class="bi bi-calendar-check"></i>
+                <span>Vols Programmés</span>
             </a>
             <a th:href="@{/aeroports}" class="sidebar-link" th:classappend="${activeMenu == 'aeroports' ? 'active' : ''}">
                 <i class="bi bi-pin-map"></i>

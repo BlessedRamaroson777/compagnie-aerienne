@@ -37,6 +37,9 @@ public class ClasseSiege {
     @OneToMany(mappedBy = "classeSiege")
     private List<PrixVol> prixVols;
     
+    @ManyToMany(mappedBy = "classesDisponibles")
+    private List<ModelAvion> modelAvions;
+    
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${volProgramme.id != null ? 'Modifier Vol Programmé' : 'Nouveau Vol Programmé'}">Vol Programmé</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 th:text="${volProgramme.id != null ? 'Modifier Vol Programmé' : 'Nouveau Vol Programmé'}"></h3>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{${volProgramme.id != null ? '/vols-programmes/' + volProgramme.id : '/vols-programmes'}}" 
+                              th:object="${volProgramme}" method="post">
+                            
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> Programmer un vol spécifique avec date, heure et avion
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="volId" class="form-label">Vol (Route) *</label>
+                                <select class="form-select" id="volId" name="volId" required>
+                                    <option value="">-- Sélectionner une route --</option>
+                                    <option th:each="vol : ${vols}" 
+                                            th:value="${vol.id}"
+                                            th:selected="${volProgramme.vol != null && volProgramme.vol.id == vol.id}"
+                                            th:text="${vol.numeroVol + ' - ' + vol.aeroportDepart.codeAeroport + ' → ' + vol.aeroportArrivee.codeAeroport + ' (' + vol.aeroportDepart.ville + ' → ' + vol.aeroportArrivee.ville + ')'}">
+                                    </option>
+                                </select>
+                                <div class="form-text">Sélectionner la route (numéro de vol et aéroports)</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="avionId" class="form-label">Avion *</label>
+                                <select class="form-select" id="avionId" name="avionId" required>
+                                    <option value="">-- Sélectionner un avion --</option>
+                                    <option th:each="avion : ${avions}" 
+                                            th:value="${avion.id}"
+                                            th:selected="${volProgramme.avion != null && volProgramme.avion.id == avion.id}"
+                                            th:text="${avion.codeAvion + ' (' + avion.modelAvion.designation + ' - ' + avion.etatAvion.libelle + ')'}">
+                                    </option>
+                                </select>
+                                <div class="form-text">Avion qui effectuera ce vol</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="dateHeureDepart" class="form-label">Date et Heure de Départ *</label>
+                                    <input type="datetime-local" class="form-control" id="dateHeureDepart" 
+                                           th:field="*{dateHeureDepart}" required>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="dateHeureArrivee" class="form-label">Date et Heure d'Arrivée *</label>
+                                    <input type="datetime-local" class="form-control" id="dateHeureArrivee" 
+                                           th:field="*{dateHeureArrivee}" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Statut *</label>
+                                <select class="form-select" id="status" th:field="*{status}" required>
+                                    <option th:each="statut : ${statuts}" 
+                                            th:value="${statut}"
+                                            th:text="${statut}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/vols-programmes}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Retour
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save"></i> Enregistrer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

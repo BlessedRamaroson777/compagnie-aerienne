@@ -72,23 +72,23 @@
                         <h5 class="mb-3"><i class="bi bi-airplane text-primary me-2"></i>Informations Vol</h5>
                         <dl class="row mb-0">
                             <dt class="col-sm-5">Numéro de vol:</dt>
-                            <dd class="col-sm-7 fw-bold" th:text="${reservation.vol.numeroVol}"></dd>
+                            <dd class="col-sm-7 fw-bold" th:text="${reservation.volProgramme.vol.numeroVol}"></dd>
                             
                             <dt class="col-sm-5">Trajet:</dt>
                             <dd class="col-sm-7">
-                                <span th:text="${reservation.vol.aeroportDepart.codeAeroport}"></span>
+                                <span th:text="${reservation.volProgramme.vol.aeroportDepart.ville}"></span>
                                 <i class="bi bi-arrow-right mx-1"></i>
-                                <span th:text="${reservation.vol.aeroportArrivee.codeAeroport}"></span>
+                                <span th:text="${reservation.volProgramme.vol.aeroportArrivee.ville}"></span>
                             </dd>
                             
                             <dt class="col-sm-5">Départ:</dt>
-                            <dd class="col-sm-7" th:text="${#temporals.format(reservation.vol.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></dd>
+                            <dd class="col-sm-7" th:text="${#temporals.format(reservation.volProgramme.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></dd>
                             
                             <dt class="col-sm-5">Arrivée:</dt>
-                            <dd class="col-sm-7" th:text="${#temporals.format(reservation.vol.dateHeureArrivee, 'dd/MM/yyyy HH:mm')}"></dd>
+                            <dd class="col-sm-7" th:text="${#temporals.format(reservation.volProgramme.dateHeureArrivee, 'dd/MM/yyyy HH:mm')}"></dd>
                             
                             <dt class="col-sm-5">Avion:</dt>
-                            <dd class="col-sm-7" th:text="${reservation.vol.avion?.modelAvion?.designation}"></dd>
+                            <dd class="col-sm-7" th:text="${reservation.volProgramme.avion?.modelAvion?.designation}"></dd>
                         </dl>
                     </div>
                 </div>
@@ -114,24 +114,59 @@
                 <div class="col-12">
                     <div class="info-card">
                         <h5 class="mb-3"><i class="bi bi-receipt text-primary me-2"></i>Détails de la Réservation</h5>
-                        <div class="row">
-                            <div class="col-md-3">
+                        
+                        <!-- Si détails multiples disponibles -->
+                        <div th:if="${!#lists.isEmpty(reservation.details)}" class="mb-3">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Classe</th>
+                                        <th>Places</th>
+                                        <th>Prix unitaire</th>
+                                        <th class="text-end">Sous-total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="detail : ${reservation.details}">
+                                        <td><span class="badge bg-info" th:text="${detail.classeSiege.libelle}">ECONOMY</span></td>
+                                        <td th:text="${detail.nombrePlaces}">1</td>
+                                        <td th:text="${#numbers.formatDecimal(detail.prixUnitaire, 0, 'COMMA', 0, 'POINT')} + ' Ar'">100000 Ar</td>
+                                        <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(detail.sousTotal, 0, 'COMMA', 0, 'POINT')} + ' Ar'">100000 Ar</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Si ancien format (une seule classe) -->
+                        <div th:if="${#lists.isEmpty(reservation.details)}" class="row mb-3">
+                            <div class="col-md-6">
                                 <dt>Classe</dt>
                                 <dd class="fw-bold fs-5">
                                     <span class="badge bg-info" th:text="${reservation.classeSiege?.libelle}">ECONOMY</span>
                                 </dd>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <dt>Nombre de places</dt>
                                 <dd class="fw-bold fs-5" th:text="${reservation.nombrePlaces}">1</dd>
                             </div>
-                            <div class="col-md-3">
-                                <dt>Date réservation</dt>
-                                <dd th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy HH:mm')}"></dd>
+                        </div>
+                        
+                        <div class="row border-top pt-3">
+                            <div class="col-md-6">
+                                <dt>Total des places</dt>
+                                <dd class="fw-bold fs-5" th:text="${reservation.nombrePlaces}">1</dd>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <dt>Prix Total</dt>
                                 <dd class="fw-bold fs-4 text-success" th:text="${#numbers.formatDecimal(reservation.prixTotal, 0, 'COMMA', 0, 'POINT')} + ' Ar'">150000 Ar</dd>
+                            </div>
+                            <div class="col-md-12 mt-2">
+                                <dt>Statut</dt>
+                                <dd>
+                                    <span th:class="${'badge bg-' + (reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE ? 'success' : 
+                                                     reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).ANNULEE ? 'danger' : 'warning')}" 
+                                          th:text="${reservation.statut}">EN_ATTENTE</span>
+                                </dd>
                             </div>
                         </div>
                     </div>

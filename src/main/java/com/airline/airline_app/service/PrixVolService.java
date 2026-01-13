@@ -34,6 +34,23 @@ public class PrixVolService extends GenericServiceImpl<PrixVol, Long> {
     public List<PrixVol> findByVolProgrammeId(Long volProgrammeId) {
         return prixVolRepository.findByVolProgrammeId(volProgrammeId);
     }
+    
+    public List<PrixVol> findByVolProgrammeIdAndModelAvion(Long volProgrammeId) {
+        List<PrixVol> allPrixVols = prixVolRepository.findByVolProgrammeId(volProgrammeId);
+        // Filtrer pour ne garder que les classes disponibles dans le modèle d'avion
+        return allPrixVols.stream()
+                .filter(pv -> {
+                    if (pv.getVolProgramme().getAvion() != null 
+                            && pv.getVolProgramme().getAvion().getModelAvion() != null
+                            && pv.getVolProgramme().getAvion().getModelAvion().getClassesDisponibles() != null) {
+                        return pv.getVolProgramme().getAvion().getModelAvion().getClassesDisponibles()
+                                .stream()
+                                .anyMatch(c -> c.getId().equals(pv.getClasseSiege().getId()));
+                    }
+                    return false; // Si pas de modèle ou classes définies, ne pas afficher
+                })
+                .toList();
+    }
 
     public Optional<PrixVol> findByVolProgrammeIdAndClasseSiegeId(Long volProgrammeId, Long classeSiegeId) {
         return prixVolRepository.findByVolProgrammeIdAndClasseSiegeId(volProgrammeId, classeSiegeId);

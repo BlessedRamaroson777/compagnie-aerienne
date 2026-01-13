@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::body}, 'billets')}">
+<head>
+    <title th:text="${billet.id != null ? 'Modifier Billet' : 'Nouveau Billet'}">Formulaire Billet</title>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-ticket-perforated me-2"></i>
+                <span th:text="${billet.id != null ? 'Modifier Billet #' + billet.id : 'Nouveau Billet'}"></span>
+            </h2>
+            <a href="/billets" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Retour
+            </a>
+        </div>
+
+        <!-- Messages -->
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form th:action="@{/billets}" th:object="${billet}" method="post">
+                    <input type="hidden" th:field="*{id}">
+
+                    <div class="row">
+                        <!-- Réservation -->
+                        <div class="col-md-6 mb-3">
+                            <label for="reservation" class="form-label">Réservation *</label>
+                            <select class="form-select" id="reservation" th:field="*{reservation.id}" required>
+                                <option value="">-- Sélectionner une réservation --</option>
+                                <option th:each="reservation : ${reservations}" 
+                                        th:value="${reservation.id}"
+                                        th:text="'#' + ${reservation.id} + ' - ' + ${reservation.client.nom} + ' ' + ${reservation.client.prenom} + ' - Vol ' + ${reservation.volProgramme.vol.numeroVol}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Siège Vol -->
+                        <div class="col-md-6 mb-3">
+                            <label for="siegeVol" class="form-label">Siège *</label>
+                            <select class="form-select" id="siegeVol" th:field="*{siegeVol.id}" required>
+                                <option value="">-- Sélectionner un siège --</option>
+                                <option th:each="siegeVol : ${siegesVol}" 
+                                        th:value="${siegeVol.id}"
+                                        th:text="${siegeVol.siege.numeroSiege} + ' (' + ${siegeVol.siege.classeSiege.libelle} + ')'"
+                                        th:disabled="${siegeVol.occupe}">
+                                </option>
+                            </select>
+                            <div class="form-text">Seuls les sièges disponibles (non occupés) sont sélectionnables</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Prix -->
+                        <div class="col-md-6 mb-3">
+                            <label for="prix" class="form-label">Prix (Ar) *</label>
+                            <input type="number" step="0.01" class="form-control" id="prix" th:field="*{prix}" required min="0">
+                        </div>
+
+                        <!-- Statut -->
+                        <div class="col-md-6 mb-3">
+                            <label for="statut" class="form-label">Statut *</label>
+                            <select class="form-select" id="statut" th:field="*{statut}" required>
+                                <option th:each="statut : ${T(com.airline.airline_app.entity.enums.StatutBillet).values()}"
+                                        th:value="${statut}"
+                                        th:text="${statut}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="/billets" class="btn btn-secondary">
+                            <i class="bi bi-x-circle me-1"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i>Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Information</h5>
+            </div>
+            <div class="card-body">
+                <h6>Rôle du billet dans le système :</h6>
+                <ul>
+                    <li><strong>Identité</strong> : Le billet relie un passager (via une réservation) à un vol spécifique</li>
+                    <li><strong>Attributs clés</strong> : ID unique, réservation, siège, prix, statut (EMIS, ANNULE, UTILISE, REMBOURSE)</li>
+                    <li><strong>Relations</strong> : 
+                        <ul>
+                            <li>Billet → Réservation → Client (qui voyage)</li>
+                            <li>Billet → SiègeVol → Vol programmé (où et quand)</li>
+                            <li>Billet → Paiement (transaction financière)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Fonctionnalités</strong> : 
+                        <ul>
+                            <li>Vérifier si un passager peut embarquer</li>
+                            <li>Calculer le nombre de sièges occupés sur un vol</li>
+                            <li>Statistiques et rapports financiers (revenus par vol, par classe)</li>
+                            <li>Gérer les modifications et annulations via le statut</li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-lightbulb me-2"></i>
+                    <strong>Résumé</strong> : Le billet est l'objet central qui matérialise la réservation d'un siège pour un passager sur un vol précis. 
+                    Sans billet, le passager n'a pas de droit de voyage.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Charger les sièges disponibles selon la réservation sélectionnée
+        document.getElementById('reservation').addEventListener('change', function() {
+            const reservationId = this.value;
+            if (reservationId) {
+                // Ici vous pourriez ajouter un appel AJAX pour charger les sièges du vol programmé
+                // correspondant à la réservation sélectionnée
+                console.log('Réservation sélectionnée:', reservationId);
+            }
+        });
+    </script>
+</body>
+</html>

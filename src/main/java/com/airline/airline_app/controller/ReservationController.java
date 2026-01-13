@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/reservations")
@@ -29,6 +30,8 @@ public class ReservationController {
     private final PrixVolService prixVolService;
     private final PaiementService paiementService;
     private final AeroportService aeroportService;
+    private final BilletService billetService;
+    private final SiegeVolService siegeVolService;
 
     @GetMapping
     public String list(Model model) {
@@ -37,46 +40,36 @@ public class ReservationController {
         return "reservation/list";
     }
 
-    // Étape 1: Recherche de vols
+    // Étape 1: Recherche de vols (seulement aéroports)
     @GetMapping("/new")
     public String rechercheVol(Model model) {
         model.addAttribute("aeroports", aeroportService.findAll());
         return "reservation/recherche-vol";
     }
 
-    // Étape 2: Liste des vols programmés disponibles
+    // Étape 2: Liste des dates/heures disponibles pour la route
     @GetMapping("/vols-disponibles")
     public String volsDisponibles(@RequestParam Long aeroportDepartId,
             @RequestParam Long aeroportArriveeId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateVol,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime heureVol,
             Model model) {
-        // Rechercher les vols programmés pour cette route et date
-        List<VolProgramme> volsProgrammes = volProgrammeService.findByAeroportsAndDate(
-                aeroportDepartId, aeroportArriveeId, dateVol);
-
-        // Filtrer par heure si spécifiée
-        if (heureVol != null) {
-            volsProgrammes = volsProgrammes.stream()
-                    .filter(vp -> vp.getDateHeureDepart().toLocalTime().equals(heureVol))
-                    .toList();
-        }
+        // Rechercher TOUS les vols programmés pour cette route (toutes dates/heures)
+        List<VolProgramme> volsProgrammes = volProgrammeService.findByAeroportsAllDates(
+                aeroportDepartId, aeroportArriveeId);
 
         model.addAttribute("volsProgrammes", volsProgrammes);
         model.addAttribute("aeroportDepart", aeroportService.findById(aeroportDepartId).orElse(null));
         model.addAttribute("aeroportArrivee", aeroportService.findById(aeroportArriveeId).orElse(null));
-        model.addAttribute("dateVol", dateVol);
-        model.addAttribute("heureVol", heureVol);
         return "reservation/vols-disponibles";
     }
 
-    // Étape 3: Configuration de la réservation
+    // Étape 3: Configuration de la réservation avec choix de sièges
     @GetMapping("/configurer/{volProgrammeId}")
     public String configurerReservation(@PathVariable Long volProgrammeId, Model model) {
         VolProgramme volProgramme = volProgrammeService.findById(volProgrammeId)
                 .orElseThrow(() -> new RuntimeException("Vol programmé non trouvé"));
 
-        List<PrixVol> prixVols = prixVolService.findByVolProgrammeId(volProgrammeId);
+        // Utiliser la nouvelle méthode qui filtre selon le modèle d'avion
+        List<PrixVol> prixVols = prixVolService.findByVolProgrammeIdAndModelAvion(volProgrammeId);
 
         model.addAttribute("volProgramme", volProgramme);
         model.addAttribute("prixVols", prixVols);
@@ -97,31 +90,90 @@ public class ReservationController {
     @PostMapping("/confirmer")
     public String confirmerReservation(@RequestParam Long volProgrammeId,
             @RequestParam Long clientId,
-            @RequestParam Long classeSiegeId,
-            @RequestParam Integer nombrePlaces,
+            @RequestParam Map<String, String> allParams,
             RedirectAttributes redirectAttributes) {
         try {
             VolProgramme volProgramme = volProgrammeService.findById(volProgrammeId)
                     .orElseThrow(() -> new RuntimeException("Vol programmé non trouvé"));
             Client client = clientService.findById(clientId)
                     .orElseThrow(() -> new RuntimeException("Client non trouvé"));
-            ClasseSiege classeSiege = classeSiegeService.findById(classeSiegeId)
-                    .orElseThrow(() -> new RuntimeException("Classe de siège non trouvée"));
 
-            PrixVol prixVol = prixVolService.findByVolProgrammeIdAndClasseSiegeId(volProgrammeId, classeSiegeId)
-                    .orElseThrow(() -> new RuntimeException("Prix non défini pour ce vol et cette classe"));
-
-            BigDecimal prixTotal = prixVol.getPrix().multiply(BigDecimal.valueOf(nombrePlaces));
-
+            // Créer la réservation principale
             Reservation reservation = new Reservation();
             reservation.setClient(client);
             reservation.setVolProgramme(volProgramme);
-            reservation.setClasseSiege(classeSiege);
-            reservation.setNombrePlaces(nombrePlaces);
-            reservation.setPrixTotal(prixTotal);
             reservation.setStatut(StatutReservation.EN_ATTENTE);
+            
+            BigDecimal prixTotal = BigDecimal.ZERO;
+            int totalPlaces = 0;
+            
+            // Parser les paramètres places_X
+            for (Map.Entry<String, String> entry : allParams.entrySet()) {
+                if (entry.getKey().startsWith("places_")) {
+                    int nbPlaces = Integer.parseInt(entry.getValue());
+                    if (nbPlaces > 0) {
+                        Long classeSiegeId = Long.parseLong(entry.getKey().replace("places_", ""));
+                        ClasseSiege classeSiege = classeSiegeService.findById(classeSiegeId)
+                                .orElseThrow(() -> new RuntimeException("Classe de siège non trouvée"));
+                        
+                        PrixVol prixVol = prixVolService.findByVolProgrammeIdAndClasseSiegeId(volProgrammeId, classeSiegeId)
+                                .orElseThrow(() -> new RuntimeException("Prix non défini"));
+                        
+                        BigDecimal sousTotal = prixVol.getPrix().multiply(BigDecimal.valueOf(nbPlaces));
+                        prixTotal = prixTotal.add(sousTotal);
+                        totalPlaces += nbPlaces;
+                        
+                        // Créer un détail de réservation
+                        ReservationDetail detail = new ReservationDetail();
+                        detail.setReservation(reservation);
+                        detail.setClasseSiege(classeSiege);
+                        detail.setNombrePlaces(nbPlaces);
+                        detail.setPrixUnitaire(prixVol.getPrix());
+                        detail.setSousTotal(sousTotal);
+                        
+                        reservation.getDetails().add(detail);
+                    }
+                }
+            }
+            
+            if (totalPlaces == 0) {
+                throw new RuntimeException("Aucune place sélectionnée");
+            }
+            
+            reservation.setNombrePlaces(totalPlaces);
+            reservation.setPrixTotal(prixTotal);
+            // Garder la classe principale pour compatibilité (première classe sélectionnée)
+            if (!reservation.getDetails().isEmpty()) {
+                reservation.setClasseSiege(reservation.getDetails().get(0).getClasseSiege());
+            }
 
             Reservation savedReservation = reservationService.save(reservation);
+
+            // Générer automatiquement les billets pour chaque détail de réservation
+            for (ReservationDetail detail : savedReservation.getDetails()) {
+                // Pour chaque place dans ce détail
+                for (int i = 0; i < detail.getNombrePlaces(); i++) {
+                    // Trouver un siège disponible de cette classe
+                    List<SiegeVol> siegesDisponibles = siegeVolService.findDisponiblesByVolProgrammeAndClasse(
+                        volProgrammeId, detail.getClasseSiege().getId());
+                    
+                    if (!siegesDisponibles.isEmpty()) {
+                        SiegeVol siegeVol = siegesDisponibles.get(0);
+                        
+                        // Créer le billet
+                        Billet billet = new Billet();
+                        billet.setReservation(savedReservation);
+                        billet.setSiegeVol(siegeVol);
+                        billet.setPrix(detail.getPrixUnitaire());
+                        billet.setStatut(com.airline.airline_app.entity.enums.StatutBillet.EMIS);
+                        billetService.save(billet);
+                        
+                        // Marquer le siège comme occupé
+                        siegeVol.setOccupe(true);
+                        siegeVolService.update(siegeVol.getId(), siegeVol);
+                    }
+                }
+            }
 
             return "redirect:/reservations/paiement/" + savedReservation.getId();
         } catch (Exception e) {

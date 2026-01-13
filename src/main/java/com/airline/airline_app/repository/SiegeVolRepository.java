@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface SiegeVolRepository extends JpaRepository<SiegeVol, Long>, JpaSpecificationExecutor<SiegeVol> {
-    List<SiegeVol> findByVolId(Long volId);
-    List<SiegeVol> findByVolIdAndOccupe(Long volId, Boolean occupe);
+    List<SiegeVol> findByVolProgramme_Id(Long volProgrammeId);
+    List<SiegeVol> findByVolProgramme_IdAndOccupe(Long volProgrammeId, Boolean occupe);
 }

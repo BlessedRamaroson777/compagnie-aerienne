@@ -30,7 +30,7 @@
                             <dd class="col-sm-8" th:text="${paiement.reservation.client.nom + ' ' + paiement.reservation.client.prenom}"></dd>
                             
                             <dt class="col-sm-4">Montant:</dt>
-                            <dd class="col-sm-8" th:text="${paiement.montant + ' €'}"></dd>
+                            <dd class="col-sm-8" th:text="${paiement.montant + ' Ar'}"></dd>
                             
                             <dt class="col-sm-4">Date Paiement:</dt>
                             <dd class="col-sm-8" th:text="${#temporals.format(paiement.datePaiement, 'dd/MM/yyyy HH:mm')}"></dd>
