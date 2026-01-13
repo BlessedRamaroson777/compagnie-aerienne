@@ -23,13 +23,13 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="volId" class="form-label">Vol *</label>
-                                <select class="form-select" id="volId" name="volId" required>
-                                    <option value="">-- Sélectionner un vol --</option>
-                                    <option th:each="vol : ${vols}" 
-                                            th:value="${vol.id}"
-                                            th:selected="${prixVol.vol != null && prixVol.vol.id == vol.id}"
-                                            th:text="${vol.numeroVol + ' - ' + vol.aeroportDepart.codeAeroport + ' → ' + vol.aeroportArrivee.codeAeroport + ' (' + #temporals.format(vol.dateHeureDepart, 'dd/MM/yyyy HH:mm') + ')'}">
+                                <label for="volProgrammeId" class="form-label">Vol Programmé *</label>
+                                <select class="form-select" id="volProgrammeId" name="volProgrammeId" required>
+                                    <option value="">-- Sélectionner un vol programmé --</option>
+                                    <option th:each="volProg : ${volsProgrammes}" 
+                                            th:value="${volProg.id}"
+                                            th:selected="${prixVol.volProgramme != null && prixVol.volProgramme.id == volProg.id}"
+                                            th:text="${volProg.vol.numeroVol + ' - ' + volProg.vol.aeroportDepart.codeAeroport + ' → ' + volProg.vol.aeroportArrivee.codeAeroport + ' (' + #temporals.format(volProg.dateHeureDepart, 'dd/MM/yyyy HH:mm') + ')'}">
                                     </option>
                                 </select>
                             </div>
@@ -38,17 +38,17 @@
                                 <label for="classeSiegeId" class="form-label">Classe de Siège *</label>
                                 <select class="form-select" id="classeSiegeId" name="classeSiegeId" required>
                                     <option value="">-- Sélectionner une classe --</option>
-                                    <option th:each="classe : ${classeSieges}" 
+                                    <option th:each="classe : ${classes}" 
                                             th:value="${classe.id}"
                                             th:selected="${prixVol.classeSiege != null && prixVol.classeSiege.id == classe.id}"
                                             th:text="${classe.libelle}">
                                     </option>
                                 </select>
-                                <div class="form-text">Chaque combinaison Vol + Classe doit être unique</div>
+                                <div class="form-text">Chaque combinaison Vol Programmé + Classe doit être unique</div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="prix" class="form-label">Prix (€) *</label>
+                                <label for="prix" class="form-label">Prix (Ar) *</label>
                                 <input type="number" class="form-control" id="prix" th:field="*{prix}" 
                                        required min="0" step="0.01">
                                 <div class="form-text">Prix en euros (Ex: 150.00)</div>

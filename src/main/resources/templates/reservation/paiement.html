@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement - Airline App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background-color: #f5f7fa; }
+        .payment-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        .summary-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+        }
+        .total-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+        .btn-pay {
+            background: linear-gradient(135deg, #198754, #157347);
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 10px;
+        }
+        .btn-pay:hover {
+            background: linear-gradient(135deg, #157347, #146c43);
+            transform: translateY(-2px);
+        }
+        .info-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="bi bi-airplane-fill me-2"></i>Airline App</a>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Alerte -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <h2 class="mb-4 text-center">
+                    <i class="bi bi-credit-card-2-front text-primary me-2"></i>Finaliser le paiement
+                </h2>
+
+                <!-- Récapitulatif de la réservation -->
+                <div class="summary-card mb-4">
+                    <h5 class="mb-4"><i class="bi bi-receipt me-2"></i>Récapitulatif de votre réservation</h5>
+                    
+                    <div class="info-item d-flex justify-content-between">
+                        <span class="opacity-75">Vol</span>
+                        <span class="fw-bold" th:text="${reservation.volProgramme.vol.numeroVol}">AF123</span>
+                    </div>
+                    
+                    <div class="info-item d-flex justify-content-between">
+                        <span class="opacity-75">Trajet</span>
+                        <span class="fw-bold">
+                            <span th:text="${reservation.volProgramme.vol.aeroportDepart?.codeAeroport}">CDG</span>
+                            <i class="bi bi-arrow-right mx-2"></i>
+                            <span th:text="${reservation.volProgramme.vol.aeroportArrivee?.codeAeroport}">JFK</span>
+                        </span>
+                    </div>
+                    
+                    <div class="info-item d-flex justify-content-between">
+                        <span class="opacity-75">Date et heure</span>
+                        <span class="fw-bold" th:text="${#temporals.format(reservation.volProgramme.dateHeureDepart, 'dd/MM/yyyy HH:mm')}">01/01/2024 08:00</span>
+                    </div>
+                    
+                    <div class="info-item d-flex justify-content-between">
+                        <span class="opacity-75">Passager</span>
+                        <span class="fw-bold" th:text="${reservation.client.prenom + ' ' + reservation.client.nom}">John Doe</span>
+                    </div>
+                    
+                    <div class="info-item d-flex justify-content-between">
+                        <span class="opacity-75">Classe</span>
+                        <span class="fw-bold" th:text="${reservation.classeSiege?.libelle}">ECONOMY</span>
+                    </div>
+                    
+                    <div class="info-item d-flex justify-content-between">
+                        <span class="opacity-75">Nombre de places</span>
+                        <span class="fw-bold" th:text="${reservation.nombrePlaces}">1</span>
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+                        <span class="fs-5">Montant total</span>
+                        <span class="total-amount" th:text="${#numbers.formatDecimal(reservation.prixTotal, 0, 'COMMA', 0, 'POINT')} + ' Ar'">150000 Ar</span>
+                    </div>
+                </div>
+
+                <!-- Formulaire de paiement -->
+                <div class="payment-card">
+                    <h5 class="mb-4"><i class="bi bi-lock-fill text-success me-2"></i>Paiement sécurisé</h5>
+                    
+                    <form th:action="@{/reservations/paiement/{id}(id=${reservation.id})}" method="post">
+                        <!-- Simulation de formulaire de carte -->
+                        <div class="mb-3">
+                            <label class="form-label">Numéro de carte</label>
+                            <input type="text" class="form-control form-control-lg" 
+                                   placeholder="1234 5678 9012 3456" 
+                                   pattern="[0-9\s]{13,19}" maxlength="19">
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Date d'expiration</label>
+                                <input type="text" class="form-control form-control-lg" 
+                                       placeholder="MM/AA" maxlength="5">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">CVV</label>
+                                <input type="text" class="form-control form-control-lg" 
+                                       placeholder="123" maxlength="4">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Nom sur la carte</label>
+                            <input type="text" class="form-control form-control-lg" 
+                                   th:value="${reservation.client.prenom + ' ' + reservation.client.nom}">
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-pay">
+                                <i class="bi bi-shield-check me-2"></i>
+                                Payer <span th:text="${#numbers.formatDecimal(reservation.prixTotal, 0, 'COMMA', 0, 'POINT')} + ' Ar'">150000 Ar</span>
+                            </button>
+                            <a th:href="@{/reservations/{id}/annuler(id=${reservation.id})}" 
+                               class="btn btn-outline-danger btn-lg"
+                               onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')">
+                                <i class="bi bi-x-circle me-2"></i>Annuler la réservation
+                            </a>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <div class="d-flex justify-content-center gap-3">
+                            <i class="bi bi-credit-card fs-3 text-muted"></i>
+                            <i class="bi bi-paypal fs-3 text-muted"></i>
+                            <i class="bi bi-shield-check fs-3 text-success"></i>
+                        </div>
+                        <small class="text-muted">Paiement 100% sécurisé</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

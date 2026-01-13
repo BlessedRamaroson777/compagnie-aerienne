@@ -34,7 +34,7 @@
                                     <option value="">Sélectionnez un vol</option>
                                     <option th:each="vol : ${vols}" 
                                             th:value="${vol.id}"
-                                            th:text="${vol.numeroVol + ' - ' + vol.depart + ' → ' + vol.arrivee + ' (' + #temporals.format(vol.dateHeureDepart, 'dd/MM/yyyy') + ')'}"
+                                            th:text="${vol.numeroVol + ' - ' + vol.aeroportDepart.codeAeroport + ' → ' + vol.aeroportArrivee.codeAeroport + ' (' + #temporals.format(vol.dateHeureDepart, 'dd/MM/yyyy') + ')'}"
                                             th:selected="${reservation.vol != null && reservation.vol.id == vol.id}"></option>
                                 </select>
                             </div>

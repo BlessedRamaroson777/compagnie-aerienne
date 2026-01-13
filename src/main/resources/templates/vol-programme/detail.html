@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails Vol Programmé</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h3>Détails du Vol Programmé</h3>
+                        <div>
+                            <a th:href="@{/vols-programmes/{id}/edit(id=${volProgramme.id})}" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Modifier
+                            </a>
+                            <a th:href="@{/vols-programmes/{id}/delete(id=${volProgramme.id})}" 
+                               class="btn btn-danger"
+                               onclick="return confirm('Supprimer ce vol programmé ?')">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="text-primary"><i class="bi bi-airplane"></i> Informations du Vol</h5>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th width="40%">Numéro de Vol</th>
+                                        <td th:text="${volProgramme.vol.numeroVol}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Départ</th>
+                                        <td>
+                                            <strong th:text="${volProgramme.vol.aeroportDepart.codeAeroport}"></strong><br>
+                                            <span th:text="${volProgramme.vol.aeroportDepart.nom}"></span><br>
+                                            <small class="text-muted" th:text="${volProgramme.vol.aeroportDepart.ville + ', ' + volProgramme.vol.aeroportDepart.pays}"></small>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Arrivée</th>
+                                        <td>
+                                            <strong th:text="${volProgramme.vol.aeroportArrivee.codeAeroport}"></strong><br>
+                                            <span th:text="${volProgramme.vol.aeroportArrivee.nom}"></span><br>
+                                            <small class="text-muted" th:text="${volProgramme.vol.aeroportArrivee.ville + ', ' + volProgramme.vol.aeroportArrivee.pays}"></small>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h5 class="text-success"><i class="bi bi-calendar-check"></i> Programmation</h5>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th width="40%">Date Départ</th>
+                                        <td th:text="${#temporals.format(volProgramme.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date Arrivée</th>
+                                        <td th:text="${#temporals.format(volProgramme.dateHeureArrivee, 'dd/MM/yyyy HH:mm')}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Statut</th>
+                                        <td>
+                                            <span th:text="${volProgramme.status}"
+                                                  th:classappend="${volProgramme.status.name() == 'PLANIFIE' ? 'badge bg-info' :
+                                                                  (volProgramme.status.name() == 'EN_VOL' ? 'badge bg-primary' :
+                                                                  (volProgramme.status.name() == 'TERMINE' ? 'badge bg-success' :
+                                                                  (volProgramme.status.name() == 'ANNULE' ? 'badge bg-danger' : 'badge bg-warning')))}">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <h5 class="text-warning"><i class="bi bi-airplane-fill"></i> Avion</h5>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th width="20%">Code Avion</th>
+                                        <td th:text="${volProgramme.avion.codeAvion}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Modèle</th>
+                                        <td th:text="${volProgramme.avion.modelAvion.designation + ' (' + volProgramme.avion.modelAvion.fabricant + ')'}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Capacité</th>
+                                        <td th:text="${volProgramme.avion.capaciteTotale + ' passagers'}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>État</th>
+                                        <td>
+                                            <span th:text="${volProgramme.avion.etatAvion.libelle}"
+                                                  th:classappend="${volProgramme.avion.etatAvion.libelle == 'OPERATIONNEL' ? 'badge bg-success' :
+                                                                  (volProgramme.avion.etatAvion.libelle == 'EN_MAINTENANCE' ? 'badge bg-warning' :
+                                                                  'badge bg-danger')}">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <a th:href="@{/vols-programmes}" class="btn btn-secondary mt-3">
+                            <i class="bi bi-arrow-left"></i> Retour à la liste
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -39,11 +39,8 @@ public class ReservationService extends GenericServiceImpl<Reservation, Long> {
     @Override
     @Transactional
     public Reservation save(Reservation reservation) {
-        if (reservation.getDateReservation() == null) {
-            reservation.setDateReservation(LocalDateTime.now());
-        }
         if (reservation.getStatut() == null) {
-            reservation.setStatut(StatutReservation.CONFIRMEE);
+            reservation.setStatut(StatutReservation.EN_ATTENTE);
         }
         return super.save(reservation);
     }
@@ -61,8 +58,8 @@ public class ReservationService extends GenericServiceImpl<Reservation, Long> {
         }
         
         // Récupérer le prix du vol pour la classe du siège
-        PrixVol prixVol = prixVolRepository.findByVolIdAndClasseSiegeId(
-            reservation.getVol().getId(),
+        PrixVol prixVol = prixVolRepository.findByVolProgrammeIdAndClasseSiegeId(
+            reservation.getVolProgramme().getId(),
             siegeVol.getSiege().getClasseSiege().getId()
         ).orElseThrow(() -> new RuntimeException("Prix non trouvé pour ce vol et cette classe"));
         

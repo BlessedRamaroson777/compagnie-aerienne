@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titre}">Chiffre d'affaires</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="mb-4" th:text="${titre}">Chiffre d'affaires</h1>
+
+                <!-- Résumé -->
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong th:text="${caList.size()}">0</strong> résultat(s) trouvé(s)
+                    <span th:if="${!caList.isEmpty()}">
+                        - Total: <strong th:text="${#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}">0.00</strong> Ar
+                    </span>
+                </div>
+
+                <!-- Table des résultats -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}">Numéro de vol</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}">Date/Heure</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}">Trajet</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}">Avion</th>
+                                        
+                                        <th th:if="${type == 'AVION'}">Immatriculation</th>
+                                        <th th:if="${type == 'AVION'}">Période</th>
+                                        
+                                        <th th:if="${type == 'VOL'}">Numéro de vol</th>
+                                        <th th:if="${type == 'VOL'}">Trajet</th>
+                                        <th th:if="${type == 'VOL'}">Période</th>
+                                        
+                                        <th class="text-end">Montant (Ar)</th>
+                                        <th class="text-center">Réservations</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-center">Billets</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="ca, iterStat : ${caList}">
+                                        <td th:text="${iterStat.count}">1</td>
+                                        
+                                        <!-- Vol programmé -->
+                                        <td th:if="${type == 'VOL_PROGRAMME'}" th:text="${ca.numeroVol}">AF001</td>
+                                        <td th:if="${type == 'VOL_PROGRAMME'}">
+                                            <span th:text="${#temporals.format(ca.dateHeureVol, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span>
+                                        </td>
+                                        <td th:if="${type == 'VOL_PROGRAMME'}">
+                                            <span th:text="${ca.aeroportDepart}">CDG</span>
+                                            <i class="fas fa-arrow-right mx-2"></i>
+                                            <span th:text="${ca.aeroportArrivee}">JFK</span>
+                                        </td>
+                                        <td th:if="${type == 'VOL_PROGRAMME'}" th:text="${ca.immatriculation}">F-ABCD</td>
+                                        
+                                        <!-- Avion -->
+                                        <td th:if="${type == 'AVION'}" th:text="${ca.immatriculation}">F-ABCD</td>
+                                        <td th:if="${type == 'AVION'}">
+                                            <small class="text-muted">Tous les vols</small>
+                                        </td>
+                                        
+                                        <!-- Vol (trajet) -->
+                                        <td th:if="${type == 'VOL'}" th:text="${ca.numeroVol}">AF001</td>
+                                        <td th:if="${type == 'VOL'}">
+                                            <span th:text="${ca.aeroportDepart}">CDG</span>
+                                            <i class="fas fa-arrow-right mx-2"></i>
+                                            <span th:text="${ca.aeroportArrivee}">JFK</span>
+                                        </td>
+                                        <td th:if="${type == 'VOL'}">
+                                            <small class="text-muted">Toutes les dates</small>
+                                        </td>
+                                        
+                                        <td class="text-end">
+                                            <strong th:text="${#numbers.formatDecimal(ca.montantTotal, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-primary" th:text="${ca.nombreReservations}">0</span>
+                                        </td>
+                                        <td th:if="${type == 'VOL_PROGRAMME'}" class="text-center">
+                                            <span class="badge bg-success" th:text="${ca.nombreBillets}">0</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <a th:href="@{'/chiffre-affaire/' + ${type == 'VOL_PROGRAMME' ? 'par-vol-programme' : (type == 'AVION' ? 'par-avion' : 'par-vol')} + '/' + ${ca.id}}" 
+                                               class="btn btn-sm btn-info" title="Voir détails">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${caList.isEmpty()}">
+                                        <td colspan="8" class="text-center text-muted">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Aucun résultat trouvé
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="mt-4">
+                    <a href="/chiffre-affaire" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

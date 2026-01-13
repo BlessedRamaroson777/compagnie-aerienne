@@ -69,9 +69,7 @@
                                 <td th:text="${client.reservations.size()}"></td>
                                 <td>
                                     <a th:href="@{/clients/{id}(id=${client.id})}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
-                                    <a th:href="@{/clients/{id}/edit(id=${client.id})}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
-                                    <a th:href="@{/clients/{id}/delete(id=${client.id})}" class="btn btn-sm btn-danger" 
-                                       onclick="return confirm('Supprimer ce client?')"><i class="bi bi-trash"></i></a>
+                                    <a th:href="@{/clients/{id}/edit(id=${client.id})}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil"></i></a>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(clients)}">

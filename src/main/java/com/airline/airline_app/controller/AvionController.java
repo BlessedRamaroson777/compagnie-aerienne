@@ -44,10 +44,31 @@ public class AvionController {
     
     @GetMapping("/new")
     public String newForm(Model model) {
-        model.addAttribute("avion", new Avion());
-        model.addAttribute("modeles", modelAvionService.findAll());
-        model.addAttribute("etats", etatAvionService.findAll());
-        return "avion/form";
+        try {
+            System.out.println("=== DEBUG: Entering /avions/new ===");
+            
+            Avion avion = new Avion();
+            System.out.println("DEBUG: Created new Avion object");
+            
+            List<com.airline.airline_app.entity.ModelAvion> modeles = modelAvionService.findAll();
+            System.out.println("DEBUG: Fetched modeles count: " + (modeles != null ? modeles.size() : "null"));
+            
+            List<com.airline.airline_app.entity.EtatAvion> etats = etatAvionService.findAll();
+            System.out.println("DEBUG: Fetched etats count: " + (etats != null ? etats.size() : "null"));
+            
+            model.addAttribute("avion", avion);
+            model.addAttribute("modeles", modeles);
+            model.addAttribute("etats", etats);
+            
+            System.out.println("DEBUG: All attributes added to model successfully");
+            System.out.println("=== DEBUG: Exiting /avions/new ===");
+            
+            return "avion/form";
+        } catch (Exception e) {
+            System.err.println("ERROR in /avions/new: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
     
     @GetMapping("/{id}")
@@ -71,6 +92,11 @@ public class AvionController {
     @PostMapping
     public String save(@ModelAttribute Avion avion, RedirectAttributes redirectAttributes) {
         try {
+            // Auto-set capacity from ModelAvion
+            if (avion.getModelAvion() != null && avion.getModelAvion().getCapacite() != null) {
+                avion.setCapaciteTotale(avion.getModelAvion().getCapacite());
+            }
+            
             if (avion.getId() == null) {
                 avionService.save(avion);
                 redirectAttributes.addFlashAttribute("success", "Avion créé avec succès");

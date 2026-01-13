@@ -5,31 +5,101 @@
     <title>Détail Réservation</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f5f7fa; }
+        .detail-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .success-banner {
+            background: linear-gradient(135deg, #198754, #157347);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h3><i class="bi bi-calendar-check"></i> Détails de la Réservation #<span th:text="${reservation.id}"></span></h3>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="bi bi-airplane-fill me-2"></i>Airline App</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/reservations"><i class="bi bi-list me-1"></i>Mes Réservations</a>
             </div>
-            <div class="card-body">
-                <!-- Messages -->
-                <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
-                    <span th:text="${success}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
-                    <span th:text="${error}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+        </div>
+    </nav>
 
-                <!-- Informations de la réservation -->
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h5>Informations Client</h5>
-                        <dl class="row">
+    <div class="container py-4">
+        <!-- Messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Confirmation Success Banner -->
+        <div th:if="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE}" class="success-banner mb-4">
+            <i class="bi bi-check-circle-fill fs-1 mb-3 d-block"></i>
+            <h2>Réservation Confirmée!</h2>
+            <p class="mb-0">Votre réservation #<span th:text="${reservation.id}"></span> a été confirmée avec succès.</p>
+        </div>
+
+        <div class="detail-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3><i class="bi bi-calendar-check text-primary me-2"></i>Réservation #<span th:text="${reservation.id}"></span></h3>
+                <span class="badge fs-6" 
+                      th:classappend="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE ? 'bg-success' : 
+                                       (reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).EN_ATTENTE ? 'bg-warning text-dark' : 'bg-danger')}"
+                      th:text="${reservation.statut}"></span>
+            </div>
+
+            <div class="row g-4">
+                <!-- Informations Vol -->
+                <div class="col-md-6">
+                    <div class="info-card h-100">
+                        <h5 class="mb-3"><i class="bi bi-airplane text-primary me-2"></i>Informations Vol</h5>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Numéro de vol:</dt>
+                            <dd class="col-sm-7 fw-bold" th:text="${reservation.volProgramme.vol.numeroVol}"></dd>
+                            
+                            <dt class="col-sm-5">Trajet:</dt>
+                            <dd class="col-sm-7">
+                                <span th:text="${reservation.volProgramme.vol.aeroportDepart.ville}"></span>
+                                <i class="bi bi-arrow-right mx-1"></i>
+                                <span th:text="${reservation.volProgramme.vol.aeroportArrivee.ville}"></span>
+                            </dd>
+                            
+                            <dt class="col-sm-5">Départ:</dt>
+                            <dd class="col-sm-7" th:text="${#temporals.format(reservation.volProgramme.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></dd>
+                            
+                            <dt class="col-sm-5">Arrivée:</dt>
+                            <dd class="col-sm-7" th:text="${#temporals.format(reservation.volProgramme.dateHeureArrivee, 'dd/MM/yyyy HH:mm')}"></dd>
+                            
+                            <dt class="col-sm-5">Avion:</dt>
+                            <dd class="col-sm-7" th:text="${reservation.volProgramme.avion?.modelAvion?.designation}"></dd>
+                        </dl>
+                    </div>
+                </div>
+                
+                <!-- Informations Client -->
+                <div class="col-md-6">
+                    <div class="info-card h-100">
+                        <h5 class="mb-3"><i class="bi bi-person text-primary me-2"></i>Informations Passager</h5>
+                        <dl class="row mb-0">
                             <dt class="col-sm-4">Nom:</dt>
-                            <dd class="col-sm-8" th:text="${reservation.client.nom + ' ' + reservation.client.prenom}"></dd>
+                            <dd class="col-sm-8 fw-bold" th:text="${reservation.client.prenom + ' ' + reservation.client.nom}"></dd>
                             
                             <dt class="col-sm-4">Email:</dt>
                             <dd class="col-sm-8" th:text="${reservation.client.email}"></dd>
@@ -38,127 +108,91 @@
                             <dd class="col-sm-8" th:text="${reservation.client.telephone}"></dd>
                         </dl>
                     </div>
-                    
-                    <div class="col-md-6">
-                        <h5>Informations Vol</h5>
-                        <dl class="row">
-                            <dt class="col-sm-4">Numéro:</dt>
-                            <dd class="col-sm-8" th:text="${reservation.vol.numeroVol}"></dd>
-                            
-                            <dt class="col-sm-4">Trajet:</dt>
-                            <dd class="col-sm-8" th:text="${reservation.vol.depart + ' → ' + reservation.vol.arrivee}"></dd>
-                            
-                            <dt class="col-sm-4">Départ:</dt>
-                            <dd class="col-sm-8" th:text="${#temporals.format(reservation.vol.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></dd>
-                            
-                            <dt class="col-sm-4">Arrivée:</dt>
-                            <dd class="col-sm-8" th:text="${#temporals.format(reservation.vol.dateHeureArrivee, 'dd/MM/yyyy HH:mm')}"></dd>
-                            
-                            <dt class="col-sm-4">Prix Base:</dt>
-                            <dd class="col-sm-8" th:text="${reservation.vol.prixBase + ' €'}"></dd>
-                        </dl>
-                    </div>
                 </div>
-
-                <div class="row mb-4">
-                    <div class="col-md-12">
-                        <dl class="row">
-                            <dt class="col-sm-3">Date Réservation:</dt>
-                            <dd class="col-sm-9" th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy HH:mm')}"></dd>
-                            
-                            <dt class="col-sm-3">Statut:</dt>
-                            <dd class="col-sm-9">
-                                <span class="badge" 
-                                      th:classappend="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE ? 'bg-success' : 'bg-danger'}"
-                                      th:text="${reservation.statut}"></span>
-                            </dd>
-                        </dl>
-                    </div>
-                </div>
-
-                <!-- Billets -->
-                <h5>Billets Émis (<span th:text="${reservation.billets.size()}"></span>)</h5>
-                <div th:if="${!#lists.isEmpty(reservation.billets)}" class="table-responsive mb-4">
-                    <table class="table table-sm table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Siège</th>
-                                <th>Classe</th>
-                                <th>Prix</th>
-                                <th>Statut</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="billet : ${reservation.billets}">
-                                <td th:text="${billet.siegeVol.siege.numeroSiege}"></td>
-                                <td>
-                                    <span class="badge" 
-                                          th:classappend="${billet.siegeVol.siege.classeSiege.libelle == 'BUSINESS' ? 'bg-warning text-dark' : 'bg-info'}"
-                                          th:text="${billet.siegeVol.siege.classeSiege.libelle}"></span>
-                                </td>
-                                <td th:text="${billet.prix + ' €'}"></td>
-                                <td>
-                                    <span class="badge" 
-                                          th:classappend="${billet.statut == T(com.airline.airline_app.entity.enums.StatutBillet).EMIS ? 'bg-success' : 'bg-danger'}"
-                                          th:text="${billet.statut}"></span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div th:if="${#lists.isEmpty(reservation.billets)}" class="alert alert-info">
-                    Aucun billet émis pour cette réservation
-                </div>
-
-                <!-- Ajouter un billet (si réservation confirmée) -->
-                <div th:if="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE && !#lists.isEmpty(siegesLibres)}" class="card mb-4">
-                    <div class="card-header bg-success text-white">
-                        <h5><i class="bi bi-ticket-perforated"></i> Émettre un Nouveau Billet</h5>
-                    </div>
-                    <div class="card-body">
-                        <form th:action="@{/reservations/{id}/billet(id=${reservation.id})}" method="post">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <label for="siegeVolId" class="form-label">Sélectionner un siège disponible</label>
-                                    <select class="form-select" id="siegeVolId" name="siegeVolId" required>
-                                        <option value="">-- Choisir un siège --</option>
-                                        <option th:each="siegeVol : ${siegesLibres}" 
-                                                th:value="${siegeVol.id}"
-                                                th:text="${siegeVol.siege.numeroSiege + ' - ' + siegeVol.siege.classeSiege}"></option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-success w-100">
-                                        <i class="bi bi-plus-circle"></i> Émettre Billet
-                                    </button>
-                                </div>
+                
+                <!-- Détails Réservation -->
+                <div class="col-12">
+                    <div class="info-card">
+                        <h5 class="mb-3"><i class="bi bi-receipt text-primary me-2"></i>Détails de la Réservation</h5>
+                        
+                        <!-- Si détails multiples disponibles -->
+                        <div th:if="${!#lists.isEmpty(reservation.details)}" class="mb-3">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Classe</th>
+                                        <th>Places</th>
+                                        <th>Prix unitaire</th>
+                                        <th class="text-end">Sous-total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="detail : ${reservation.details}">
+                                        <td><span class="badge bg-info" th:text="${detail.classeSiege.libelle}">ECONOMY</span></td>
+                                        <td th:text="${detail.nombrePlaces}">1</td>
+                                        <td th:text="${#numbers.formatDecimal(detail.prixUnitaire, 0, 'COMMA', 0, 'POINT')} + ' Ar'">100000 Ar</td>
+                                        <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(detail.sousTotal, 0, 'COMMA', 0, 'POINT')} + ' Ar'">100000 Ar</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Si ancien format (une seule classe) -->
+                        <div th:if="${#lists.isEmpty(reservation.details)}" class="row mb-3">
+                            <div class="col-md-6">
+                                <dt>Classe</dt>
+                                <dd class="fw-bold fs-5">
+                                    <span class="badge bg-info" th:text="${reservation.classeSiege?.libelle}">ECONOMY</span>
+                                </dd>
                             </div>
-                        </form>
+                            <div class="col-md-6">
+                                <dt>Nombre de places</dt>
+                                <dd class="fw-bold fs-5" th:text="${reservation.nombrePlaces}">1</dd>
+                            </div>
+                        </div>
+                        
+                        <div class="row border-top pt-3">
+                            <div class="col-md-6">
+                                <dt>Total des places</dt>
+                                <dd class="fw-bold fs-5" th:text="${reservation.nombrePlaces}">1</dd>
+                            </div>
+                            <div class="col-md-6">
+                                <dt>Prix Total</dt>
+                                <dd class="fw-bold fs-4 text-success" th:text="${#numbers.formatDecimal(reservation.prixTotal, 0, 'COMMA', 0, 'POINT')} + ' Ar'">150000 Ar</dd>
+                            </div>
+                            <div class="col-md-12 mt-2">
+                                <dt>Statut</dt>
+                                <dd>
+                                    <span th:class="${'badge bg-' + (reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE ? 'success' : 
+                                                     reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).ANNULEE ? 'danger' : 'warning')}" 
+                                          th:text="${reservation.statut}">EN_ATTENTE</span>
+                                </dd>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div th:if="${#lists.isEmpty(siegesLibres)}" class="alert alert-warning">
-                    <i class="bi bi-exclamation-triangle"></i> Aucun siège disponible pour ce vol
-                </div>
-
-                <!-- Actions -->
-                <div class="d-flex justify-content-between mt-4">
-                    <a th:href="@{/reservations}" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Retour
+            <!-- Actions -->
+            <div class="d-flex justify-content-between mt-4">
+                <a th:href="@{/reservations}" class="btn btn-secondary btn-lg">
+                    <i class="bi bi-arrow-left me-2"></i>Retour aux réservations
+                </a>
+                <div class="d-flex gap-2">
+                    <a th:if="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).EN_ATTENTE}"
+                       th:href="@{/reservations/paiement/{id}(id=${reservation.id})}" 
+                       class="btn btn-success btn-lg">
+                        <i class="bi bi-credit-card me-2"></i>Payer maintenant
                     </a>
-                    <div>
-                        <a th:if="${reservation.statut == T(com.airline.airline_app.entity.enums.StatutReservation).CONFIRMEE}"
-                           th:href="@{/reservations/{id}/annuler(id=${reservation.id})}" 
-                           class="btn btn-warning" 
-                           onclick="return confirm('Annuler cette réservation? Tous les billets seront annulés et les sièges libérés.')">
-                            <i class="bi bi-x-circle"></i> Annuler Réservation
-                        </a>
-                        <a th:href="@{/reservations/{id}/delete(id=${reservation.id})}" 
-                           class="btn btn-danger" 
-                           onclick="return confirm('Supprimer cette réservation?')">
-                            <i class="bi bi-trash"></i> Supprimer
-                        </a>
-                    </div>
+                    <a th:if="${reservation.statut != T(com.airline.airline_app.entity.enums.StatutReservation).ANNULEE}"
+                       th:href="@{/reservations/{id}/annuler(id=${reservation.id})}" 
+                       class="btn btn-warning btn-lg" 
+                       onclick="return confirm('Annuler cette réservation?')">
+                        <i class="bi bi-x-circle me-2"></i>Annuler
+                    </a>
+                    <a th:href="@{/reservations/new}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle me-2"></i>Nouvelle réservation
+                    </a>
                 </div>
             </div>
         </div>

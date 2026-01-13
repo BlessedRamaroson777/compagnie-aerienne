@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,29 +17,39 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Reservation {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
-    
+
     @ManyToOne
-    @JoinColumn(name = "vol_id", nullable = false)
-    private Vol vol;
-    
-    @Column(nullable = false)
-    private LocalDateTime dateReservation;
-    
+    @JoinColumn(name = "vol_programme_id", nullable = false)
+    private VolProgramme volProgramme;
+
+    @ManyToOne
+    @JoinColumn(name = "classe_siege_id")
+    private ClasseSiege classeSiege;
+
+    @Column(name = "nombre_places")
+    private Integer nombrePlaces = 1;
+
+    @Column(name = "prix_total", precision = 10, scale = 2)
+    private BigDecimal prixTotal = BigDecimal.ZERO;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StatutReservation statut;
-    
+    private StatutReservation statut = StatutReservation.EN_ATTENTE;
+
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
     private List<Billet> billets = new ArrayList<>();
-    
+
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReservationDetail> details = new ArrayList<>();
+
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
     private List<Paiement> paiements = new ArrayList<>();
 }

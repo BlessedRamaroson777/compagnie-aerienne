@@ -74,7 +74,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="modele : ${modelAvions}">
+                                <tr th:each="modele : ${modeles}">
                                     <td th:text="${modele.id}"></td>
                                     <td><strong th:text="${modele.designation}"></strong></td>
                                     <td th:text="${modele.fabricant}"></td>
@@ -87,13 +87,8 @@
                                         <a th:href="@{/modeles-avion/{id}(id=${modele.id})}" class="btn btn-sm btn-info">
                                             <i class="bi bi-eye"></i> Voir
                                         </a>
-                                        <a th:href="@{/modeles-avion/{id}/edit(id=${modele.id})}" class="btn btn-sm btn-warning">
+                                        <a th:href="@{/modeles-avion/{id}/edit(id=${modele.id})}" class="btn btn-sm btn-secondary">
                                             <i class="bi bi-pencil"></i> Modifier
-                                        </a>
-                                        <a th:href="@{/modeles-avion/{id}/delete(id=${modele.id})}" 
-                                           class="btn btn-sm btn-danger"
-                                           onclick="return confirm('Supprimer ce modèle ?')">
-                                            <i class="bi bi-trash"></i> Supprimer
                                         </a>
                                     </td>
                                 </tr>

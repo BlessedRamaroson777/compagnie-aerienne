@@ -25,30 +25,32 @@
                     
                     <dt class="col-sm-3">Rôle:</dt>
                     <dd class="col-sm-9">
-                        <span class="badge bg-info" th:text="${equipage.role}"></span>
+                        <span class="badge bg-info" th:text="${equipage.role != null ? equipage.role.libelle : 'N/A'}"></span>
                     </dd>
                 </dl>
 
-                <h5 class="mt-4">Vols Assignés (<span th:text="${equipage.vols.size()}"></span>)</h5>
-                <div class="table-responsive" th:if="${!#lists.isEmpty(equipage.vols)}">
+                <h5 class="mt-4">Vols Assignés (<span th:text="${equipage.vols != null ? equipage.vols.size() : 0}"></span>)</h5>
+                <div class="table-responsive" th:if="${equipage.vols != null && !equipage.vols.isEmpty()}">
                     <table class="table table-sm">
                         <thead>
                             <tr>
                                 <th>Numéro Vol</th>
                                 <th>Trajet</th>
                                 <th>Date Départ</th>
+                                <th>Avion</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr th:each="volEquipage : ${equipage.vols}">
-                                <td th:text="${volEquipage.vol.numeroVol}"></td>
-                                <td th:text="${volEquipage.vol.depart + ' → ' + volEquipage.vol.arrivee}"></td>
-                                <td th:text="${#temporals.format(volEquipage.vol.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td><span class="badge bg-primary" th:text="${volEquipage.volProgramme.vol.numeroVol}"></span></td>
+                                <td th:text="${volEquipage.volProgramme.vol.aeroportDepart.codeAeroport + ' → ' + volEquipage.volProgramme.vol.aeroportArrivee.codeAeroport}"></td>
+                                <td th:text="${#temporals.format(volEquipage.volProgramme.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${volEquipage.volProgramme.avion.codeAvion}"></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div th:if="${#lists.isEmpty(equipage.vols)}" class="alert alert-info">
+                <div th:if="${equipage.vols == null || equipage.vols.isEmpty()}" class="alert alert-info">
                     Aucun vol assigné
                 </div>
 

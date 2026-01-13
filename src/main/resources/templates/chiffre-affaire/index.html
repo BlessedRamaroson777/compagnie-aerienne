@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiffre d'affaires - Airline App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="mb-4">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Chiffre d'affaires
+                </h1>
+
+                <!-- Chiffre d'affaires global -->
+                <div class="card mb-4 border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-globe me-2"></i>
+                            Chiffre d'affaires global
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-6">
+                                <h2 class="text-primary">
+                                    <span th:text="${#numbers.formatDecimal(caGlobal.montantTotal, 0, 'COMMA', 2, 'POINT')}">0.00</span> Ar
+                                </h2>
+                                <p class="text-muted">Montant total</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h2 class="text-success">
+                                    <span th:text="${caGlobal.nombreReservations}">0</span>
+                                </h2>
+                                <p class="text-muted">Réservations</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu de navigation -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-calendar-check fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">Par vol programmé</h5>
+                                <p class="card-text">Chiffre d'affaires détaillé par vol avec dates et heures</p>
+                                <a href="/chiffre-affaire/par-vol-programme" class="btn btn-primary">
+                                    <i class="fas fa-arrow-right me-2"></i>Consulter
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-plane fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">Par avion</h5>
+                                <p class="card-text">Chiffre d'affaires par appareil (immatriculation)</p>
+                                <a href="/chiffre-affaire/par-avion" class="btn btn-primary">
+                                    <i class="fas fa-arrow-right me-2"></i>Consulter
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-route fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">Par trajet</h5>
+                                <p class="card-text">Chiffre d'affaires par ligne de vol (numéro de vol)</p>
+                                <a href="/chiffre-affaire/par-vol" class="btn btn-primary">
+                                    <i class="fas fa-arrow-right me-2"></i>Consulter
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="mt-4">
+                    <a href="/" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

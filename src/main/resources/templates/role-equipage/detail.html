@@ -14,10 +14,10 @@
                     <div class="card-header d-flex justify-content-between">
                         <h3>Détails du Rôle d'Équipage</h3>
                         <div>
-                            <a th:href="@{/roles-equipage/{id}/edit(id=${roleEquipage.id})}" class="btn btn-warning">
+                            <a th:href="@{/roles-equipage/{id}/edit(id=${role.id})}" class="btn btn-warning">
                                 <i class="bi bi-pencil"></i> Modifier
                             </a>
-                            <a th:href="@{/roles-equipage/{id}/delete(id=${roleEquipage.id})}" 
+                            <a th:href="@{/roles-equipage/{id}/delete(id=${role.id})}" 
                                class="btn btn-danger"
                                onclick="return confirm('Supprimer ce rôle ?')">
                                 <i class="bi bi-trash"></i> Supprimer
@@ -28,19 +28,19 @@
                         <table class="table table-bordered">
                             <tr>
                                 <th width="30%">ID</th>
-                                <td th:text="${roleEquipage.id}"></td>
+                                <td th:text="${role.id}"></td>
                             </tr>
                             <tr>
                                 <th>Libellé</th>
-                                <td><strong th:text="${roleEquipage.libelle}"></strong></td>
+                                <td><strong th:text="${role.libelle}"></strong></td>
                             </tr>
                             <tr>
                                 <th>Date de Création</th>
-                                <td th:text="${#temporals.format(roleEquipage.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${#temporals.format(role.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
                             </tr>
                             <tr>
                                 <th>Dernière Modification</th>
-                                <td th:text="${#temporals.format(roleEquipage.updatedAt, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${#temporals.format(role.updatedAt, 'dd/MM/yyyy HH:mm')}"></td>
                             </tr>
                         </table>
 

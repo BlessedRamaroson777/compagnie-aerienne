@@ -25,13 +25,13 @@ public class ModelAvion {
     @Column(nullable = false, length = 100)
     private String fabricant;
     
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer capacite;
     
-    @Column(name = "autonomie_km")
+    @Column(name = "autonomie_km", nullable = true)
     private Integer autonomieKm;
     
-    @Column(name = "vitesse_km_h")
+    @Column(name = "vitesse_km_h", nullable = true)
     private Integer vitesseKmH;
     
     @Column(columnDefinition = "TEXT")
@@ -45,6 +45,14 @@ public class ModelAvion {
     
     @OneToMany(mappedBy = "modelAvion")
     private List<Avion> avions;
+    
+    @ManyToMany
+    @JoinTable(
+        name = "model_avion_classe_siege",
+        joinColumns = @JoinColumn(name = "model_avion_id"),
+        inverseJoinColumns = @JoinColumn(name = "classe_siege_id")
+    )
+    private List<ClasseSiege> classesDisponibles;
     
     @PreUpdate
     public void preUpdate() {

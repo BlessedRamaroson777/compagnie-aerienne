@@ -33,31 +33,6 @@ public class VolService extends GenericServiceImpl<Vol, Long> {
         return volRepository;
     }
     
-    @Override
-    @Transactional
-    public Vol save(Vol vol) {
-        Vol savedVol = super.save(vol);
-        creerSiegesVol(savedVol);
-        return savedVol;
-    }
-    
-    /**
-     * Crée automatiquement les sièges pour un vol basé sur l'avion
-     */
-    private void creerSiegesVol(Vol vol) {
-        List<Siege> sieges = siegeRepository.findAll((root, query, cb) -> 
-            cb.equal(root.get("avion").get("id"), vol.getAvion().getId())
-        );
-        
-        for (Siege siege : sieges) {
-            SiegeVol siegeVol = new SiegeVol();
-            siegeVol.setVol(vol);
-            siegeVol.setSiege(siege);
-            siegeVol.setOccupe(false);
-            siegeVolRepository.save(siegeVol);
-        }
-    }
-    
     public List<Vol> findAll(Specification<Vol> specification) {
         return volRepository.findAll(specification);
     }

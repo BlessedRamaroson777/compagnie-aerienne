@@ -10,6 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface PrixVolRepository extends JpaRepository<PrixVol, Long>, JpaSpecificationExecutor<PrixVol> {
-    List<PrixVol> findByVolId(Long volId);
-    Optional<PrixVol> findByVolIdAndClasseSiegeId(Long volId, Long classeSiegeId);
+    List<PrixVol> findByVolProgrammeId(Long volProgrammeId);
+
+    Optional<PrixVol> findByVolProgrammeIdAndClasseSiegeId(Long volProgrammeId, Long classeSiegeId);
 }

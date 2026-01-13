@@ -25,11 +25,20 @@ public class SiegeVolService extends GenericServiceImpl<SiegeVol, Long> {
         return siegeVolRepository;
     }
     
-    public List<SiegeVol> findByVolId(Long volId) {
-        return siegeVolRepository.findByVolId(volId);
+    public List<SiegeVol> findByVolProgrammeId(Long volProgrammeId) {
+        return siegeVolRepository.findByVolProgramme_Id(volProgrammeId);
     }
     
-    public List<SiegeVol> findSiegesLibres(Long volId) {
-        return siegeVolRepository.findByVolIdAndOccupe(volId, false);
+    public List<SiegeVol> findSiegesLibres(Long volProgrammeId) {
+        return siegeVolRepository.findByVolProgramme_IdAndOccupe(volProgrammeId, false);
+    }
+    
+    public List<SiegeVol> findDisponiblesByVolProgrammeAndClasse(Long volProgrammeId, Long classeSiegeId) {
+        return siegeVolRepository.findByVolProgramme_IdAndOccupe(volProgrammeId, false)
+            .stream()
+            .filter(sv -> sv.getSiege() != null && 
+                         sv.getSiege().getClasseSiege() != null && 
+                         sv.getSiege().getClasseSiege().getId().equals(classeSiegeId))
+            .toList();
     }
 }

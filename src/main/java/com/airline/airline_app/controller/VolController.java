@@ -87,12 +87,8 @@ public class VolController {
     }
     
     @PostMapping
-    public String save(@ModelAttribute Vol vol, @RequestParam Long avionId, RedirectAttributes redirectAttributes) {
+    public String save(@ModelAttribute Vol vol, RedirectAttributes redirectAttributes) {
         try {
-            Avion avion = avionService.findById(avionId)
-                .orElseThrow(() -> new RuntimeException("Avion non trouvé"));
-            vol.setAvion(avion);
-            
             if (vol.getId() == null) {
                 volService.save(vol);
                 redirectAttributes.addFlashAttribute("success", "Vol créé avec succès");

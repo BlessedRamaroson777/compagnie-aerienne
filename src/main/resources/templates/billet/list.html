@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::title}, ~{::body}, 'billets')}">
+<head>
+    <title>Liste des Billets</title>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-ticket-perforated me-2"></i>Gestion des Billets</h2>
+            <a href="/billets/new" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>Nouveau Billet
+            </a>
+        </div>
+
+        <!-- Messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+            <div class="card-body">
+                <div th:if="${#lists.isEmpty(billets)}" class="text-center text-muted py-5">
+                    <i class="bi bi-ticket-perforated display-1 mb-3"></i>
+                    <p>Aucun billet enregistré</p>
+                </div>
+
+                <div th:unless="${#lists.isEmpty(billets)}" class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Réservation</th>
+                                <th>Client</th>
+                                <th>Vol</th>
+                                <th>Siège</th>
+                                <th>Prix</th>
+                                <th>Statut</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="billet : ${billets}">
+                                <td th:text="${billet.id}">1</td>
+                                <td>
+                                    <a th:href="@{/reservations/{id}(id=${billet.reservation.id})}" 
+                                       th:text="'Réservation #' + ${billet.reservation.id}">Réservation #1</a>
+                                </td>
+                                <td th:text="${billet.reservation.client.prenom + ' ' + billet.reservation.client.nom}">Client</td>
+                                <td th:text="${billet.reservation.volProgramme.vol.numeroVol}">AF123</td>
+                                <td>
+                                    <span th:text="${billet.siegeVol != null && billet.siegeVol.siege != null ? billet.siegeVol.siege.numeroSiege : 'N/A'}">12A</span>
+                                    <span th:if="${billet.siegeVol != null && billet.siegeVol.siege != null && billet.siegeVol.siege.classeSiege != null}" 
+                                          class="badge bg-info ms-1" 
+                                          th:text="${billet.siegeVol.siege.classeSiege.libelle}">ECONOMY</span>
+                                </td>
+                                <td th:text="${#numbers.formatDecimal(billet.prix, 0, 'COMMA', 0, 'POINT')} + ' Ar'">100000 Ar</td>
+                                <td>
+                                    <span th:class="${'badge bg-' + (billet.statut == T(com.airline.airline_app.entity.enums.StatutBillet).EMIS ? 'success' : (billet.statut == T(com.airline.airline_app.entity.enums.StatutBillet).ANNULE ? 'danger' : 'warning'))}"
+                                          th:text="${billet.statut}">EMIS</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/billets/{id}(id=${billet.id})}" class="btn btn-info" title="Détails">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a th:if="${billet.statut == T(com.airline.airline_app.entity.enums.StatutBillet).EMIS}"
+                                           th:href="@{/billets/{id}/annuler(id=${billet.id})}" 
+                                           class="btn btn-warning" 
+                                           title="Annuler"
+                                           onclick="return confirm('Êtes-vous sûr de vouloir annuler ce billet ?')">
+                                            <i class="bi bi-x-circle"></i>
+                                        </a>
+                                        <a th:href="@{/billets/{id}/delete(id=${billet.id})}" 
+                                           class="btn btn-danger" 
+                                           title="Supprimer"
+                                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce billet ?')">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

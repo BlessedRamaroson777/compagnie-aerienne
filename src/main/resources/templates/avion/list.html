@@ -78,19 +78,15 @@
                             <tr th:each="avion : ${avions}">
                                 <td th:text="${avion.id}"></td>
                                 <td th:text="${avion.codeAvion}"></td>
-                                <td th:text="${avion.modele}"></td>
+                                <td th:text="${avion.modelAvion.designation}"></td>
                                 <td th:text="${avion.capaciteTotale}"></td>
                                 <td th:text="${avion.sieges.size()}"></td>
                                 <td>
                                     <a th:href="@{/avions/{id}(id=${avion.id})}" class="btn btn-sm btn-info">
                                         <i class="bi bi-eye"></i> Voir
                                     </a>
-                                    <a th:href="@{/avions/{id}/edit(id=${avion.id})}" class="btn btn-sm btn-warning">
+                                    <a th:href="@{/avions/{id}/edit(id=${avion.id})}" class="btn btn-sm btn-secondary">
                                         <i class="bi bi-pencil"></i> Modifier
-                                    </a>
-                                    <a th:href="@{/avions/{id}/delete(id=${avion.id})}" class="btn btn-sm btn-danger" 
-                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet avion?')">
-                                        <i class="bi bi-trash"></i> Supprimer
                                     </a>
                                 </td>
                             </tr>

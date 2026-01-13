@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class VolEquipageService extends GenericServiceImpl<VolEquipage, Long> {
@@ -21,5 +23,9 @@ public class VolEquipageService extends GenericServiceImpl<VolEquipage, Long> {
     @Override
     protected JpaSpecificationExecutor<VolEquipage> getSpecificationExecutor() {
         return volEquipageRepository;
+    }
+    
+    public List<VolEquipage> findByVolProgrammeId(Long volProgrammeId) {
+        return volEquipageRepository.findByVolProgrammeId(volProgrammeId);
     }
 }
