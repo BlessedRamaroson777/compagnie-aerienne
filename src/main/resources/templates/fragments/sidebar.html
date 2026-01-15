@@ -1,9 +1,103 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
 </head>
 <body>
-    <nav th:fragment="sidebar(activeMenu)" class="col-md-2 d-md-block modern-sidebar">
+    <!-- Sidebar Fragment -->
+    <div th:fragment="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h4><i class="bi bi-airplane-engines"></i> Airline System</h4>
+        </div>
+        
+        <div class="sidebar-menu">
+            <!-- Dashboard -->
+            <a th:href="@{/}" class="sidebar-item" th:classappend="${currentUri == '/' ? 'active' : ''}">
+                <i class="bi bi-house-door"></i>
+                <span>Accueil</span>
+            </a>
+            
+            <!-- Gestion Flotte -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Gestion de la Flotte</div>
+                <a th:href="@{/avions}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/avions') ? 'active' : ''}">
+                    <i class="bi bi-airplane"></i>
+                    <span>Avions</span>
+                </a>
+                <a th:href="@{/modeles-avion}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/modeles-avion') ? 'active' : ''}">
+                    <i class="bi bi-gear"></i>
+                    <span>Modèles d'Avions</span>
+                </a>
+                <a th:href="@{/etats-avion}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/etats-avion') ? 'active' : ''}">
+                    <i class="bi bi-wrench"></i>
+                    <span>États Avions</span>
+                </a>
+            </div>
+            
+            <!-- Gestion Vols -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Gestion des Vols</div>
+                <a th:href="@{/vols}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/vols') and !#strings.contains(currentUri, '/vols-programmes') ? 'active' : ''}">
+                    <i class="bi bi-send"></i>
+                    <span>Vols</span>
+                </a>
+                <a th:href="@{/vols-programmes}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/vols-programmes') ? 'active' : ''}">
+                    <i class="bi bi-calendar-event"></i>
+                    <span>Vols Programmés</span>
+                </a>
+                <a th:href="@{/aeroports}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/aeroports') ? 'active' : ''}">
+                    <i class="bi bi-building"></i>
+                    <span>Aéroports</span>
+                </a>
+            </div>
+            
+            <!-- Gestion Équipage -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Gestion Équipage</div>
+                <a th:href="@{/equipages}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/equipages') ? 'active' : ''}">
+                    <i class="bi bi-people"></i>
+                    <span>Équipages</span>
+                </a>
+                <a th:href="@{/roles-equipage}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/roles-equipage') ? 'active' : ''}">
+                    <i class="bi bi-person-badge"></i>
+                    <span>Rôles Équipage</span>
+                </a>
+            </div>
+            
+            <!-- Gestion Réservations -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Réservations & Clients</div>
+                <a th:href="@{/reservations}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/reservations') ? 'active' : ''}">
+                    <i class="bi bi-ticket-perforated"></i>
+                    <span>Réservations</span>
+                </a>
+                <a th:href="@{/clients}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/clients') ? 'active' : ''}">
+                    <i class="bi bi-person"></i>
+                    <span>Clients</span>
+                </a>
+                <a th:href="@{/classes-siege}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/classes-siege') ? 'active' : ''}">
+                    <i class="bi bi-columns-gap"></i>
+                    <span>Classes de Siège</span>
+                </a>
+            </div>
+            
+            <!-- Gestion Financière -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Gestion Financière</div>
+                <a th:href="@{/prix-vol}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/prix-vol') ? 'active' : ''}">
+                    <i class="bi bi-cash-coin"></i>
+                    <span>Prix des Vols</span>
+                </a>
+                <a th:href="@{/paiements}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/paiements') ? 'active' : ''}">
+                    <i class="bi bi-credit-card"></i>
+                    <span>Paiements</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
         <div class="sidebar-header">
             <h4>✈️ Airline System</h4>
         </div>
