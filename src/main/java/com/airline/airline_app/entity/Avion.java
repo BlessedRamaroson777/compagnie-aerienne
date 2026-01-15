@@ -46,6 +46,9 @@ public class Avion {
     @OneToMany(mappedBy = "avion")
     private List<VolProgramme> volsProgrammes = new ArrayList<>();
     
+    @OneToMany(mappedBy = "avion", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AvionClasseConfiguration> configurations = new ArrayList<>();
+    
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();

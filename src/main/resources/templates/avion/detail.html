@@ -44,6 +44,33 @@
                             <dd class="col-sm-9" th:text="${avion.volsProgrammes != null ? avion.volsProgrammes.size() : 0}"></dd>
                         </dl>
 
+                        <h5 class="mt-4"><i class="bi bi-layout-three-columns"></i> Configuration des Classes</h5>
+                        <div class="table-responsive" th:if="${avion.configurations != null and !avion.configurations.isEmpty()}">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th>Classe de Siège</th>
+                                        <th class="text-end">Nombre de Places</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="config : ${avion.configurations}">
+                                        <td>
+                                            <span class="badge bg-primary" th:text="${config.classeSiege.libelle}"></span>
+                                        </td>
+                                        <td class="text-end" th:text="${config.nombrePlaces}"></td>
+                                    </tr>
+                                    <tr class="table-info fw-bold">
+                                        <td>Total</td>
+                                        <td class="text-end" th:text="${avion.capaciteTotale}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="alert alert-info" th:if="${avion.configurations == null or avion.configurations.isEmpty()}">
+                            <i class="bi bi-info-circle"></i> Aucune configuration de classe définie pour cet avion.
+                        </div>
+
                         <h5 class="mt-4">Sièges</h5>
                         <div class="table-responsive">
                             <table class="table table-sm">
