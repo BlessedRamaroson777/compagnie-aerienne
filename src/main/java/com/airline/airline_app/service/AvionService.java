@@ -38,7 +38,8 @@ public class AvionService extends GenericServiceImpl<Avion, Long> {
     @Transactional
     public Avion save(Avion avion) {
         Avion savedAvion = super.save(avion);
-        genererSieges(savedAvion);
+        // Ne plus générer automatiquement les sièges
+        // Les sièges seront gérés via AvionClasseConfiguration
         return savedAvion;
     }
     

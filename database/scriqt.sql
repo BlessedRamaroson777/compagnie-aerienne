@@ -76,6 +76,7 @@ CREATE TABLE avion (
     code_avion VARCHAR(50) UNIQUE NOT NULL,
     model_avion_id INT NOT NULL,
     etat_avion_id INT NOT NULL,
+    capacite_totale INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (model_avion_id) REFERENCES model_avion(id),

@@ -1,114 +1,98 @@
 package com.airline.airline_app.controller;
 
-import com.airline.airline_app.entity.ClasseSiege;
-import com.airline.airline_app.entity.PrixVol;
-import com.airline.airline_app.entity.VolProgramme;
-import com.airline.airline_app.service.ClasseSiegeService;
-import com.airline.airline_app.service.PrixVolService;
-import com.airline.airline_app.service.VolProgrammeService;
-import com.airline.airline_app.specification.PrixVolSpecification;
+import com.airline.airline_app.entity.*;
+import com.airline.airline_app.repository.AvionClasseConfigurationRepository;
+import com.airline.airline_app.service.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping({"/prix-vol", "/prix-vols"})
+@RequestMapping("/prix-vol")
 @RequiredArgsConstructor
 public class PrixVolController {
     
-    private final PrixVolService prixVolService;
+    private final VolService volService;
     private final VolProgrammeService volProgrammeService;
-    private final ClasseSiegeService classeSiegeService;
+    private final VolProgrammeClassePrixService volProgrammeClassePrixService;
+    private final AvionClasseConfigurationRepository avionClasseConfigurationRepository;
     
     @GetMapping
-    public String list(@RequestParam(required = false) Long volId,
-                      @RequestParam(required = false) Long classeSiegeId,
-                      @RequestParam(required = false) BigDecimal prixMin,
-                      @RequestParam(required = false) BigDecimal prixMax,
-                      Model model) {
+    public String listPrixParVol(@RequestParam(required = false) Long volId, Model model) {
+        List<Vol> vols = volService.findAll();
+        model.addAttribute("vols", vols);
         
-        Specification<PrixVol> spec = PrixVolSpecification.filterBy(volId, classeSiegeId, prixMin, prixMax);
-        List<PrixVol> prixVols = prixVolService.findAll(spec);
+        if (volId != null) {
+            Vol vol = volService.findById(volId).orElse(null);
+            if (vol != null) {
+                // Récupérer tous les vols programmés pour ce vol
+                List<VolProgramme> volsProgrammes = volProgrammeService.findAll().stream()
+                    .filter(vp -> vp.getVol().getId().equals(volId))
+                    .collect(Collectors.toList());
+                
+                // Calculer le revenu pour chaque vol programmé
+                List<VolProgrammeRevenu> volsProgrammesAvecRevenu = volsProgrammes.stream()
+                    .map(vp -> {
+                        BigDecimal revenuTotal = calculerRevenuTotal(vp);
+                        return new VolProgrammeRevenu(vp, revenuTotal);
+                    })
+                    .collect(Collectors.toList());
+                
+                model.addAttribute("vol", vol);
+                model.addAttribute("volsProgrammesAvecRevenu", volsProgrammesAvecRevenu);
+            }
+        }
         
-        model.addAttribute("prixVols", prixVols);
-        model.addAttribute("volsProgrammes", volProgrammeService.findAll());
-        model.addAttribute("classes", classeSiegeService.findAll());
         model.addAttribute("volId", volId);
-        model.addAttribute("classeSiegeId", classeSiegeId);
-        model.addAttribute("prixMin", prixMin);
-        model.addAttribute("prixMax", prixMax);
-        
         return "prix-vol/list";
     }
     
-    @GetMapping("/new")
-    public String newForm(Model model) {
-        model.addAttribute("prixVol", new PrixVol());
-        model.addAttribute("volsProgrammes", volProgrammeService.findAll());
-        model.addAttribute("classes", classeSiegeService.findAll());
-        return "prix-vol/form";
-    }
-    
-    @GetMapping("/{id}")
-    public String detail(@PathVariable Long id, Model model) {
-        PrixVol prixVol = prixVolService.findById(id)
-            .orElseThrow(() -> new RuntimeException("Prix de vol non trouvé"));
-        model.addAttribute("prixVol", prixVol);
-        return "prix-vol/detail";
-    }
-    
-    @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable Long id, Model model) {
-        PrixVol prixVol = prixVolService.findById(id)
-            .orElseThrow(() -> new RuntimeException("Prix de vol non trouvé"));
-        model.addAttribute("prixVol", prixVol);
-        model.addAttribute("volsProgrammes", volProgrammeService.findAll());
-        model.addAttribute("classes", classeSiegeService.findAll());
-        return "prix-vol/form";
-    }
-    
-    @PostMapping
-    public String save(@ModelAttribute PrixVol prixVol,
-                      @RequestParam Long volProgrammeId,
-                      @RequestParam Long classeSiegeId,
-                      RedirectAttributes redirectAttributes) {
-        try {
-            VolProgramme volProgramme = volProgrammeService.findById(volProgrammeId)
-                .orElseThrow(() -> new RuntimeException("Vol programmé non trouvé"));
-            ClasseSiege classeSiege = classeSiegeService.findById(classeSiegeId)
-                .orElseThrow(() -> new RuntimeException("Classe de siège non trouvée"));
+    private BigDecimal calculerRevenuTotal(VolProgramme volProgramme) {
+        BigDecimal total = BigDecimal.ZERO;
+        
+        // Récupérer les prix par classe pour ce vol programmé
+        List<VolProgrammeClassePrix> prixParClasse = volProgrammeClassePrixService.getPrixByVolProgramme(volProgramme.getId());
+        
+        // Récupérer les configurations de l'avion
+        List<AvionClasseConfiguration> configurations = avionClasseConfigurationRepository.findByAvionId(volProgramme.getAvion().getId());
+        
+        // Calculer le revenu maximum (prix × nombre de places) pour chaque classe
+        for (AvionClasseConfiguration config : configurations) {
+            Optional<VolProgrammeClassePrix> prixOpt = prixParClasse.stream()
+                .filter(p -> p.getClasseSiege().getId().equals(config.getClasseSiege().getId()))
+                .findFirst();
             
-            prixVol.setVolProgramme(volProgramme);
-            prixVol.setClasseSiege(classeSiege);
-            
-            if (prixVol.getId() == null) {
-                prixVolService.save(prixVol);
-                redirectAttributes.addFlashAttribute("success", "Prix de vol créé avec succès");
-            } else {
-                prixVolService.update(prixVol.getId(), prixVol);
-                redirectAttributes.addFlashAttribute("success", "Prix de vol modifié avec succès");
+            if (prixOpt.isPresent()) {
+                BigDecimal prix = prixOpt.get().getPrix();
+                int nombrePlaces = config.getNombrePlaces();
+                total = total.add(prix.multiply(BigDecimal.valueOf(nombrePlaces)));
             }
-            return "redirect:/prix-vol";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Erreur: " + e.getMessage());
-            return "redirect:/prix-vol/new";
         }
+        
+        return total;
     }
     
-    @GetMapping("/{id}/delete")
-    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        try {
-            prixVolService.delete(id);
-            redirectAttributes.addFlashAttribute("success", "Prix de vol supprimé avec succès");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Impossible de supprimer: " + e.getMessage());
+    // Classe interne pour transporter les données
+    public static class VolProgrammeRevenu {
+        private final VolProgramme volProgramme;
+        private final BigDecimal revenuTotal;
+        
+        public VolProgrammeRevenu(VolProgramme volProgramme, BigDecimal revenuTotal) {
+            this.volProgramme = volProgramme;
+            this.revenuTotal = revenuTotal;
         }
-        return "redirect:/prix-vol";
+        
+        public VolProgramme getVolProgramme() {
+            return volProgramme;
+        }
+        
+        public BigDecimal getRevenuTotal() {
+            return revenuTotal;
+        }
     }
 }

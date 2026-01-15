@@ -50,4 +50,7 @@ public class VolProgramme {
 
     @OneToMany(mappedBy = "volProgramme")
     private List<Reservation> reservations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "volProgramme", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VolProgrammeClassePrix> prixParClasse = new ArrayList<>();
 }

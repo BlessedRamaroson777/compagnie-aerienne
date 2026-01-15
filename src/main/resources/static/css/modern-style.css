@@ -603,28 +603,179 @@ nav a:hover {
     text-decoration: none;
 }
 
-.sidebar {
-    background-color: var(--color-bg-dark);
+/* ============================================
+   11. SIDEBAR & NAVIGATION MODERNISÉE
+   ============================================ */
+
+/* Sidebar Container */
+.sidebar,
+.modern-sidebar {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #1e3a5f 100%);
     color: var(--color-white);
     min-height: 100vh;
-    padding: var(--spacing-lg);
+    padding: 0;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
 }
 
-.sidebar a {
-    display: block;
-    color: var(--color-light-grey);
-    padding: var(--spacing-sm);
-    margin-bottom: var(--spacing-xs);
-    border-radius: var(--border-radius-sm);
-    transition: all var(--transition-speed) ease;
+/* Decorative overlay for depth */
+.sidebar::before,
+.modern-sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: radial-gradient(circle at 50% 0%, rgba(96, 165, 250, 0.15), transparent);
+    pointer-events: none;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+    padding: var(--spacing-lg) var(--spacing-md);
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 1;
+}
+
+.sidebar-header h4 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-white);
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Sidebar Navigation Container */
+.sidebar-nav {
+    padding: var(--spacing-md) 0;
+}
+
+/* Sidebar Section Headers */
+.sidebar-section {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-xs) var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+/* Sidebar Links */
+.sidebar a,
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: rgba(255, 255, 255, 0.85);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin: 2px var(--spacing-xs);
+    border-radius: var(--border-radius-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Link hover effect with subtle glow */
+.sidebar a::before,
+.sidebar-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.sidebar a:hover::before,
+.sidebar-link:hover::before {
+    left: 100%;
 }
 
 .sidebar a:hover,
-.sidebar a.active {
-    background-color: var(--color-primary);
+.sidebar-link:hover {
+    background: rgba(96, 165, 250, 0.2);
     color: var(--color-white);
     text-decoration: none;
     transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.2);
+}
+
+.sidebar a.active,
+.sidebar-link.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: var(--color-white);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    font-weight: 600;
+}
+
+.sidebar a i,
+.sidebar-link i {
+    font-size: 1.1rem;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* Header / Navbar Styles */
+.navbar {
+    background: linear-gradient(135deg, #1e3a5f 0%, #3b82f6 100%) !important;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    border-bottom: 3px solid rgba(96, 165, 250, 0.3);
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-white) !important;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+    text-decoration: none;
+}
+
+.navbar-nav a {
+    color: rgba(255, 255, 255, 0.9) !important;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.navbar-nav a:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--color-white) !important;
+    text-decoration: none;
+}
+
+/* Card Headers with Modern Blue */
+.card-header.bg-primary {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%) !important;
+    border-bottom: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+.card-header.bg-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    border-bottom: 2px solid rgba(96, 165, 250, 0.3);
 }
 
 /* ============================================

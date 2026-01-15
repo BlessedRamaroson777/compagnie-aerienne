@@ -10,6 +10,17 @@
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-10">
+                
+                <!-- Messages Flash -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <h3>Détails du Vol Programmé</h3>
@@ -108,6 +119,77 @@
                             </div>
                         </div>
 
+                        <!-- Configuration des classes de l'avion -->
+                        <div class="row mt-3" th:if="${configurations != null && !configurations.isEmpty()}">
+                            <div class="col-md-12">
+                                <h5 class="text-info"><i class="bi bi-layout-three-columns"></i> Configuration des Sièges et Tarification</h5>
+                                <form th:action="@{/vols-programmes/{id}/prix(id=${volProgramme.id})}" method="post">
+                                    <table class="table table-bordered table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th width="25%">Classe de Siège</th>
+                                                <th class="text-center" width="15%">Nombre de Places</th>
+                                                <th width="30%">Description</th>
+                                                <th class="text-center" width="30%">Prix du Billet (Ar)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="config : ${configurations}">
+                                                <td>
+                                                    <strong th:text="${config.classeSiege.libelle}"></strong>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-primary" th:text="${config.nombrePlaces}"></span>
+                                                </td>
+                                                <td>
+                                                    <small class="text-muted" th:text="${config.classeSiege.description}"></small>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-text">Ar</span>
+                                                        <input type="number" 
+                                                               class="form-control prix-input" 
+                                                               th:name="'prix_classe_' + ${config.classeSiege.id}"
+                                                               th:data-places="${config.nombrePlaces}"
+                                                               th:data-classe-id="${config.classeSiege.id}"
+                                                               th:value="${#lists.isEmpty(prixParClasse.?[classeSiege.id == __${config.classeSiege.id}__]) ? '' : prixParClasse.?[classeSiege.id == __${config.classeSiege.id}__][0].prix}"
+                                                               placeholder="Entrer le prix"
+                                                               step="0.01"
+                                                               min="0"
+                                                               oninput="calculerRevenuMax()"
+                                                               required>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot class="table-success">
+                                            <tr>
+                                                <td colspan="4" class="text-center py-4">
+                                                    <div class="d-flex justify-content-between align-items-center px-3">
+                                                        <div>
+                                                            <h6 class="mb-0 text-muted fw-bold">REVENU MAXIMUM TOTAL SI TOUTES LES PLACES SONT OCCUPÉES</h6>
+                                                        </div>
+                                                        <div>
+                                                            <h2 class="mb-0 text-success fw-bold" id="revenuTotalMax" style="font-size: 2.5rem;">0 Ar</h2>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4" class="text-end py-2 bg-white">
+                                                    <button type="submit" class="btn btn-success btn-lg">
+                                                        <i class="bi bi-save"></i> Enregistrer les prix
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </form>
+                            </div>
+                        </div>
+
+
+
                         <a th:href="@{/vols-programmes}" class="btn btn-secondary mt-3">
                             <i class="bi bi-arrow-left"></i> Retour à la liste
                         </a>
@@ -117,5 +199,31 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Calculer le revenu maximum total
+        function calculerRevenuMax() {
+            let totalMax = 0;
+            
+            document.querySelectorAll('.prix-input').forEach(input => {
+                const prix = parseFloat(input.value) || 0;
+                const places = parseInt(input.dataset.places) || 0;
+                const revenuMax = prix * places;
+                totalMax += revenuMax;
+            });
+            
+            // Afficher le total avec format plus visible
+            const totalElement = document.getElementById('revenuTotalMax');
+            if (totalElement) {
+                totalElement.textContent = totalMax.toLocaleString('fr-FR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }) + ' Ar';
+            }
+        }
+        
+        // Calculer au chargement de la page
+        document.addEventListener('DOMContentLoaded', calculerRevenuMax);
+    </script>
 </body>
 </html>
