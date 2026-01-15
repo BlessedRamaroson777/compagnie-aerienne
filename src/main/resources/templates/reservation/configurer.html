@@ -133,35 +133,36 @@
                             Vous pouvez réserver plusieurs places de différentes classes. Exemple: 7 Economy + 2 Business
                         </div>
                         
-                        <div th:if="${#lists.isEmpty(prixVols)}" class="alert alert-warning">
+                        <div th:if="${#lists.isEmpty(prixParClasse)}" class="alert alert-warning">
                             <i class="bi bi-exclamation-triangle me-2"></i>
                             Aucun prix défini pour ce vol. Veuillez contacter l'administrateur.
                         </div>
                         
                         <div class="row g-3">
-                            <div th:each="prixVol : ${prixVols}" class="col-md-12">
-                                <div class="class-option-multi">
-                                    <div class="row align-items-center">
+                            <div th:each="config : ${configurations}" class="col-md-12">
+                                <div class="class-option-multi" th:with="prixObj=${prixParClasse.?[classeSiege.id == __${config.classeSiege.id}__]}">
+                                    <div class="row align-items-center" th:if="${!#lists.isEmpty(prixObj)}">
                                         <div class="col-md-5">
-                                            <h6 class="mb-1 fw-bold" th:text="${prixVol.classeSiege.libelle}">ECONOMY</h6>
-                                            <small class="text-muted" th:text="${prixVol.classeSiege.description}">Classe économique</small>
+                                            <h6 class="mb-1 fw-bold" th:text="${config.classeSiege.libelle}">ECONOMY</h6>
+                                            <small class="text-muted" th:text="${config.classeSiege.description}">Classe économique</small>
                                         </div>
                                         <div class="col-md-3">
-                                            <div class="price-tag" th:text="${#numbers.formatDecimal(prixVol.prix, 0, 'COMMA', 0, 'POINT')} + ' Ar'">150000 Ar</div>
+                                            <div class="price-tag" th:text="${#numbers.formatDecimal(prixObj[0].prix, 0, 'COMMA', 0, 'POINT')} + ' Ar'">150000 Ar</div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="input-group">
                                                 <span class="input-group-text"><i class="bi bi-people-fill"></i></span>
                                                 <input type="number" 
-                                                       th:name="'places_' + ${prixVol.classeSiege.id}"
-                                                       th:id="'places_' + ${prixVol.classeSiege.id}"
-                                                       th:data-classeid="${prixVol.classeSiege.id}"
-                                                       th:data-prix="${prixVol.prix}"
+                                                       th:name="'places_' + ${config.classeSiege.id}"
+                                                       th:id="'places_' + ${config.classeSiege.id}"
+                                                       th:data-classeid="${config.classeSiege.id}"
+                                                       th:data-prix="${prixObj[0].prix}"
+                                                       th:data-maxplaces="${config.nombrePlaces}"
                                                        class="form-control places-input" 
-                                                       value="0" min="0" max="20"
+                                                       value="0" min="0" th:max="${config.nombrePlaces}"
                                                        onchange="updateTotal()"
                                                        placeholder="Nombre">
-                                                <span class="input-group-text">places</span>
+                                                <span class="input-group-text" th:text="'/' + ${config.nombrePlaces}">places</span>
                                             </div>
                                         </div>
                                     </div>

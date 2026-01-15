@@ -3,6 +3,7 @@ package com.airline.airline_app.controller;
 import com.airline.airline_app.entity.*;
 import com.airline.airline_app.entity.enums.StatutPaiement;
 import com.airline.airline_app.entity.enums.StatutReservation;
+import com.airline.airline_app.repository.AvionClasseConfigurationRepository;
 import com.airline.airline_app.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -27,11 +28,12 @@ public class ReservationController {
     private final VolService volService;
     private final VolProgrammeService volProgrammeService;
     private final ClasseSiegeService classeSiegeService;
-    private final PrixVolService prixVolService;
+    private final VolProgrammeClassePrixService volProgrammeClassePrixService;
     private final PaiementService paiementService;
     private final AeroportService aeroportService;
     private final BilletService billetService;
     private final SiegeVolService siegeVolService;
+    private final AvionClasseConfigurationRepository avionClasseConfigurationRepository;
 
     @GetMapping
     public String list(Model model) {
@@ -68,11 +70,15 @@ public class ReservationController {
         VolProgramme volProgramme = volProgrammeService.findById(volProgrammeId)
                 .orElseThrow(() -> new RuntimeException("Vol programmé non trouvé"));
 
-        // Utiliser la nouvelle méthode qui filtre selon le modèle d'avion
-        List<PrixVol> prixVols = prixVolService.findByVolProgrammeIdAndModelAvion(volProgrammeId);
+        // Obtenir les prix par classe pour ce vol programmé
+        List<VolProgrammeClassePrix> prixParClasse = volProgrammeClassePrixService.getPrixByVolProgramme(volProgrammeId);
+        
+        // Obtenir les configurations de sièges de l'avion
+        List<AvionClasseConfiguration> configurations = avionClasseConfigurationRepository.findByAvionId(volProgramme.getAvion().getId());
 
         model.addAttribute("volProgramme", volProgramme);
-        model.addAttribute("prixVols", prixVols);
+        model.addAttribute("prixParClasse", prixParClasse);
+        model.addAttribute("configurations", configurations);
         model.addAttribute("clients", clientService.findAll());
         return "reservation/configurer";
     }
@@ -81,8 +87,10 @@ public class ReservationController {
     @GetMapping("/prix/{volProgrammeId}/{classeSiegeId}")
     @ResponseBody
     public BigDecimal getPrix(@PathVariable Long volProgrammeId, @PathVariable Long classeSiegeId) {
-        return prixVolService.findByVolProgrammeIdAndClasseSiegeId(volProgrammeId, classeSiegeId)
-                .map(PrixVol::getPrix)
+        return volProgrammeClassePrixService.getPrixByVolProgramme(volProgrammeId).stream()
+                .filter(p -> p.getClasseSiege().getId().equals(classeSiegeId))
+                .map(VolProgrammeClassePrix::getPrix)
+                .findFirst()
                 .orElse(BigDecimal.ZERO);
     }
 
@@ -116,10 +124,12 @@ public class ReservationController {
                         ClasseSiege classeSiege = classeSiegeService.findById(classeSiegeId)
                                 .orElseThrow(() -> new RuntimeException("Classe de siège non trouvée"));
                         
-                        PrixVol prixVol = prixVolService.findByVolProgrammeIdAndClasseSiegeId(volProgrammeId, classeSiegeId)
-                                .orElseThrow(() -> new RuntimeException("Prix non défini"));
+                        VolProgrammeClassePrix prixClasse = volProgrammeClassePrixService.getPrixByVolProgramme(volProgrammeId).stream()
+                                .filter(p -> p.getClasseSiege().getId().equals(classeSiegeId))
+                                .findFirst()
+                                .orElseThrow(() -> new RuntimeException("Prix non défini pour cette classe"));
                         
-                        BigDecimal sousTotal = prixVol.getPrix().multiply(BigDecimal.valueOf(nbPlaces));
+                        BigDecimal sousTotal = prixClasse.getPrix().multiply(BigDecimal.valueOf(nbPlaces));
                         prixTotal = prixTotal.add(sousTotal);
                         totalPlaces += nbPlaces;
                         
@@ -128,7 +138,7 @@ public class ReservationController {
                         detail.setReservation(reservation);
                         detail.setClasseSiege(classeSiege);
                         detail.setNombrePlaces(nbPlaces);
-                        detail.setPrixUnitaire(prixVol.getPrix());
+                        detail.setPrixUnitaire(prixClasse.getPrix());
                         detail.setSousTotal(sousTotal);
                         
                         reservation.getDetails().add(detail);

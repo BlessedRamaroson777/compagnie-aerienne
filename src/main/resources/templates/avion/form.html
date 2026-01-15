@@ -64,10 +64,10 @@
                                                                class="form-control classe-input" 
                                                                th:name="'classe_' + ${classe.id}"
                                                                th:id="'classe_' + ${classe.id}"
-                                                               th:value="${configurations != null ? configurations.![classeSiege.id == classe.id ? nombrePlaces : null][0] : 0}"
+                                                               value="0"
                                                                min="0" 
                                                                placeholder="Nombre de places"
-                                                               onchange="updateTotalCapacity()">
+                                                               oninput="updateTotalCapacity()">
                                                         <span class="input-group-text">places</span>
                                                     </div>
                                                 </div>
@@ -115,7 +115,10 @@
             });
             
             document.getElementById('totalCapacity').textContent = total;
-            document.getElementById('capaciteTotale').value = total;
+            const capaciteTotaleInput = document.getElementById('capaciteTotale');
+            if (capaciteTotaleInput) {
+                capaciteTotaleInput.value = total;
+            }
             
             // Validation
             if (total === 0) {
@@ -128,8 +131,22 @@
             }
         }
         
-        // Initialiser au chargement
+        // Initialiser au chargement et débloquer le bouton si des valeurs existent
         document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier s'il y a déjà des valeurs (mode édition)
+            const inputs = document.querySelectorAll('.classe-input');
+            let hasValues = false;
+            inputs.forEach(input => {
+                if (parseInt(input.value) > 0) {
+                    hasValues = true;
+                }
+            });
+            
+            // Si pas de valeurs, débloquer quand même le bouton pour permettre la saisie
+            if (!hasValues) {
+                document.getElementById('submitBtn').disabled = false;
+            }
+            
             updateTotalCapacity();
         });
     </script>

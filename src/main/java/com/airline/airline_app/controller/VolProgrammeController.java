@@ -1,16 +1,10 @@
 package com.airline.airline_app.controller;
 
-import com.airline.airline_app.entity.Equipage;
-import com.airline.airline_app.entity.RoleEquipage;
-import com.airline.airline_app.entity.VolEquipage;
-import com.airline.airline_app.entity.VolProgramme;
+import com.airline.airline_app.entity.*;
 import com.airline.airline_app.entity.enums.StatutVol;
-import com.airline.airline_app.service.AvionService;
-import com.airline.airline_app.service.EquipageService;
-import com.airline.airline_app.service.RoleEquipageService;
-import com.airline.airline_app.service.VolEquipageService;
-import com.airline.airline_app.service.VolProgrammeService;
-import com.airline.airline_app.service.VolService;
+import com.airline.airline_app.service.*;
+import com.airline.airline_app.repository.AvionClasseConfigurationRepository;
+import com.airline.airline_app.dto.AvionSimpleDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -32,6 +26,9 @@ public class VolProgrammeController {
     private final EquipageService equipageService;
     private final RoleEquipageService roleEquipageService;
     private final VolEquipageService volEquipageService;
+    private final ClasseSiegeService classeSiegeService;
+    private final VolProgrammeClassePrixService volProgrammeClassePrixService;
+    private final AvionClasseConfigurationRepository avionClasseConfigurationRepository;
     
     @GetMapping
     public String list(@RequestParam(required = false) Long volId,
@@ -77,10 +74,14 @@ public class VolProgrammeController {
     
     @GetMapping("/new")
     public String newForm(Model model) {
+        List<Avion> avions = avionService.findAll();
+        List<AvionSimpleDTO> avionsDTOs = avions.stream().map(this::convertToSimpleDTO).toList();
+        
         model.addAttribute("volProgramme", new VolProgramme());
         model.addAttribute("vols", volService.findAll());
-        model.addAttribute("avions", avionService.findAll());
+        model.addAttribute("avions", avionsDTOs);
         model.addAttribute("statuts", StatutVol.values());
+        model.addAttribute("classes", classeSiegeService.findAll());
         return "vol-programme/form";
     }
     
@@ -88,18 +89,57 @@ public class VolProgrammeController {
     public String detail(@PathVariable Long id, Model model) {
         VolProgramme volProgramme = volProgrammeService.findById(id)
             .orElseThrow(() -> new RuntimeException("Vol programmé non trouvé"));
+        List<VolProgrammeClassePrix> prixParClasse = volProgrammeClassePrixService.getPrixByVolProgramme(id);
+        List<AvionClasseConfiguration> configurations = avionClasseConfigurationRepository.findByAvionId(volProgramme.getAvion().getId());
+        
         model.addAttribute("volProgramme", volProgramme);
+        model.addAttribute("prixParClasse", prixParClasse);
+        model.addAttribute("configurations", configurations);
         return "vol-programme/detail";
+    }
+    
+    @PostMapping("/{id}/prix")
+    public String savePrix(@PathVariable Long id,
+                          @RequestParam java.util.Map<String, String> allParams,
+                          RedirectAttributes redirectAttributes) {
+        try {
+            VolProgramme volProgramme = volProgrammeService.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vol programmé non trouvé"));
+            
+            // Traiter les prix par classe
+            allParams.forEach((key, value) -> {
+                if (key.startsWith("prix_classe_") && value != null && !value.isEmpty()) {
+                    Long classeSiegeId = Long.parseLong(key.substring("prix_classe_".length()));
+                    java.math.BigDecimal prix = new java.math.BigDecimal(value);
+                    ClasseSiege classeSiege = classeSiegeService.findById(classeSiegeId)
+                        .orElseThrow(() -> new RuntimeException("Classe de siège non trouvée"));
+                    volProgrammeClassePrixService.createOrUpdatePrix(volProgramme, classeSiege, prix);
+                }
+            });
+            
+            redirectAttributes.addFlashAttribute("success", "Prix enregistrés avec succès");
+            return "redirect:/vols-programmes/" + id;
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Erreur: " + e.getMessage());
+            return "redirect:/vols-programmes/" + id;
+        }
     }
     
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
         VolProgramme volProgramme = volProgrammeService.findById(id)
             .orElseThrow(() -> new RuntimeException("Vol programmé non trouvé"));
+        List<VolProgrammeClassePrix> prixExistants = volProgrammeClassePrixService.getPrixByVolProgramme(id);
+        
+        List<Avion> avions = avionService.findAll();
+        List<AvionSimpleDTO> avionsDTOs = avions.stream().map(this::convertToSimpleDTO).toList();
+        
         model.addAttribute("volProgramme", volProgramme);
         model.addAttribute("vols", volService.findAll());
-        model.addAttribute("avions", avionService.findAll());
+        model.addAttribute("avions", avionsDTOs);
         model.addAttribute("statuts", StatutVol.values());
+        model.addAttribute("classes", classeSiegeService.findAll());
+        model.addAttribute("prixExistants", prixExistants);
         return "vol-programme/form";
     }
     
@@ -115,7 +155,8 @@ public class VolProgrammeController {
                 .orElseThrow(() -> new RuntimeException("Avion non trouvé")));
             
             volProgrammeService.save(volProgramme);
-            redirectAttributes.addFlashAttribute("success", "Vol programmé enregistré avec succès");
+            
+            redirectAttributes.addFlashAttribute("success", "Vol programmé enregistré avec succès. Définissez maintenant les prix par classe.");
             return "redirect:/vols-programmes";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur: " + e.getMessage());
@@ -142,6 +183,7 @@ public class VolProgrammeController {
             existing.setStatus(volProgramme.getStatus());
             
             volProgrammeService.save(existing);
+            
             redirectAttributes.addFlashAttribute("success", "Vol programmé modifié avec succès");
             return "redirect:/vols-programmes";
         } catch (Exception e) {
@@ -224,5 +266,43 @@ public class VolProgrammeController {
             redirectAttributes.addFlashAttribute("error", "Erreur: " + e.getMessage());
         }
         return "redirect:/vols-programmes/" + volId + "/equipages";
+    }
+    
+    // Méthode utilitaire pour convertir Avion en DTO simplifié
+    private AvionSimpleDTO convertToSimpleDTO(Avion avion) {
+        AvionSimpleDTO dto = new AvionSimpleDTO();
+        dto.setId(avion.getId());
+        dto.setCodeAvion(avion.getCodeAvion());
+        dto.setCapaciteTotale(avion.getCapaciteTotale());
+        
+        if (avion.getModelAvion() != null) {
+            AvionSimpleDTO.ModelAvionSimpleDTO modelDTO = new AvionSimpleDTO.ModelAvionSimpleDTO();
+            modelDTO.setId(avion.getModelAvion().getId());
+            modelDTO.setDesignation(avion.getModelAvion().getDesignation());
+            modelDTO.setFabricant(avion.getModelAvion().getFabricant());
+            
+            if (avion.getModelAvion().getClassesDisponibles() != null) {
+                List<AvionSimpleDTO.ClasseSiegeSimpleDTO> classesDTO = avion.getModelAvion().getClassesDisponibles().stream()
+                    .map(classe -> {
+                        AvionSimpleDTO.ClasseSiegeSimpleDTO classeDTO = new AvionSimpleDTO.ClasseSiegeSimpleDTO();
+                        classeDTO.setId(classe.getId());
+                        classeDTO.setLibelle(classe.getLibelle());
+                        classeDTO.setDescription(classe.getDescription());
+                        return classeDTO;
+                    }).toList();
+                modelDTO.setClassesDisponibles(classesDTO);
+            }
+            
+            dto.setModelAvion(modelDTO);
+        }
+        
+        if (avion.getEtatAvion() != null) {
+            AvionSimpleDTO.EtatAvionSimpleDTO etatDTO = new AvionSimpleDTO.EtatAvionSimpleDTO();
+            etatDTO.setId(avion.getEtatAvion().getId());
+            etatDTO.setLibelle(avion.getEtatAvion().getLibelle());
+            dto.setEtatAvion(etatDTO);
+        }
+        
+        return dto;
     }
 }
