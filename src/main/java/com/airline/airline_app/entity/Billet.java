@@ -30,6 +30,16 @@ public class Billet {
     @Column(nullable = false)
     private BigDecimal prix;
     
+    @Column(name = "prix_base")
+    private BigDecimal prixBase;
+    
+    @Column(name = "remise")
+    private BigDecimal remise;
+    
+    @ManyToOne
+    @JoinColumn(name = "categorie_passager_id")
+    private CategoriePassager categoriePassager;
+    
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatutBillet statut;

@@ -201,7 +201,8 @@ public class ReservationController {
             Reservation savedReservation = reservationService.save(reservation);
 
             // Générer automatiquement les billets par catégorie
-            for (ReservationCategoriePassager rcp : savedReservation.getCategoriesPassagers()) {
+            // Utiliser les catégories de l'objet original (pas lazy loaded)
+            for (ReservationCategoriePassager rcp : reservation.getCategoriesPassagers()) {
                 // Pour chaque passager dans cette catégorie
                 for (int i = 0; i < rcp.getNombrePassagers(); i++) {
                     // Trouver un siège disponible de cette classe
@@ -211,11 +212,14 @@ public class ReservationController {
                     if (!siegesDisponibles.isEmpty()) {
                         SiegeVol siegeVol = siegesDisponibles.get(0);
                         
-                        // Créer le billet avec le prix après remise
+                        // Créer le billet avec le prix après remise et tous les détails en dur
                         Billet billet = new Billet();
                         billet.setReservation(savedReservation);
                         billet.setSiegeVol(siegeVol);
-                        billet.setPrix(BigDecimal.valueOf(rcp.getPrixApresRemise()));
+                        billet.setPrix(BigDecimal.valueOf(rcp.getPrixApresRemise())); // Prix final payé
+                        billet.setPrixBase(BigDecimal.valueOf(rcp.getPrixUnitaire())); // Prix de base avant remise
+                        billet.setRemise(BigDecimal.valueOf(rcp.getRemiseUnitaire())); // Remise appliquée
+                        billet.setCategoriePassager(rcp.getCategoriePassager()); // Catégorie du passager
                         billet.setStatut(com.airline.airline_app.entity.enums.StatutBillet.EMIS);
                         billetService.save(billet);
                         

@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface ReservationCategoriePassagerRepository extends JpaRepository<ReservationCategoriePassager, Long> {
     List<ReservationCategoriePassager> findByReservation_Id(Long reservationId);
+    List<ReservationCategoriePassager> findByCategoriePassager_IdCategoriePassager(Long categorieId);
+    List<ReservationCategoriePassager> findByClasseSiege_Id(Long classeId);
 }

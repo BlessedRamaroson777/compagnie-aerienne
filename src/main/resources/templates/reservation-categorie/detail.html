@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail Catégorie Réservation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <style>
+        body { background-color: #f5f7fa; }
+        .detail-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .calculation-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="bi bi-airplane-fill me-2"></i>Airline App</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/reservation-categories"><i class="bi bi-list me-1"></i>Catégories</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-file-text"></i> Détail Catégorie Réservation</h2>
+            <div>
+                <a href="/reservation-categories" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour à la liste
+                </a>
+            </div>
+        </div>
+
+        <!-- Informations principales -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card detail-card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informations Générales</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="text-muted">ID Catégorie</div>
+                            <div class="h5" th:text="${categorie.id}">1</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="text-muted">ID Réservation</div>
+                            <div class="h5">
+                                <a th:href="@{'/reservations/' + ${categorie.reservation.id}}" 
+                                   th:text="${'#' + categorie.reservation.id}">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <div class="text-muted">Statut Réservation</div>
+                            <div class="h5">
+                                <span class="badge bg-success" th:text="${categorie.reservation.statut}">CONFIRMEE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card detail-card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-person"></i> Client</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="text-muted">Nom Complet</div>
+                            <div class="h5" 
+                                 th:text="${categorie.reservation.client.nom + ' ' + categorie.reservation.client.prenom}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="text-muted">Email</div>
+                            <div class="h5" th:text="${categorie.reservation.client.email}">email@example.com</div>
+                        </div>
+                        <div class="mb-0">
+                            <div class="text-muted">Téléphone</div>
+                            <div class="h5" th:text="${categorie.reservation.client.telephone}">+261 34 00 000 00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Détails Vol -->
+        <div class="card detail-card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-airplane"></i> Informations Vol</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="text-muted">Vol</div>
+                            <div class="h6" th:text="${categorie.reservation.volProgramme.vol.numeroVol}">AF123</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="text-muted">Départ</div>
+                            <div class="h6" 
+                                 th:text="${categorie.reservation.volProgramme.vol.aeroportDepart.nom + ' (' + categorie.reservation.volProgramme.vol.aeroportDepart.codeAeroport + ')'}">
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <div class="text-muted">Date Départ</div>
+                            <div class="h6" 
+                                 th:text="${#temporals.format(categorie.reservation.volProgramme.dateHeureDepart, 'dd/MM/yyyy HH:mm')}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="text-muted">Avion</div>
+                            <div class="h6" 
+                                 th:text="${categorie.reservation.volProgramme.avion.modelAvion.designation + ' (' + categorie.reservation.volProgramme.avion.codeAvion + ')'}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="text-muted">Arrivée</div>
+                            <div class="h6" 
+                                 th:text="${categorie.reservation.volProgramme.vol.aeroportArrivee.nom + ' (' + categorie.reservation.volProgramme.vol.aeroportArrivee.codeAeroport + ')'}">
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <div class="text-muted">Date Arrivée</div>
+                            <div class="h6" 
+                                 th:text="${#temporals.format(categorie.reservation.volProgramme.dateHeureArrivee, 'dd/MM/yyyy HH:mm')}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Détails Catégorie et Tarification -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card detail-card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="bi bi-ticket-perforated"></i> Catégorie & Classe</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="text-muted">Catégorie Passager</div>
+                            <div>
+                                <span class="badge bg-info fs-6" 
+                                      th:text="${categorie.categoriePassager.libelle}">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="text-muted">Description Catégorie</div>
+                            <div class="h6" th:text="${categorie.categoriePassager.description}">Description</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="text-muted">Classe Siège</div>
+                            <div>
+                                <span class="badge bg-secondary fs-6" 
+                                      th:text="${categorie.classeSiege.libelle}">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <div class="text-muted">Nombre de Passagers</div>
+                            <div class="h3 text-primary" th:text="${categorie.nombrePassagers}">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card detail-card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-currency-exchange"></i> Tarification</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="text-muted">Prix Unitaire (base)</div>
+                            <div class="h5" 
+                                 th:text="${#numbers.formatDecimal(categorie.prixUnitaire, 0, 'COMMA', 2, 'POINT')} + ' Ar'">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="text-muted">Remise Unitaire</div>
+                            <div class="h5 text-success">
+                                - <span th:text="${#numbers.formatDecimal(categorie.remiseUnitaire, 0, 'COMMA', 2, 'POINT')} + ' Ar'"></span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="text-muted">Prix après Remise (unitaire)</div>
+                            <div class="h5">
+                                <strong th:text="${#numbers.formatDecimal(categorie.prixApresRemise, 0, 'COMMA', 2, 'POINT')} + ' Ar'"></strong>
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <div class="text-muted">Sous-Total</div>
+                            <div class="h3 text-primary" 
+                                 th:text="${#numbers.formatDecimal(categorie.sousTotal, 0, 'COMMA', 2, 'POINT')} + ' Ar'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calcul détaillé -->
+        <div class="calculation-box">
+            <h5 class="mb-3"><i class="bi bi-calculator"></i> Détail du Calcul</h5>
+        <div class="row">
+            <div class="col-md-12">
+                <p class="mb-2">
+                    <strong>Prix Unitaire:</strong> 
+                    <span th:text="${#numbers.formatDecimal(categorie.prixUnitaire, 0, 'COMMA', 2, 'POINT')} + ' Ar'"></span>
+                </p>
+                <p class="mb-2">
+                    <strong>Remise Unitaire:</strong> 
+                    <span th:text="${#numbers.formatDecimal(categorie.remiseUnitaire, 0, 'COMMA', 2, 'POINT')} + ' Ar'"></span>
+                </p>
+                <p class="mb-2">
+                    <strong>Prix après Remise:</strong> 
+                    <span th:text="${#numbers.formatDecimal(categorie.prixUnitaire, 0, 'COMMA', 2, 'POINT')} + ' - ' + ${#numbers.formatDecimal(categorie.remiseUnitaire, 0, 'COMMA', 2, 'POINT')} + ' = ' + ${#numbers.formatDecimal(categorie.prixApresRemise, 0, 'COMMA', 2, 'POINT')} + ' Ar'"></span>
+                </p>
+                <p class="mb-0">
+                    <strong>Sous-Total:</strong> 
+                    <span th:text="${#numbers.formatDecimal(categorie.prixApresRemise, 0, 'COMMA', 2, 'POINT')} + ' × ' + ${categorie.nombrePassagers} + ' passagers = ' + ${#numbers.formatDecimal(categorie.sousTotal, 0, 'COMMA', 2, 'POINT')} + ' Ar'"></span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+        <!-- Informations système -->
+        <div class="card detail-card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="bi bi-gear"></i> Informations Système</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-0">
+                            <div class="text-muted">Prix Total Réservation</div>
+                            <div class="h5" 
+                                 th:text="${#numbers.formatDecimal(categorie.reservation.prixTotal, 0, 'COMMA', 2, 'POINT')} + ' Ar'">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-0">
+                            <div class="text-muted">Nombre Total Places Réservées</div>
+                            <div class="h5" th:text="${categorie.reservation.nombrePlaces}">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

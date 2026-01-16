@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Catégories de Réservations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="bi bi-people-fill"></i> Catégories de Réservations par Passager</h1>
+                </div>
+
+                <!-- Statistiques globales -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card text-white bg-primary">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Enregistrements</h5>
+                                <h2 class="mb-0" th:text="${categories.size()}">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-success">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Passagers</h5>
+                                <h2 class="mb-0" th:text="${#aggregates.sum(categories.![nombrePassagers])}">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-info">
+                            <div class="card-body">
+                                <h5 class="card-title">Montant Total</h5>
+                                <h2 class="mb-0" th:text="${#numbers.formatDecimal(#aggregates.sum(categories.![sousTotal]), 0, 'COMMA', 2, 'POINT')} + ' Ar'">0 Ar</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtres -->
+                <!-- <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-funnel"></i> Filtres</h5>
+                        <form method="get" action="/reservation-categories" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Par Réservation</label>
+                <select name="reservationId" class="form-select" onchange="this.form.submit()">
+                    <option value="">Toutes les réservations</option>
+                    <option th:each="reservation : ${reservations}" 
+                            th:value="${reservation.id}" 
+                            th:text="${'#' + reservation.id + ' - ' + reservation.client.nom + ' ' + reservation.client.prenom}"
+                            th:selected="${reservation.id == selectedReservationId}">
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Par Catégorie Passager</label>
+                <select name="categorieId" class="form-select" onchange="this.form.submit()">
+                    <option value="">Toutes les catégories</option>
+                    <option th:each="cat : ${categoriesPassagers}" 
+                            th:value="${cat.idCategoriePassager}" 
+                            th:text="${cat.libelle}"
+                            th:selected="${cat.idCategoriePassager == selectedCategorieId}">
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Par Classe Siège</label>
+                <select name="classeId" class="form-select" onchange="this.form.submit()">
+                    <option value="">Toutes les classes</option>
+                    <option th:each="classe : ${classessieges}" 
+                            th:value="${classe.id}" 
+                            th:text="${classe.libelle}"
+                            th:selected="${classe.id == selectedClasseId}">
+                    </option>
+                </select>
+            </div>
+                            <div class="col-md-12">
+                                <a href="/reservation-categories" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-circle"></i> Réinitialiser les filtres
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div> -->
+
+                <!-- Tableau des résultats -->
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="bi bi-list-ul"></i> Liste des Catégories</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Réservation</th>
+                            <th>Client</th>
+                            <th>Catégorie</th>
+                            <th>Classe</th>
+                            <th>Nombre</th>
+                            <th>Prix Unitaire</th>
+                            <th>Remise</th>
+                            <th>Prix après Remise</th>
+                            <th>Sous-Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${categories.empty}">
+                            <td colspan="11" class="text-center text-muted py-4">
+                                Aucune catégorie trouvée
+                            </td>
+                        </tr>
+                        <tr th:each="cat : ${categories}">
+                            <td th:text="${cat.id}">1</td>
+                            <td>
+                                <a th:href="@{'/reservations/' + ${cat.reservation.id}}" 
+                                   th:text="${'#' + cat.reservation.id}">
+                                </a>
+                            </td>
+                            <td th:text="${cat.reservation.client.nom + ' ' + cat.reservation.client.prenom}">Client</td>
+                            <td>
+                                <span class="badge bg-info" 
+                                      th:text="${cat.categoriePassager.libelle}">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary" 
+                                      th:text="${cat.classeSiege.libelle}">
+                                </span>
+                            </td>
+                            <td>
+                                <strong th:text="${cat.nombrePassagers}">0</strong>
+                            </td>
+                            <td th:text="${#numbers.formatDecimal(cat.prixUnitaire, 0, 'COMMA', 2, 'POINT')} + ' Ar'">0 Ar</td>
+                            <td>
+                                <span class="text-success" 
+                                      th:text="${#numbers.formatDecimal(cat.remiseUnitaire, 0, 'COMMA', 2, 'POINT')} + ' Ar'">
+                                </span>
+                            </td>
+                            <td>
+                                <strong th:text="${#numbers.formatDecimal(cat.prixApresRemise, 0, 'COMMA', 2, 'POINT')} + ' Ar'">0 Ar</strong>
+                            </td>
+                            <td>
+                                <strong class="text-primary" 
+                                        th:text="${#numbers.formatDecimal(cat.sousTotal, 0, 'COMMA', 2, 'POINT')} + ' Ar'">
+                                </strong>
+                            </td>
+                                        <td>
+                                            <a th:href="@{'/reservation-categories/' + ${cat.id}}" 
+                                               class="btn btn-sm btn-primary">
+                                                <i class="bi bi-eye"></i> Détail
+                                            </a>
+                                        </td>
+                        </tr>
+                    </tbody>
+                    <tfoot th:if="${!categories.empty}" class="table-light">
+                        <tr>
+                            <th colspan="5">TOTAUX</th>
+                            <th th:text="${#aggregates.sum(categories.![nombrePassagers])}">0</th>
+                            <th>-</th>
+                            <th th:text="${#numbers.formatDecimal(#aggregates.sum(categories.![remiseUnitaire * nombrePassagers]), 0, 'COMMA', 2, 'POINT')} + ' Ar'">0 Ar</th>
+                            <th>-</th>
+                            <th th:text="${#numbers.formatDecimal(#aggregates.sum(categories.![sousTotal]), 0, 'COMMA', 2, 'POINT')} + ' Ar'">0 Ar</th>
+                            <th>-</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

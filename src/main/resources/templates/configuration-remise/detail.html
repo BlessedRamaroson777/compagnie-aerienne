@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail Configuration Remise</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="bi bi-percent"></i> Détail Configuration: 
+                        <span th:text="${config.nom}">Config Name</span>
+                    </h1>
+                    <div class="btn-group">
+                        <a th:href="@{'/configurations-remise-personnalisee/' + ${config.id} + '/edit'}" 
+                           class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Modifier
+                        </a>
+                        <a href="/configurations-remise-personnalisee" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Informations générales -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informations Générales</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <th width="40%">ID</th>
+                                        <td th:text="${config.id}">1</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <td th:text="${config.nom}">Config Name</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Description</th>
+                                        <td th:text="${config.description ?: 'Aucune description'}">Description</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Statut</th>
+                                        <td>
+                                            <span th:if="${config.actif}" class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Active
+                                            </span>
+                                            <span th:unless="${config.actif}" class="badge bg-secondary">
+                                                <i class="bi bi-x-circle"></i> Inactive
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date création</th>
+                                        <td th:text="${config.dateCreation != null ? #temporals.format(config.dateCreation, 'dd/MM/yyyy HH:mm') : '-'}">01/01/2026</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Dernière modification</th>
+                                        <td th:text="${config.dateModification != null ? #temporals.format(config.dateModification, 'dd/MM/yyyy HH:mm') : '-'}">01/01/2026</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="bi bi-airplane"></i> Vol Programmé</h5>
+                            </div>
+                            <div class="card-body" th:if="${config.volProgramme != null}">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <th width="40%">Numéro de Vol</th>
+                                        <td>
+                                            <strong th:text="${config.volProgramme.vol.numeroVol}">VOL001</strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Trajet</th>
+                                        <td th:text="${config.volProgramme.vol.aeroportDepart.codeAeroport + ' → ' + config.volProgramme.vol.aeroportArrivee.codeAeroport}">
+                                            TNR → CDG
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Départ</th>
+                                        <td th:text="${#temporals.format(config.volProgramme.dateHeureDepart, 'dd/MM/yyyy HH:mm')}">
+                                            01/01/2026 10:00
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Arrivée</th>
+                                        <td th:text="${#temporals.format(config.volProgramme.dateHeureArrivee, 'dd/MM/yyyy HH:mm')}">
+                                            01/01/2026 18:00
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <!-- Prix de référence -->
+                                <hr>
+                                <h6><i class="bi bi-currency-dollar"></i> Prix de référence (prix_vol)</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li th:each="pv : ${prixVols}" class="mb-1">
+                                        <span class="badge bg-secondary" th:text="${pv.classeSiege.libelle}">Classe</span>
+                                        <strong th:text="${#numbers.formatDecimal(pv.prix, 0, 'COMMA', 0, 'POINT')} + ' Ar'">100 000 Ar</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body text-muted" th:unless="${config.volProgramme != null}">
+                                <i class="bi bi-exclamation-circle"></i> Aucun vol programmé associé
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tableau des associations avec calculs -->
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-table"></i> Détail des Remises par Catégorie et Classe
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Catégorie Passager</th>
+                                        <th>Classe de Siège</th>
+                                        <th class="text-center">% Remise</th>
+                                        <th class="text-end">Prix Référence</th>
+                                        <th class="text-end text-danger">Montant Remise</th>
+                                        <th class="text-end text-success">Prix Final</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${associationsAvecPrix == null || associationsAvecPrix.empty}">
+                                        <td colspan="6" class="text-center text-muted py-4">
+                                            <i class="bi bi-info-circle"></i> Aucune association définie pour cette configuration
+                                        </td>
+                                    </tr>
+                                    <tr th:each="item : ${associationsAvecPrix}">
+                                        <td>
+                                            <i class="bi bi-person"></i>
+                                            <span th:text="${item.association.categoriePassager.libelle}">Enfant</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary" 
+                                                  th:text="${item.association.classeSiege.libelle}">Économique</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-primary fs-6" 
+                                                  th:text="${item.association.pourcentageRemise} + '%'">30%</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span th:text="${#numbers.formatDecimal(item.prixReference, 0, 'COMMA', 0, 'POINT')} + ' Ar'">
+                                                100 000 Ar
+                                            </span>
+                                        </td>
+                                        <td class="text-end text-danger">
+                                            <strong th:text="'-' + ${#numbers.formatDecimal(item.montantRemise, 0, 'COMMA', 0, 'POINT')} + ' Ar'">
+                                                -30 000 Ar
+                                            </strong>
+                                        </td>
+                                        <td class="text-end text-success">
+                                            <strong class="fs-5" 
+                                                    th:text="${#numbers.formatDecimal(item.prixFinal, 0, 'COMMA', 0, 'POINT')} + ' Ar'">
+                                                70 000 Ar
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Note explicative -->
+                <div class="alert alert-info mt-4">
+                    <i class="bi bi-lightbulb"></i>
+                    <strong>Calcul :</strong> 
+                    <ul class="mb-0 mt-2">
+                        <li>Prix Final = Prix Référence × (1 - Pourcentage Remise / 100)</li>
+                        <li>Montant Remise = Prix Référence × (Pourcentage Remise / 100)</li>
+                        <li>Le montant de la remise est stocké dans <code>remise_categorie_place.remise_prix</code></li>
+                        <li>Les remises sont automatiquement mises à jour quand le <code>prix_vol</code> change</li>
+                    </ul>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

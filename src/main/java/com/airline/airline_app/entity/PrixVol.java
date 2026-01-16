@@ -1,5 +1,6 @@
 package com.airline.airline_app.entity;
 
+import com.airline.airline_app.listener.PrixVolListener;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 @Table(name = "prix_vol", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "vol_programme_id", "classe_siege_id" })
 })
+@EntityListeners(PrixVolListener.class)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

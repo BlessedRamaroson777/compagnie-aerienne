@@ -71,6 +71,10 @@
                     <i class="bi bi-ticket-perforated"></i>
                     <span>Réservations</span>
                 </a>
+                <a th:href="@{/reservation-categories}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/reservation-categories') ? 'active' : ''}">
+                    <i class="bi bi-ticket-perforated"></i>
+                    <span>Billets</span>
+                </a>
                 <a th:href="@{/clients}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/clients') ? 'active' : ''}">
                     <i class="bi bi-person"></i>
                     <span>Clients</span>
@@ -104,10 +108,10 @@
                     <i class="bi bi-credit-card"></i>
                     <span>Chiffre d'Affaires</span>
                 </a>
-                <a th:href="@{/billets}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/billet') ? 'active' : ''}">
+                <!-- <a th:href="@{/billets}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/billet') ? 'active' : ''}">
                     <i class="bi bi-credit-card"></i>
                     <span>Billets</span>
-                </a>
+                </a> -->
             </div>
         </div>
     </div>
