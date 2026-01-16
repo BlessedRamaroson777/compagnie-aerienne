@@ -92,6 +92,14 @@
                     <i class="bi bi-credit-card"></i>
                     <span>Paiements</span>
                 </a>
+                <a th:href="@{/chiffre-affaire}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/chiffre-affaire') ? 'active' : ''}">
+                    <i class="bi bi-credit-card"></i>
+                    <span>Chiffre d'Affaires</span>
+                </a>
+                <a th:href="@{/billets}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/billet') ? 'active' : ''}">
+                    <i class="bi bi-credit-card"></i>
+                    <span>Billets</span>
+                </a>
             </div>
         </div>
     </div>
