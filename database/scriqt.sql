@@ -21,6 +21,36 @@ CREATE TABLE classe_siege (
 );
 
 -- =====================================================
+-- 2b) CATEGORIE_PASSAGER
+-- =====================================================
+
+CREATE TABLE categorie_passager (
+    id_categorie_passager SERIAL PRIMARY KEY,
+    libelle VARCHAR(100) NOT NULL,
+    description VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =====================================================
+-- 2c) REMISE_CATEGORIE_PLACE
+-- =====================================================
+
+CREATE TABLE remise_categorie_place (
+    id SERIAL PRIMARY KEY,
+    vol_programme_id INT NOT NULL,
+    id_categorie_passager INT NOT NULL,
+    id_classe_siege INT NOT NULL,
+    remise_prix DECIMAL(10,2) NOT NULL CHECK (remise_prix >= 0),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (vol_programme_id) REFERENCES vol_programme(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_categorie_passager) REFERENCES categorie_passager(id_categorie_passager) ON DELETE CASCADE,
+    FOREIGN KEY (id_classe_siege) REFERENCES classe_siege(id) ON DELETE CASCADE,
+    UNIQUE (vol_programme_id, id_categorie_passager, id_classe_siege)
+);
+
+-- =====================================================
 -- 3) ROLE_EQUIPAGE
 -- =====================================================
 
@@ -252,6 +282,25 @@ CREATE TABLE reservation_detail (
 );
 
 -- =====================================================
+-- 16c) RESERVATION_CATEGORIE_PASSAGER (passagers par catégorie)
+-- =====================================================
+
+CREATE TABLE reservation_categorie_passager (
+    id SERIAL PRIMARY KEY,
+    reservation_id INT NOT NULL,
+    classe_siege_id INT NOT NULL,
+    categorie_passager_id INT NOT NULL,
+    nombre_passagers INT NOT NULL CHECK (nombre_passagers > 0),
+    prix_unitaire DECIMAL(10,2) NOT NULL,
+    remise_unitaire DECIMAL(10,2) DEFAULT 0,
+    prix_apres_remise DECIMAL(10,2) NOT NULL,
+    sous_total DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (reservation_id) REFERENCES reservation(id) ON DELETE CASCADE,
+    FOREIGN KEY (classe_siege_id) REFERENCES classe_siege(id),
+    FOREIGN KEY (categorie_passager_id) REFERENCES categorie_passager(id_categorie_passager)
+);
+
+-- =====================================================
 -- 17) BILLET
 -- =====================================================
 
@@ -343,6 +392,12 @@ CREATE INDEX idx_paiement_statut ON paiement(statut);
 CREATE INDEX idx_paiement_methode_paiement ON paiement_methode(paiement_id);
 CREATE INDEX idx_model_avion_classe_model ON model_avion_classe_siege(model_avion_id);
 CREATE INDEX idx_model_avion_classe_classe ON model_avion_classe_siege(classe_siege_id);
+CREATE INDEX idx_remise_vol_programme ON remise_categorie_place(vol_programme_id);
+CREATE INDEX idx_remise_categorie ON remise_categorie_place(id_categorie_passager);
+CREATE INDEX idx_remise_classe ON remise_categorie_place(id_classe_siege);
+CREATE INDEX idx_reservation_categorie_reservation ON reservation_categorie_passager(reservation_id);
+CREATE INDEX idx_reservation_categorie_classe ON reservation_categorie_passager(classe_siege_id);
+CREATE INDEX idx_reservation_categorie_categorie ON reservation_categorie_passager(categorie_passager_id);
 
 -- =====================================================
 -- 22) DONNEES PAR DEFAUT (mises à jour)
@@ -385,6 +440,45 @@ INSERT INTO methode_paiement (libelle) VALUES
     ('MOBILE_MONEY'),
     ('CHEQUE');
 
+-- Insertion des catégories de passagers
+INSERT INTO categorie_passager (libelle, description) VALUES 
+    ('ADULTE', 'Passager adulte (12 ans et plus)'),
+    ('ENFANT', 'Enfant (2-11 ans) avec remise'),
+    ('BEBE', 'Bébé (0-2 ans) avec remise importante'),
+    ('SENIOR', 'Senior (65 ans et plus) avec remise'),
+    ('ETUDIANT', 'Étudiant avec carte valide');
+
+-- Insertion des remises par catégorie et classe (exemples)
+-- Adulte : aucune remise
+INSERT INTO remise_categorie_place (id_categorie_passager, id_classe_siege, remise_prix) VALUES 
+    (1, 1, 0),      -- Adulte Économie
+    (1, 2, 0),      -- Adulte Business
+    (1, 3, 0);      -- Adulte Première
+
+-- Enfant : 20000 Ar de remise
+INSERT INTO remise_categorie_place (id_categorie_passager, id_classe_siege, remise_prix) VALUES 
+    (2, 1, 20000),  -- Enfant Économie
+    (2, 2, 30000),  -- Enfant Business
+    (2, 3, 50000);  -- Enfant Première
+
+-- Bébé : 50000 Ar de remise
+INSERT INTO remise_categorie_place (id_categorie_passager, id_classe_siege, remise_prix) VALUES 
+    (3, 1, 50000),  -- Bébé Économie
+    (3, 2, 80000),  -- Bébé Business
+    (3, 3, 120000); -- Bébé Première
+
+-- Senior : 15000 Ar de remise
+INSERT INTO remise_categorie_place (id_categorie_passager, id_classe_siege, remise_prix) VALUES 
+    (4, 1, 15000),  -- Senior Économie
+    (4, 2, 25000),  -- Senior Business
+    (4, 3, 40000);  -- Senior Première
+
+-- Étudiant : 10000 Ar de remise
+INSERT INTO remise_categorie_place (id_categorie_passager, id_classe_siege, remise_prix) VALUES 
+    (5, 1, 10000),  -- Étudiant Économie
+    (5, 2, 20000),  -- Étudiant Business
+    (5, 3, 30000);  -- Étudiant Première
+
 -- =====================================================
 -- 23) COMMENTAIRES SUR LES MODIFICATIONS PRINCIPALES
 -- =====================================================
@@ -397,6 +491,9 @@ INSERT INTO methode_paiement (libelle) VALUES
 -- 5. Modes de paiement combinés : plusieurs méthodes pour un même paiement
 -- 6. Timestamps : created_at et updated_at sur toutes les tables principales
 -- 7. Gestion équipages : table vol_equipage pour assigner équipages aux vols
+-- 8. Catégories de passagers : table categorie_passager (Adulte, Enfant, Bébé, Senior, Étudiant)
+-- 9. Remises par catégorie : table remise_categorie_place pour les remises par catégorie et classe
+-- 10. Réservation par catégorie : table reservation_categorie_passager pour détailler les passagers
 
 -- =====================================================
 -- FIN DU SCRIPT

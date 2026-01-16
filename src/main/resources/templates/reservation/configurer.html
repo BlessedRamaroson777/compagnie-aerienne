@@ -127,11 +127,11 @@
 
                     <!-- Sélection des classes et places -->
                     <div class="config-card mb-4">
-                        <h5 class="mb-3" style="color: var(--primary-blue);"><i class="bi bi-star-fill me-2"></i>Sélection des places par classe</h5>
+                        <h5 class="mb-3" style="color: var(--primary-blue);"><i class="bi bi-star-fill me-2"></i>Sélection des passagers par classe et catégorie</h5>
                         
                         <div class="alert alert-info mb-3">
                             <i class="bi bi-info-circle me-2"></i>
-                            Vous pouvez réserver plusieurs places de différentes classes. Exemple: 7 Economy + 2 Business
+                            Sélectionnez le nombre de passagers par catégorie pour chaque classe. Le total sera calculé automatiquement.
                         </div>
                         
                         <div th:if="${#lists.isEmpty(prixParClasse)}" class="alert alert-warning">
@@ -142,29 +142,79 @@
                         <div class="row g-3">
                             <div th:each="config : ${configurations}" class="col-md-12">
                                 <div class="class-option-multi" th:with="prixObj=${prixParClasse.?[classeSiege.id == __${config.classeSiege.id}__]}">
-                                    <div class="row align-items-center" th:if="${!#lists.isEmpty(prixObj)}">
-                                        <div class="col-md-5">
-                                            <h6 class="mb-1 fw-bold" th:text="${config.classeSiege.libelle}">ECONOMY</h6>
-                                            <small class="text-muted" th:text="${config.classeSiege.description}">Classe économique</small>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="price-tag" th:text="${#numbers.formatDecimal(prixObj[0].prix, 0, 'COMMA', 0, 'POINT')} + ' Ar'">150000 Ar</div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="bi bi-people-fill"></i></span>
-                                                <input type="number" 
-                                                       th:name="'places_' + ${config.classeSiege.id}"
-                                                       th:id="'places_' + ${config.classeSiege.id}"
-                                                       th:data-classeid="${config.classeSiege.id}"
-                                                       th:data-prix="${prixObj[0].prix}"
-                                                       th:data-maxplaces="${config.nombrePlaces}"
-                                                       class="form-control places-input" 
-                                                       value="0" min="0" th:max="${config.nombrePlaces}"
-                                                       onchange="updateTotal()"
-                                                       placeholder="Nombre">
-                                                <span class="input-group-text" th:text="'/' + ${config.nombrePlaces}">places</span>
+                                    <div th:if="${!#lists.isEmpty(prixObj)}">
+                                        <!-- En-tête de classe -->
+                                        <div class="row align-items-center mb-3 pb-2 border-bottom">
+                                            <div class="col-md-5">
+                                                <h6 class="mb-1 fw-bold" th:text="${config.classeSiege.libelle}">ECONOMY</h6>
+                                                <small class="text-muted" th:text="${config.classeSiege.description}">Classe économique</small>
                                             </div>
+                                            <div class="col-md-3">
+                                                <div class="price-tag" th:text="${#numbers.formatDecimal(prixObj[0].prix, 0, 'COMMA', 0, 'POINT')} + ' Ar'">150000 Ar</div>
+                                                <small class="text-muted">Prix de base</small>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="bi bi-people-fill"></i></span>
+                                                    <input type="number" 
+                                                           th:name="'places_' + ${config.classeSiege.id}"
+                                                           th:id="'totalPlaces_' + ${config.classeSiege.id}"
+                                                           th:data-classeid="${config.classeSiege.id}"
+                                                           th:data-maxplaces="${config.nombrePlaces}"
+                                                           class="form-control total-places-input" 
+                                                           value="0" min="0" th:max="${config.nombrePlaces}"
+                                                           readonly
+                                                           placeholder="Total">
+                                                    <span class="input-group-text" th:text="'/' + ${config.nombrePlaces}">places</span>
+                                                </div>
+                                                <small class="text-muted">Total auto-calculé</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Table des catégories -->
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th width="30%">Catégorie</th>
+                                                        <th width="25%">Remise</th>
+                                                        <th width="25%">Prix après remise</th>
+                                                        <th width="20%">Nombre</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr th:each="categorie : ${categories}">
+                                                        <td th:text="${categorie.libelle}">ADULTE</td>
+                                                        <td>
+                                                            <span th:with="remise=${remises.?[categoriePassager.idCategoriePassager == __${categorie.idCategoriePassager}__ and classeSiege.id == __${config.classeSiege.id}__]}"
+                                                                  th:text="${#lists.isEmpty(remise) ? '0 Ar' : #numbers.formatDecimal(remise[0].remisePrix, 0, 'COMMA', 0, 'POINT') + ' Ar'}"
+                                                                  th:data-remise="${#lists.isEmpty(remise) ? 0 : remise[0].remisePrix}">
+                                                                0 Ar
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="prix-apres-remise fw-bold"
+                                                                  th:with="remise=${remises.?[categoriePassager.idCategoriePassager == __${categorie.idCategoriePassager}__ and classeSiege.id == __${config.classeSiege.id}__]}"
+                                                                  th:text="${#numbers.formatDecimal(prixObj[0].prix - (#lists.isEmpty(remise) ? 0 : remise[0].remisePrix), 0, 'COMMA', 0, 'POINT')} + ' Ar'">
+                                                                150000 Ar
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" 
+                                                                   th:name="'categorie_' + ${config.classeSiege.id} + '_' + ${categorie.idCategoriePassager}"
+                                                                   th:id="'cat_' + ${config.classeSiege.id} + '_' + ${categorie.idCategoriePassager}"
+                                                                   th:data-classeid="${config.classeSiege.id}"
+                                                                   th:data-categorieid="${categorie.idCategoriePassager}"
+                                                                   th:with="remise=${remises.?[categoriePassager.idCategoriePassager == __${categorie.idCategoriePassager}__ and classeSiege.id == __${config.classeSiege.id}__]}"
+                                                                   th:data-prix="${prixObj[0].prix}"
+                                                                   th:data-remise="${#lists.isEmpty(remise) ? 0 : remise[0].remisePrix}"
+                                                                   class="form-control form-control-sm categorie-input" 
+                                                                   value="0" min="0"
+                                                                   onchange="updateCategoryTotal(this)">
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -174,7 +224,7 @@
                         <div class="mt-3">
                             <small class="text-muted">
                                 <i class="bi bi-lightning-fill text-warning me-1"></i>
-                                Note : Vous pouvez mélanger différentes classes dans une seule réservation
+                                Note : Les remises sont appliquées automatiquement selon la catégorie de passager
                             </small>
                         </div>
                     </div>
@@ -214,34 +264,88 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Mettre à jour le total d'une classe quand une catégorie change
+        function updateCategoryTotal(input) {
+            const classeId = input.dataset.classeid;
+            const maxPlaces = parseInt(document.getElementById('totalPlaces_' + classeId).dataset.maxplaces);
+            
+            // Calculer le total des passagers pour cette classe
+            const categorieInputs = document.querySelectorAll(`input[data-classeid="${classeId}"].categorie-input`);
+            let totalPassagersClasse = 0;
+            
+            categorieInputs.forEach(catInput => {
+                totalPassagersClasse += parseInt(catInput.value) || 0;
+            });
+            
+            // Vérifier que le total ne dépasse pas le max
+            if (totalPassagersClasse > maxPlaces) {
+                alert(`Le nombre total de passagers pour cette classe ne peut pas dépasser ${maxPlaces} places disponibles.`);
+                input.value = 0;
+                updateCategoryTotal(input);
+                return;
+            }
+            
+            // Mettre à jour le champ total
+            document.getElementById('totalPlaces_' + classeId).value = totalPassagersClasse;
+            
+            // Mettre à jour le récapitulatif global
+            updateTotal();
+        }
+        
         function updateTotal() {
-            const placesInputs = document.querySelectorAll('.places-input');
+            const categorieInputs = document.querySelectorAll('.categorie-input');
             let totalPlaces = 0;
             let totalPrix = 0;
             let detailHTML = '';
             
-            placesInputs.forEach(input => {
-                const nbPlaces = parseInt(input.value) || 0;
-                if (nbPlaces > 0) {
+            // Grouper par classe
+            const classeMap = new Map();
+            
+            categorieInputs.forEach(input => {
+                const nbPassagers = parseInt(input.value) || 0;
+                if (nbPassagers > 0) {
+                    const classeId = input.dataset.classeid;
                     const prix = parseFloat(input.dataset.prix) || 0;
-                    const subtotal = prix * nbPlaces;
-                    totalPlaces += nbPlaces;
+                    const remise = parseFloat(input.dataset.remise) || 0;
+                    const prixApresRemise = prix - remise;
+                    const subtotal = prixApresRemise * nbPassagers;
+                    
+                    totalPlaces += nbPassagers;
                     totalPrix += subtotal;
                     
-                    // Récupérer le libellé de la classe
+                    // Récupérer le libellé de la classe et catégorie
                     const classeLabel = input.closest('.class-option-multi').querySelector('h6').textContent;
+                    const categorieLabel = input.closest('tr').querySelector('td').textContent;
                     
-                    detailHTML += `
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">${classeLabel} × ${nbPlaces}</span>
-                            <span class="fw-bold">${formatNumber(subtotal)} Ar</span>
-                        </div>
-                    `;
+                    const key = classeId + '_' + classeLabel;
+                    if (!classeMap.has(key)) {
+                        classeMap.set(key, []);
+                    }
+                    classeMap.get(key).push({
+                        categorie: categorieLabel,
+                        nb: nbPassagers,
+                        prix: prixApresRemise,
+                        subtotal: subtotal
+                    });
                 }
             });
             
+            // Construire le HTML du détail
+            classeMap.forEach((categories, key) => {
+                const classeLabel = key.split('_')[1];
+                detailHTML += `<div class="mb-2"><strong>${classeLabel}</strong></div>`;
+                categories.forEach(cat => {
+                    detailHTML += `
+                        <div class="d-flex justify-content-between mb-1 ms-3">
+                            <span class="text-muted">${cat.categorie} × ${cat.nb} (${formatNumber(cat.prix)} Ar)</span>
+                            <span class="fw-bold">${formatNumber(cat.subtotal)} Ar</span>
+                        </div>
+                    `;
+                });
+            });
+            
             // Mettre à jour l'affichage
-            document.getElementById('detailClasses').innerHTML = detailHTML || '<p class="text-muted text-center">Aucune place sélectionnée</p>';
+            document.getElementById('detailClasses').innerHTML = detailHTML || '<p class="text-muted text-center">Aucun passager sélectionné</p>';
             document.getElementById('displayNombrePlaces').textContent = totalPlaces;
             document.getElementById('totalPrice').textContent = formatNumber(totalPrix) + ' Ar';
             

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${remise.id != null ? 'Modifier une remise' : 'Nouvelle remise'}">Remise Catégorie-Place</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    
+    <div class="main-content-with-sidebar">
+        <div class="container-fluid py-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="bi bi-percent"></i> 
+                    <span th:text="${remise.id != null ? 'Modifier une remise' : 'Nouvelle remise'}">Remise</span>
+                </h1>
+                <a th:href="@{/remises-categorie-place}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <form th:action="@{/remises-categorie-place}" th:object="${remise}" method="post">
+                                <input type="hidden" th:field="*{id}">
+                                
+                                <div class="mb-3">
+                                    <label for="volProgrammeId" class="form-label">Vol Programmé *</label>
+                                    <select class="form-select" id="volProgrammeId" name="volProgrammeId" required>
+                                        <option value="">-- Sélectionner un vol --</option>
+                                        <option th:each="vp : ${volsProgrammes}" 
+                                                th:value="${vp.id}" 
+                                                th:text="${vp.vol.numeroVol + ' - ' + vp.vol.aeroportDepart.codeAeroport + ' → ' + vp.vol.aeroportArrivee.codeAeroport + ' (' + #temporals.format(vp.dateHeureDepart, 'dd/MM/yyyy HH:mm') + ')'}"
+                                                th:selected="${remise.volProgramme != null && remise.volProgramme.id == vp.id}">
+                                            AF123 - CDG → JFK (01/01/2024)
+                                        </option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="categoriePassagerId" class="form-label">Catégorie de Passager *</label>
+                                    <select class="form-select" id="categoriePassagerId" name="categoriePassagerId" required>
+                                        <option value="">-- Sélectionner --</option>
+                                        <option th:each="cat : ${categories}" 
+                                                th:value="${cat.idCategoriePassager}" 
+                                                th:text="${cat.libelle}"
+                                                th:selected="${remise.categoriePassager != null && remise.categoriePassager.idCategoriePassager == cat.idCategoriePassager}">
+                                            Adulte
+                                        </option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="classeSiegeId" class="form-label">Classe de Siège *</label>
+                                    <select class="form-select" id="classeSiegeId" name="classeSiegeId" required>
+                                        <option value="">-- Sélectionner --</option>
+                                        <option th:each="classe : ${classes}" 
+                                                th:value="${classe.id}" 
+                                                th:text="${classe.libelle}"
+                                                th:selected="${remise.classeSiege != null && remise.classeSiege.id == classe.id}">
+                                            Économique
+                                        </option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="remisePrix" class="form-label">Montant de la remise (Ar) *</label>
+                                    <input type="number" step="0.01" class="form-control" id="remisePrix" 
+                                           th:field="*{remisePrix}" required min="0" placeholder="Ex: 10000">
+                                    <div class="form-text">Montant de réduction à appliquer sur le prix</div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <a th:href="@{/remises-categorie-place}" class="btn btn-secondary">
+                                        <i class="bi bi-x-circle"></i> Annuler
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-circle"></i> Enregistrer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

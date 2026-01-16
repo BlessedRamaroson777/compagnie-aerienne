@@ -4,6 +4,8 @@ import com.airline.airline_app.entity.*;
 import com.airline.airline_app.entity.enums.StatutPaiement;
 import com.airline.airline_app.entity.enums.StatutReservation;
 import com.airline.airline_app.repository.AvionClasseConfigurationRepository;
+import com.airline.airline_app.repository.CategoriePassagerRepository;
+import com.airline.airline_app.repository.RemiseCategoriePlaceRepository;
 import com.airline.airline_app.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -34,6 +36,8 @@ public class ReservationController {
     private final BilletService billetService;
     private final SiegeVolService siegeVolService;
     private final AvionClasseConfigurationRepository avionClasseConfigurationRepository;
+    private final CategoriePassagerRepository categoriePassagerRepository;
+    private final RemiseCategoriePlaceRepository remiseCategoriePlaceRepository;
 
     @GetMapping
     public String list(Model model) {
@@ -76,10 +80,18 @@ public class ReservationController {
         // Obtenir les configurations de sièges de l'avion
         List<AvionClasseConfiguration> configurations = avionClasseConfigurationRepository.findByAvionId(volProgramme.getAvion().getId());
 
+        // Obtenir toutes les catégories de passagers
+        List<CategoriePassager> categories = categoriePassagerRepository.findAll();
+        
+        // Obtenir les remises pour ce vol programmé
+        List<RemiseCategoriePlace> remises = remiseCategoriePlaceRepository.findByVolProgramme_Id(volProgrammeId);
+
         model.addAttribute("volProgramme", volProgramme);
         model.addAttribute("prixParClasse", prixParClasse);
         model.addAttribute("configurations", configurations);
         model.addAttribute("clients", clientService.findAll());
+        model.addAttribute("categories", categories);
+        model.addAttribute("remises", remises);
         return "reservation/configurer";
     }
 

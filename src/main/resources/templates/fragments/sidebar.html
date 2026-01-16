@@ -79,6 +79,14 @@
                     <i class="bi bi-columns-gap"></i>
                     <span>Classes de Siège</span>
                 </a>
+                <a th:href="@{/categories-passager}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/categories-passager') ? 'active' : ''}">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Catégories Passagers</span>
+                </a>
+                <a th:href="@{/remises-categorie-place}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/remises-categorie-place') ? 'active' : ''}">
+                    <i class="bi bi-percent"></i>
+                    <span>Remises</span>
+                </a>
             </div>
             
             <!-- Gestion Financière -->
