@@ -14,7 +14,7 @@ public class ChiffreAffaireDTO {
     
     private Long id;
     private String designation; // Vol, Avion, ou VolProgramme
-    private String type; // "VOL", "AVION", "VOL_PROGRAMME"
+    private String type; // "VOL", "AVION", "VOL_PROGRAMME", "CATEGORIE"
     private BigDecimal montantTotal;
     private Integer nombreReservations;
     private Integer nombreBillets;
@@ -27,4 +27,8 @@ public class ChiffreAffaireDTO {
     private String aeroportDepart;
     private String aeroportArrivee;
     private LocalDateTime dateHeureVol;
+    
+    // Informations sur les remises
+    private BigDecimal montantRemises; // Total des remises accordées
+    private BigDecimal montantAvantRemise; // Montant avant application des remises
 }

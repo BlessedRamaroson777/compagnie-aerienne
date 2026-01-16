@@ -116,8 +116,37 @@
                     <div class="info-card">
                         <h5 class="mb-3"><i class="bi bi-receipt text-primary me-2"></i>Détails de la Réservation</h5>
                         
-                        <!-- Si détails multiples disponibles -->
-                        <div th:if="${!#lists.isEmpty(reservation.details)}" class="mb-3">
+                        <!-- Détails par catégorie de passagers -->
+                        <div th:if="${!#lists.isEmpty(categoriesPassagers)}" class="mb-3">
+                            <h6 class="mb-3">Répartition par catégorie</h6>
+                            <table class="table table-sm table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Classe</th>
+                                        <th>Catégorie</th>
+                                        <th>Passagers</th>
+                                        <th>Prix unitaire</th>
+                                        <th>Remise</th>
+                                        <th>Prix après remise</th>
+                                        <th class="text-end">Sous-total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="cat : ${categoriesPassagers}">
+                                        <td><span class="badge bg-info" th:text="${cat.classeSiege.libelle}">ECONOMY</span></td>
+                                        <td th:text="${cat.categoriePassager.libelle}">ADULTE</td>
+                                        <td th:text="${cat.nombrePassagers}">2</td>
+                                        <td th:text="${#numbers.formatDecimal(cat.prixUnitaire, 0, 'COMMA', 0, 'POINT')} + ' Ar'">150000 Ar</td>
+                                        <td class="text-success" th:text="'-' + ${#numbers.formatDecimal(cat.remiseUnitaire, 0, 'COMMA', 0, 'POINT')} + ' Ar'">-50000 Ar</td>
+                                        <td th:text="${#numbers.formatDecimal(cat.prixApresRemise, 0, 'COMMA', 0, 'POINT')} + ' Ar'">100000 Ar</td>
+                                        <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(cat.sousTotal, 0, 'COMMA', 0, 'POINT')} + ' Ar'">200000 Ar</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Si détails multiples disponibles (ancien format) -->
+                        <div th:if="${#lists.isEmpty(categoriesPassagers) and !#lists.isEmpty(reservation.details)}" class="mb-3">
                             <table class="table table-sm">
                                 <thead>
                                     <tr>
@@ -139,7 +168,7 @@
                         </div>
                         
                         <!-- Si ancien format (une seule classe) -->
-                        <div th:if="${#lists.isEmpty(reservation.details)}" class="row mb-3">
+                        <div th:if="${#lists.isEmpty(categoriesPassagers) and #lists.isEmpty(reservation.details)}" class="row mb-3">
                             <div class="col-md-6">
                                 <dt>Classe</dt>
                                 <dd class="fw-bold fs-5">

@@ -57,14 +57,39 @@
                                     <td th:text="${reservation.client.prenom + ' ' + reservation.client.nom}">John Doe</td>
                                 </tr>
                                 <tr>
-                                    <th>Classe:</th>
-                                    <td th:text="${reservation.classeSiege?.libelle}">Économique</td>
-                                </tr>
-                                <tr>
-                                    <th>Places:</th>
+                                    <th>Total Places:</th>
                                     <td th:text="${reservation.nombrePlaces}">1</td>
                                 </tr>
                             </table>
+                            
+                            <hr>
+                            
+                            <!-- Détail par catégorie -->
+                            <h6 class="mb-3"><i class="bi bi-list-ul"></i> Détail par catégorie</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-borderless">
+                                    <thead>
+                                        <tr class="small text-muted">
+                                            <th>Classe</th>
+                                            <th>Catégorie</th>
+                                            <th class="text-end">Qté</th>
+                                            <th class="text-end">Prix</th>
+                                            <th class="text-end">Remise</th>
+                                            <th class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="cat : ${categoriesPassagers}">
+                                            <td class="small" th:text="${cat.classeSiege.libelle}">Economy</td>
+                                            <td class="small" th:text="${cat.categoriePassager.libelle}">ADULTE</td>
+                                            <td class="small text-end" th:text="${cat.nombrePassagers}">2</td>
+                                            <td class="small text-end" th:text="${#numbers.formatDecimal(cat.prixUnitaire, 0, 'COMMA', 0, 'POINT')}">150000</td>
+                                            <td class="small text-end text-success" th:text="'-' + ${#numbers.formatDecimal(cat.remiseUnitaire, 0, 'COMMA', 0, 'POINT')}">-50000</td>
+                                            <td class="small text-end fw-bold" th:text="${#numbers.formatDecimal(cat.sousTotal, 0, 'COMMA', 0, 'POINT')}">200000</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                             
                             <hr>
                             

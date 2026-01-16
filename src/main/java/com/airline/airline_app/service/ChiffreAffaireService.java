@@ -32,12 +32,15 @@ public class ChiffreAffaireService {
     public ChiffreAffaireDTO getCAGlobal() {
         BigDecimal total = reservationRepository.calculateTotalCA();
         Long nombreReservations = reservationRepository.count();
+        BigDecimal totalRemises = reservationRepository.calculateTotalRemises();
         
         ChiffreAffaireDTO dto = new ChiffreAffaireDTO();
         dto.setDesignation("Chiffre d'affaires global");
         dto.setType("GLOBAL");
         dto.setMontantTotal(total);
         dto.setNombreReservations(nombreReservations.intValue());
+        dto.setMontantRemises(totalRemises);
+        dto.setMontantAvantRemise(total.add(totalRemises));
         
         return dto;
     }
@@ -91,6 +94,7 @@ public class ChiffreAffaireService {
         
         BigDecimal montant = reservationRepository.calculateCAByVolProgramme(volProgrammeId);
         Long nombreBillets = reservationRepository.countBilletsByVolProgramme(volProgrammeId);
+        BigDecimal remises = reservationRepository.calculateRemisesByVolProgramme(volProgrammeId);
         
         ChiffreAffaireDTO dto = new ChiffreAffaireDTO();
         dto.setId(volProgrammeId);
@@ -103,6 +107,8 @@ public class ChiffreAffaireService {
         dto.setAeroportDepart(vp.getVol().getAeroportDepart().getNom());
         dto.setAeroportArrivee(vp.getVol().getAeroportArrivee().getNom());
         dto.setImmatriculation(vp.getAvion().getCodeAvion());
+        dto.setMontantRemises(remises);
+        dto.setMontantAvantRemise(montant.add(remises));
         
         return dto;
     }
@@ -211,5 +217,59 @@ public class ChiffreAffaireService {
         dto.setAeroportArrivee(vol.getAeroportArrivee().getNom());
         
         return dto;
+    }
+    
+    /**
+     * Obtenir le CA par catégorie de passagers
+     */
+    public List<ChiffreAffaireDTO> getCAParCategorie() {
+        List<Object[]> results = reservationRepository.calculateCAByCategorie();
+        List<ChiffreAffaireDTO> dtos = new ArrayList<>();
+        
+        for (Object[] result : results) {
+            String categorieLibelle = (String) result[0];
+            BigDecimal montant = (BigDecimal) result[1];
+            Long nombrePassagers = (Long) result[2];
+            
+            ChiffreAffaireDTO dto = new ChiffreAffaireDTO();
+            dto.setType("CATEGORIE");
+            dto.setDesignation("Catégorie: " + categorieLibelle);
+            dto.setMontantTotal(montant);
+            dto.setNombreBillets(nombrePassagers.intValue());
+            
+            dtos.add(dto);
+        }
+        
+        // Trier par montant décroissant
+        dtos.sort((a, b) -> b.getMontantTotal().compareTo(a.getMontantTotal()));
+        
+        return dtos;
+    }
+    
+    /**
+     * Obtenir le CA par catégorie pour un vol programmé
+     */
+    public List<ChiffreAffaireDTO> getCAParCategorieForVolProgramme(Long volProgrammeId) {
+        List<Object[]> results = reservationRepository.calculateCAByCategorieForVolProgramme(volProgrammeId);
+        List<ChiffreAffaireDTO> dtos = new ArrayList<>();
+        
+        for (Object[] result : results) {
+            String categorieLibelle = (String) result[0];
+            BigDecimal montant = (BigDecimal) result[1];
+            Long nombrePassagers = (Long) result[2];
+            
+            ChiffreAffaireDTO dto = new ChiffreAffaireDTO();
+            dto.setType("CATEGORIE");
+            dto.setDesignation("Catégorie: " + categorieLibelle);
+            dto.setMontantTotal(montant);
+            dto.setNombreBillets(nombrePassagers.intValue());
+            
+            dtos.add(dto);
+        }
+        
+        // Trier par montant décroissant
+        dtos.sort((a, b) -> b.getMontantTotal().compareTo(a.getMontantTotal()));
+        
+        return dtos;
     }
 }

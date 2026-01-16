@@ -47,4 +47,28 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     // Chiffre d'affaires global
     @Query("SELECT COALESCE(SUM(r.prixTotal), 0) FROM Reservation r")
     BigDecimal calculateTotalCA();
+    
+    // Chiffre d'affaires par catégorie de passagers
+    @Query("SELECT rcp.categoriePassager.libelle, COALESCE(SUM(rcp.sousTotal), 0), SUM(rcp.nombrePassagers) " +
+           "FROM ReservationCategoriePassager rcp " +
+           "GROUP BY rcp.categoriePassager.id, rcp.categoriePassager.libelle")
+    List<Object[]> calculateCAByCategorie();
+    
+    // Chiffre d'affaires par catégorie pour un vol programmé
+    @Query("SELECT rcp.categoriePassager.libelle, COALESCE(SUM(rcp.sousTotal), 0), SUM(rcp.nombrePassagers) " +
+           "FROM ReservationCategoriePassager rcp " +
+           "WHERE rcp.reservation.volProgramme.id = :volProgrammeId " +
+           "GROUP BY rcp.categoriePassager.id, rcp.categoriePassager.libelle")
+    List<Object[]> calculateCAByCategorieForVolProgramme(@Param("volProgrammeId") Long volProgrammeId);
+    
+    // Total des remises accordées
+    @Query("SELECT COALESCE(SUM(rcp.remiseUnitaire * rcp.nombrePassagers), 0) " +
+           "FROM ReservationCategoriePassager rcp")
+    BigDecimal calculateTotalRemises();
+    
+    // Remises par vol programmé
+    @Query("SELECT COALESCE(SUM(rcp.remiseUnitaire * rcp.nombrePassagers), 0) " +
+           "FROM ReservationCategoriePassager rcp " +
+           "WHERE rcp.reservation.volProgramme.id = :volProgrammeId")
+    BigDecimal calculateRemisesByVolProgramme(@Param("volProgrammeId") Long volProgrammeId);
 }

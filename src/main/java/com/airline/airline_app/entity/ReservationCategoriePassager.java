@@ -131,14 +131,14 @@ public class ReservationCategoriePassager {
     }
     
     // Méthodes utilitaires
-    private void calculerPrixApresRemise() {
+    public void calculerPrixApresRemise() {
         if (prixUnitaire != null && remiseUnitaire != null) {
             this.prixApresRemise = prixUnitaire - remiseUnitaire;
             calculerSousTotal();
         }
     }
     
-    private void calculerSousTotal() {
+    public void calculerSousTotal() {
         if (prixApresRemise != null && nombrePassagers != null) {
             this.sousTotal = prixApresRemise * nombrePassagers;
         }

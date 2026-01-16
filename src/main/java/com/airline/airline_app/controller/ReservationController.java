@@ -6,6 +6,7 @@ import com.airline.airline_app.entity.enums.StatutReservation;
 import com.airline.airline_app.repository.AvionClasseConfigurationRepository;
 import com.airline.airline_app.repository.CategoriePassagerRepository;
 import com.airline.airline_app.repository.RemiseCategoriePlaceRepository;
+import com.airline.airline_app.repository.ReservationCategoriePassagerRepository;
 import com.airline.airline_app.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -38,6 +39,7 @@ public class ReservationController {
     private final AvionClasseConfigurationRepository avionClasseConfigurationRepository;
     private final CategoriePassagerRepository categoriePassagerRepository;
     private final RemiseCategoriePlaceRepository remiseCategoriePlaceRepository;
+    private final ReservationCategoriePassagerRepository reservationCategoriePassagerRepository;
 
     @GetMapping
     public String list(Model model) {
@@ -127,33 +129,60 @@ public class ReservationController {
             BigDecimal prixTotal = BigDecimal.ZERO;
             int totalPlaces = 0;
             
-            // Parser les paramètres places_X
+            // Parser les paramètres categorie_{classeSiegeId}_{categoriePassagerId}
             for (Map.Entry<String, String> entry : allParams.entrySet()) {
-                if (entry.getKey().startsWith("places_")) {
-                    int nbPlaces = Integer.parseInt(entry.getValue());
-                    if (nbPlaces > 0) {
-                        Long classeSiegeId = Long.parseLong(entry.getKey().replace("places_", ""));
+                if (entry.getKey().startsWith("categorie_")) {
+                    int nombrePassagers = Integer.parseInt(entry.getValue());
+                    if (nombrePassagers > 0) {
+                        // Parse categorie_{classeSiegeId}_{categoriePassagerId}
+                        String[] parts = entry.getKey().replace("categorie_", "").split("_");
+                        Long classeSiegeId = Long.parseLong(parts[0]);
+                        Long categoriePassagerId = Long.parseLong(parts[1]);
+                        
                         ClasseSiege classeSiege = classeSiegeService.findById(classeSiegeId)
                                 .orElseThrow(() -> new RuntimeException("Classe de siège non trouvée"));
                         
+                        CategoriePassager categoriePassager = categoriePassagerRepository.findById(categoriePassagerId)
+                                .orElseThrow(() -> new RuntimeException("Catégorie passager non trouvée"));
+                        
+                        // Obtenir le prix de base pour cette classe
                         VolProgrammeClassePrix prixClasse = volProgrammeClassePrixService.getPrixByVolProgramme(volProgrammeId).stream()
                                 .filter(p -> p.getClasseSiege().getId().equals(classeSiegeId))
                                 .findFirst()
                                 .orElseThrow(() -> new RuntimeException("Prix non défini pour cette classe"));
                         
-                        BigDecimal sousTotal = prixClasse.getPrix().multiply(BigDecimal.valueOf(nbPlaces));
+                        // Obtenir la remise pour cette catégorie
+                        List<RemiseCategoriePlace> remises = remiseCategoriePlaceRepository
+                                .findByVolProgramme_IdAndClasseSiege_Id(volProgrammeId, classeSiegeId);
+                        
+                        BigDecimal remise = BigDecimal.ZERO;
+                        for (RemiseCategoriePlace r : remises) {
+                            if (r.getCategoriePassager().getIdCategoriePassager().equals(categoriePassagerId)) {
+                                remise = BigDecimal.valueOf(r.getRemisePrix());
+                                break;
+                            }
+                        }
+                        
+                        // Calculer le prix après remise
+                        BigDecimal prixUnitaire = prixClasse.getPrix();
+                        BigDecimal prixApresRemise = prixUnitaire.subtract(remise);
+                        BigDecimal sousTotal = prixApresRemise.multiply(BigDecimal.valueOf(nombrePassagers));
+                        
                         prixTotal = prixTotal.add(sousTotal);
-                        totalPlaces += nbPlaces;
+                        totalPlaces += nombrePassagers;
                         
-                        // Créer un détail de réservation
-                        ReservationDetail detail = new ReservationDetail();
-                        detail.setReservation(reservation);
-                        detail.setClasseSiege(classeSiege);
-                        detail.setNombrePlaces(nbPlaces);
-                        detail.setPrixUnitaire(prixClasse.getPrix());
-                        detail.setSousTotal(sousTotal);
+                        // Créer un enregistrement ReservationCategoriePassager
+                        ReservationCategoriePassager rcp = new ReservationCategoriePassager();
+                        rcp.setReservation(reservation);
+                        rcp.setClasseSiege(classeSiege);
+                        rcp.setCategoriePassager(categoriePassager);
+                        rcp.setNombrePassagers(nombrePassagers);
+                        rcp.setPrixUnitaire(prixUnitaire.doubleValue());
+                        rcp.setRemiseUnitaire(remise.doubleValue());
+                        rcp.calculerPrixApresRemise();
+                        rcp.calculerSousTotal();
                         
-                        reservation.getDetails().add(detail);
+                        reservation.getCategoriesPassagers().add(rcp);
                     }
                 }
             }
@@ -165,28 +194,28 @@ public class ReservationController {
             reservation.setNombrePlaces(totalPlaces);
             reservation.setPrixTotal(prixTotal);
             // Garder la classe principale pour compatibilité (première classe sélectionnée)
-            if (!reservation.getDetails().isEmpty()) {
-                reservation.setClasseSiege(reservation.getDetails().get(0).getClasseSiege());
+            if (!reservation.getCategoriesPassagers().isEmpty()) {
+                reservation.setClasseSiege(reservation.getCategoriesPassagers().get(0).getClasseSiege());
             }
 
             Reservation savedReservation = reservationService.save(reservation);
 
-            // Générer automatiquement les billets pour chaque détail de réservation
-            for (ReservationDetail detail : savedReservation.getDetails()) {
-                // Pour chaque place dans ce détail
-                for (int i = 0; i < detail.getNombrePlaces(); i++) {
+            // Générer automatiquement les billets par catégorie
+            for (ReservationCategoriePassager rcp : savedReservation.getCategoriesPassagers()) {
+                // Pour chaque passager dans cette catégorie
+                for (int i = 0; i < rcp.getNombrePassagers(); i++) {
                     // Trouver un siège disponible de cette classe
                     List<SiegeVol> siegesDisponibles = siegeVolService.findDisponiblesByVolProgrammeAndClasse(
-                        volProgrammeId, detail.getClasseSiege().getId());
+                        volProgrammeId, rcp.getClasseSiege().getId());
                     
                     if (!siegesDisponibles.isEmpty()) {
                         SiegeVol siegeVol = siegesDisponibles.get(0);
                         
-                        // Créer le billet
+                        // Créer le billet avec le prix après remise
                         Billet billet = new Billet();
                         billet.setReservation(savedReservation);
                         billet.setSiegeVol(siegeVol);
-                        billet.setPrix(detail.getPrixUnitaire());
+                        billet.setPrix(BigDecimal.valueOf(rcp.getPrixApresRemise()));
                         billet.setStatut(com.airline.airline_app.entity.enums.StatutBillet.EMIS);
                         billetService.save(billet);
                         
@@ -209,7 +238,13 @@ public class ReservationController {
     public String pagePaiement(@PathVariable Long id, Model model) {
         Reservation reservation = reservationService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Réservation non trouvée"));
+        
+        // Charger les détails par catégorie
+        List<ReservationCategoriePassager> categoriesPassagers = 
+                reservationCategoriePassagerRepository.findByReservation_Id(id);
+        
         model.addAttribute("reservation", reservation);
+        model.addAttribute("categoriesPassagers", categoriesPassagers);
         return "reservation/paiement";
     }
 
@@ -240,7 +275,13 @@ public class ReservationController {
     public String detail(@PathVariable Long id, Model model) {
         Reservation reservation = reservationService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Réservation non trouvée"));
+        
+        // Charger les détails par catégorie
+        List<ReservationCategoriePassager> categoriesPassagers = 
+                reservationCategoriePassagerRepository.findByReservation_Id(id);
+        
         model.addAttribute("reservation", reservation);
+        model.addAttribute("categoriesPassagers", categoriesPassagers);
         return "reservation/detail";
     }
 

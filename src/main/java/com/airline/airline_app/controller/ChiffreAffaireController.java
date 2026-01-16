@@ -106,4 +106,32 @@ public class ChiffreAffaireController {
         model.addAttribute("ca", ca);
         return "chiffre-affaire/detail";
     }
+    
+    /**
+     * Liste des CA par catégorie de passagers
+     */
+    @GetMapping("/par-categorie")
+    public String parCategorie(Model model) {
+        List<ChiffreAffaireDTO> caList = chiffreAffaireService.getCAParCategorie();
+        BigDecimal total = caList.stream()
+            .map(ChiffreAffaireDTO::getMontantTotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        model.addAttribute("caList", caList);
+        model.addAttribute("total", total);
+        model.addAttribute("type", "CATEGORIE");
+        model.addAttribute("titre", "Chiffre d'affaires par catégorie de passagers");
+        return "chiffre-affaire/list";
+    }
+    
+    /**
+     * Détails du CA par catégorie pour un vol programmé
+     */
+    @GetMapping("/par-vol-programme/{id}/categories")
+    public String detailCategoriesVolProgramme(@PathVariable Long id, Model model) {
+        ChiffreAffaireDTO ca = chiffreAffaireService.getCAParVolProgramme(id);
+        List<ChiffreAffaireDTO> categories = chiffreAffaireService.getCAParCategorieForVolProgramme(id);
+        model.addAttribute("ca", ca);
+        model.addAttribute("categories", categories);
+        return "chiffre-affaire/detail-categories";
+    }
 }
