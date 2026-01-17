@@ -15,14 +15,27 @@
         <div class="container-fluid py-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2"><i class="bi bi-percent"></i> Remises par Catégorie et Classe</h1>
-                <a th:href="@{/remises-categorie-place/new}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Nouvelle remise
-                </a>
-                <a th:href="@{/configurations-remise-personnalisee}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Nouvelle remise Special
-                </a>
+                <div class="btn-group" role="group">
+                    <a th:href="@{/remises-categorie-place/new}" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle"></i> Remise unitaire
+                    </a>
+                    <a th:href="@{/remises-rapide/new}" class="btn btn-primary">
+                        <i class="bi bi-lightning-charge"></i> Remise rapide
+                    </a>
+                    <a th:href="@{/configurations-remise-personnalisee/new}" class="btn btn-outline-success">
+                        <i class="bi bi-gear"></i> Config personnalisée
+                    </a>
+                </div>
             </div>
             
+            <!-- Info -->
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle"></i>
+                <strong>Trois façons de créer des remises :</strong><br>
+                • <strong>Unitaire</strong> : Créer une remise à la fois (idéal pour des ajustements ponctuels)<br>
+                • <strong>⚡ Rapide</strong> : Saisir directement les prix finaux pour plusieurs catégories/classes en une fois<br>
+                • <strong>Personnalisée</strong> : Définir des pourcentages automatiques qui se synchronisent avec les changements de prix
+            </div>
 
             <!-- Alertes -->
             <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">

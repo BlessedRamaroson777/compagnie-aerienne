@@ -27,8 +27,7 @@
                 <div class="col-lg-8">
                     <div class="card">
                         <div class="card-body">
-                            <form th:action="@{/remises-categorie-place}" th:object="${remise}" method="post">
-                                <input type="hidden" th:field="*{id}">
+                            <form th:action="@{/remises-categorie-place}" method="post">
                                 
                                 <div class="mb-3">
                                     <label for="volProgrammeId" class="form-label">Vol Programmé *</label>
@@ -70,10 +69,14 @@
                                 </div>
                                 
                                 <div class="mb-3">
-                                    <label for="remisePrix" class="form-label">Montant de la remise (Ar) *</label>
-                                    <input type="number" step="0.01" class="form-control" id="remisePrix" 
-                                           th:field="*{remisePrix}" required min="0" placeholder="Ex: 10000">
-                                    <div class="form-text">Montant de réduction à appliquer sur le prix</div>
+                                    <label for="prixFinal" class="form-label fw-bold">Prix final après remise (Ar) *</label>
+                                    <input type="number" step="0.01" class="form-control" id="prixFinal" 
+                                           name="prixFinal" required min="0" placeholder="Ex: 800000">
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle"></i> 
+                                        Saisissez le <strong>prix final que le client paiera</strong> (prix après remise). 
+                                        Le système calculera automatiquement le montant de la remise.
+                                    </div>
                                 </div>
                                 
                                 <div class="d-flex justify-content-between">

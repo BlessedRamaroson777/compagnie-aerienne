@@ -1,15 +1,19 @@
 package com.airline.airline_app.controller;
 
 import com.airline.airline_app.entity.RemiseCategoriePlace;
+import com.airline.airline_app.entity.VolProgrammeClassePrix;
 import com.airline.airline_app.repository.RemiseCategoriePlaceRepository;
 import com.airline.airline_app.repository.CategoriePassagerRepository;
 import com.airline.airline_app.repository.ClasseSiegeRepository;
 import com.airline.airline_app.repository.VolProgrammeRepository;
+import com.airline.airline_app.repository.VolProgrammeClassePrixRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/remises-categorie-place")
@@ -26,6 +30,9 @@ public class RemiseCategoriePlaceController {
     
     @Autowired
     private VolProgrammeRepository volProgrammeRepository;
+    
+    @Autowired
+    private VolProgrammeClassePrixRepository volProgrammeClassePrixRepository;
     
     @GetMapping
     public String list(Model model) {
@@ -63,6 +70,7 @@ public class RemiseCategoriePlaceController {
                       @RequestParam Long volProgrammeId,
                       @RequestParam Long categoriePassagerId,
                       @RequestParam Long classeSiegeId,
+                      @RequestParam Double prixFinal,
                       RedirectAttributes redirectAttributes) {
         try {
             var volProgramme = volProgrammeRepository.findById(volProgrammeId)
@@ -72,12 +80,36 @@ public class RemiseCategoriePlaceController {
             var classe = classeSiegeRepository.findById(classeSiegeId)
                 .orElseThrow(() -> new RuntimeException("Classe de siège non trouvée"));
             
+            // Récupérer le prix de référence
+            Optional<VolProgrammeClassePrix> prixRefOpt = volProgrammeClassePrixRepository
+                .findByVolProgrammeIdAndClasseSiegeId(volProgrammeId, classeSiegeId);
+            
+            if (prixRefOpt.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", 
+                    "Prix de référence non trouvé pour ce vol et cette classe");
+                return "redirect:/remises-categorie-place/new";
+            }
+            
+            Double prixReference = prixRefOpt.get().getPrix().doubleValue();
+            
+            // Calculer le montant de la remise
+            Double montantRemise = prixReference - prixFinal;
+            
+            if (montantRemise <= 0) {
+                redirectAttributes.addFlashAttribute("error", 
+                    "Le prix final doit être inférieur au prix de référence (" + prixReference + " Ar)");
+                return "redirect:/remises-categorie-place/new";
+            }
+            
             remise.setVolProgramme(volProgramme);
             remise.setCategoriePassager(categorie);
             remise.setClasseSiege(classe);
+            remise.setRemisePrix(montantRemise); // Stocker le MONTANT de remise
             remiseRepository.save(remise);
             
-            redirectAttributes.addFlashAttribute("success", "Remise enregistrée avec succès");
+            redirectAttributes.addFlashAttribute("success", 
+                "Remise enregistrée avec succès : " + montantRemise + " Ar " +
+                "(Prix final: " + prixFinal + " Ar, Prix réf: " + prixReference + " Ar)");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur lors de l'enregistrement: " + e.getMessage());
         }

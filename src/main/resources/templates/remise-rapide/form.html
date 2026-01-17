@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remise Rapide en Masse</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <style>
+        .prix-reference {
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-style: italic;
+            display: block;
+            margin-top: 0.25rem;
+        }
+        .input-prix {
+            font-weight: 500;
+        }
+        .table-remises td {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    
+    <div class="main-content-with-sidebar">
+        <div class="container-fluid py-4">
+            <!-- En-tête avec navigation -->
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2"><i class="bi bi-lightning-charge"></i> Remise Rapide en Masse</h1>
+                <div class="btn-group" role="group">
+                    <a th:href="@{/remises-categorie-place}" class="btn btn-outline-secondary">
+                        <i class="bi bi-list"></i> Toutes les remises
+                    </a>
+                    <a th:href="@{/remises-categorie-place/new}" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle"></i> Remise unitaire
+                    </a>
+                    <a th:href="@{/configurations-remise-personnalisee/new}" class="btn btn-outline-success">
+                        <i class="bi bi-gear"></i> Config personnalisée
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                <span th:utext="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${warning}" class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                <span th:utext="${warning}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <!-- Formulaire -->
+            <form method="post" th:action="@{/remises-rapide/save}" id="remiseRapideForm">
+                <input type="hidden" name="toutesLesClasses" value="true">
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-1-circle"></i> Sélection du vol programmé</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-0">
+                            <label for="volProgrammeId" class="form-label fw-bold">Vol programmé *</label>
+                            <select class="form-select form-select-lg" id="volProgrammeId" name="volProgrammeId" required>
+                                <option value="">Sélectionnez un vol programmé</option>
+                                <option th:each="vp : ${volsProgrammes}" 
+                                        th:value="${vp.id}"
+                                        th:text="${vp.vol.numeroVol + ' (' + vp.vol.aeroportDepart.codeAeroport + ' → ' + vp.vol.aeroportArrivee.codeAeroport + ') - ' + #temporals.format(vp.dateHeureDepart, 'dd/MM/yyyy HH:mm')}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-2-circle"></i> Saisie des prix finaux</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Mode d'emploi :</strong><br>
+                            • Saisissez <strong>le prix final que le client paiera</strong> (prix après remise)<br>
+                            • Les <span class="text-muted fst-italic">prix de référence</span> sont affichés pour comparaison<br>
+                            • <strong>Laissez à 0 Ar</strong> les cases pour lesquelles vous ne voulez pas créer de remise<br>
+                            • Le système calculera automatiquement le pourcentage de remise
+                        </div>
+                    
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover table-remises">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="fw-bold">Catégorie de passager</th>
+                                        <th class="text-center" th:each="classe : ${classesSiege}" th:text="${classe.libelle}"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="categorie : ${categoriesPassager}">
+                                        <td class="fw-bold text-nowrap" th:text="${categorie.libelle}"></td>
+                                        <td th:each="classe : ${classesSiege}">
+                                            <div class="px-2">
+                                                <div class="input-group input-group-sm mb-1">
+                                                    <input type="number" 
+                                                           class="form-control input-prix text-end"
+                                                           th:name="'prixFinal_' + ${categorie.idCategoriePassager} + '_' + ${classe.id}"
+                                                           th:id="'prixFinal_' + ${categorie.idCategoriePassager} + '_' + ${classe.id}"
+                                                           step="0.01"
+                                                           min="0"
+                                                           value="0"
+                                                           placeholder="0">
+                                                    <span class="input-group-text">Ar</span>
+                                                </div>
+                                                <small class="prix-reference text-center" 
+                                                       th:id="'ref_' + ${categorie.idCategoriePassager} + '_' + ${classe.id}">
+                                                    Réf: -
+                                                </small>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-5">
+                    <a th:href="@{/remises-categorie-place}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-save"></i> Créer les remises
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function() {
+            const volProgrammeSelect = document.getElementById('volProgrammeId');
+            
+            // Charger les prix de référence quand on sélectionne un vol
+            volProgrammeSelect.addEventListener('change', function() {
+                const volProgrammeId = this.value;
+                if (!volProgrammeId) {
+                    document.querySelectorAll('.prix-reference').forEach(el => {
+                        el.textContent = 'Réf: -';
+                    });
+                    return;
+                }
+                
+                fetch(`/remises-rapide/prix/${volProgrammeId}`)
+                    .then(response => response.json())
+                    .then(prixParClasse => {
+                        document.querySelectorAll('.prix-reference').forEach(el => {
+                            const match = el.id.match(/ref_(\d+)_(\d+)/);
+                            if (match) {
+                                const classeId = match[2];
+                                if (prixParClasse[classeId]) {
+                                    const prix = parseFloat(prixParClasse[classeId]);
+                                    el.textContent = `Réf: ${prix.toLocaleString('fr-FR')} Ar`;
+                                } else {
+                                    el.textContent = 'Réf: Non défini';
+                                }
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Erreur chargement prix:', error));
+            });
+            
+            // Validation du formulaire
+            document.getElementById('remiseRapideForm').addEventListener('submit', function(e) {
+                if (!volProgrammeSelect.value) {
+                    e.preventDefault();
+                    alert('Veuillez sélectionner un vol programmé');
+                    return;
+                }
+                
+                const inputsPrix = document.querySelectorAll('.input-prix');
+                const auMoinsUnPrixSaisi = Array.from(inputsPrix).some(input => {
+                    return input.value && parseFloat(input.value) > 0;
+                });
+                
+                if (!auMoinsUnPrixSaisi) {
+                    e.preventDefault();
+                    alert('Veuillez saisir au moins un prix final supérieur à 0');
+                    return;
+                }
+            });
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>

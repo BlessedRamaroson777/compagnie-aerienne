@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Configurations Remise Personnalisée</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="bi bi-percent"></i> Configurations Remise Personnalisée</h1>
+                    <div class="btn-group" role="group">
+                        <a href="/configurations-remise-personnalisee/new" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Nouvelle Configuration
+                        </a>
+                        <a href="/remises-rapide/new" class="btn btn-outline-warning">
+                            <i class="bi bi-lightning-charge"></i> Remise rapide
+                        </a>
+                        <a href="/remises-categorie-place" class="btn btn-outline-secondary">
+                            <i class="bi bi-percent"></i> Toutes les remises
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle"></i> <span th:utext="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${warning}" class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> <span th:utext="${warning}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Info -->
+                <div class="alert alert-info mb-4">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Comment ça marche :</strong> 
+                    Chaque configuration est liée à un Vol Programmé. Le prix de référence provient de <code>prix_vol</code>.
+                    Vous définissez un pourcentage de remise par catégorie et par classe via les associations.
+                    <strong>Les remises sont automatiquement insérées dans la table <code>remise_categorie_place</code>.</strong>
+                    <a href="/remises-categorie-place" class="alert-link">Voir toutes les remises →</a>
+                </div>
+
+                <!-- Table des configurations -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nom</th>
+                                        <th>Vol Programmé</th>
+                                        <th>Associations</th>
+                                        <th>Statut</th>
+                                        <th>Date Création</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="config : ${configurations}">
+                                        <td th:text="${config.id}"></td>
+                                        <td th:text="${config.nom}"></td>
+                                        <td>
+                                            <span th:if="${config.volProgramme != null}">
+                                                <span th:text="${config.volProgramme.vol?.numeroVol}"></span> - 
+                                                <small th:text="${#temporals.format(config.volProgramme.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></small>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary" th:text="${config.associations?.size()} + ' association(s)'"></span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${config.actif}" class="badge bg-success">Actif</span>
+                                            <span th:unless="${config.actif}" class="badge bg-danger">Inactif</span>
+                                        </td>
+                                        <td th:text="${config.dateCreation != null ? #temporals.format(config.dateCreation, 'dd/MM/yyyy HH:mm') : '-'}"></td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a th:href="@{/configurations-remise-personnalisee/details/{id}(id=${config.id})}" 
+                                                   class="btn btn-info" title="Détails">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a th:href="@{/configurations-remise-personnalisee/edit/{id}(id=${config.id})}" 
+                                                   class="btn btn-warning" title="Modifier">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a th:href="@{/configurations-remise-personnalisee/toggle/{id}(id=${config.id})}" 
+                                                   class="btn btn-secondary" 
+                                                   th:title="${config.actif ? 'Désactiver' : 'Activer'}">
+                                                    <i th:class="${config.actif ? 'bi bi-toggle-on' : 'bi bi-toggle-off'}"></i>
+                                                </a>
+                                                <a th:href="@{/configurations-remise-personnalisee/delete/{id}(id=${config.id})}" 
+                                                   class="btn btn-danger" title="Supprimer"
+                                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette configuration?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(configurations)}">
+                                        <td colspan="7" class="text-center text-muted">
+                                            Aucune configuration trouvée
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

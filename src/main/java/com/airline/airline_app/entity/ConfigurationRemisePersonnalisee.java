@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,19 @@ public class ConfigurationRemisePersonnalisee {
     
     @Column(name = "actif", nullable = false)
     private Boolean actif = true;
+    
+    @Column(name = "appliquer_toutes_classes")
+    private Boolean appliquerToutesClasses = false;
+    
+    // Pourcentages de remise par catégorie (colonnes anciennes, conservées pour compatibilité)
+    @Column(name = "pourcentage_bebe", nullable = false)
+    private BigDecimal pourcentageBebe = BigDecimal.ZERO;
+    
+    @Column(name = "pourcentage_enfant", nullable = false)
+    private BigDecimal pourcentageEnfant = BigDecimal.ZERO;
+    
+    @Column(name = "pourcentage_adulte", nullable = false)
+    private BigDecimal pourcentageAdulte = BigDecimal.ZERO;
     
     @Column(name = "date_creation")
     private LocalDateTime dateCreation = LocalDateTime.now();
