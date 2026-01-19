@@ -68,12 +68,12 @@
             <div class="sidebar-section">
                 <div class="sidebar-section-title">Réservations & Clients</div>
                 <a th:href="@{/reservations}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/reservations') ? 'active' : ''}">
-                    <i class="bi bi-ticket-perforated"></i>
+                    <i class="bi bi-journal-check"></i>
                     <span>Réservations</span>
                 </a>
                 <a th:href="@{/reservation-categories}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/reservation-categories') ? 'active' : ''}">
-                    <i class="bi bi-ticket-perforated"></i>
-                    <span>Billets</span>
+                    <i class="bi bi-ticket-perforated-fill"></i>
+                    <span>Billets / Détails</span>
                 </a>
                 <a th:href="@{/clients}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/clients') ? 'active' : ''}">
                     <i class="bi bi-person"></i>

@@ -111,27 +111,109 @@
                             <i class="bi bi-info-circle"></i> Aucune configuration de classe définie. Utilisez le formulaire ci-dessus pour en ajouter.
                         </div>
 
-                        <h5 class="mt-4">Sièges</h5>
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Numéro</th>
-                                        <th>Classe</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="siege : ${avion.sieges}">
-                                        <td th:text="${siege.numeroSiege}"></td>
-                                        <td>
-                                            <span class="badge" 
-                                                  th:classappend="${siege.classeSiege.libelle == 'BUSINESS' ? 'bg-warning' : 'bg-info'}"
-                                                  th:text="${siege.classeSiege.libelle}"></span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <h5 class="mt-4"><i class="bi bi-grid-3x3-gap"></i> Plan des Sièges</h5>
+                        
+                        <!-- Affichage visuel des sièges par classe -->
+                        <div class="card mb-4" th:if="${avion.sieges != null and !avion.sieges.isEmpty()}">
+                            <div class="card-body">
+                                <!-- Grouper les sièges par classe -->
+                                <div th:each="classe : ${classes}" class="mb-4">
+                                    <h6 class="border-bottom pb-2">
+                                        <span class="badge" 
+                                              th:classappend="${classe.libelle.toUpperCase().contains('BUSINESS') ? 'bg-warning text-dark' : 
+                                                               (classe.libelle.toUpperCase().contains('PREMIÈRE') or classe.libelle.toUpperCase().contains('FIRST') ? 'bg-danger' : 'bg-info')}"
+                                              th:text="${classe.libelle}"></span>
+                                        <span class="text-muted ms-2" 
+                                              th:text="'(' + ${#lists.size(avion.sieges.?[classeSiege.id == classe.id])} + ' places)'"></span>
+                                    </h6>
+                                    <div class="seat-container">
+                                        <th:block th:each="siege : ${avion.sieges}" th:if="${siege.classeSiege.id == classe.id}">
+                                            <div class="seat"
+                                                 th:classappend="${siege.classeSiege.libelle.toUpperCase().contains('BUSINESS') ? 'seat-business' : 
+                                                                  (siege.classeSiege.libelle.toUpperCase().contains('PREMIÈRE') or siege.classeSiege.libelle.toUpperCase().contains('FIRST') ? 'seat-first' : 'seat-economy')}"
+                                                 th:title="${siege.numeroSiege + ' - ' + siege.classeSiege.libelle}"
+                                                 th:text="${siege.numeroSiege}">
+                                            </div>
+                                        </th:block>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        
+                        <div class="alert alert-secondary" th:if="${avion.sieges == null or avion.sieges.isEmpty()}">
+                            <i class="bi bi-info-circle"></i> Aucun siège configuré pour cet avion.
+                        </div>
+                        
+                        <!-- Style CSS pour l'affichage visuel des sièges -->
+                        <style>
+                            .seat-container {
+                                display: flex;
+                                flex-wrap: wrap;
+                                gap: 8px;
+                                padding: 10px;
+                                background-color: #f8f9fa;
+                                border-radius: 8px;
+                            }
+                            
+                            .seat {
+                                width: 45px;
+                                height: 45px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                border-radius: 6px;
+                                font-size: 11px;
+                                font-weight: 600;
+                                cursor: default;
+                                transition: all 0.2s;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            }
+                            
+                            .seat:hover {
+                                transform: scale(1.1);
+                                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                            }
+                            
+                            .seat-first {
+                                background: linear-gradient(135deg, #dc3545, #ff6b7a);
+                                color: white;
+                                border: 2px solid #dc3545;
+                            }
+                            
+                            .seat-business {
+                                background: linear-gradient(135deg, #ffc107, #ffda6a);
+                                color: #212529;
+                                border: 2px solid #ffc107;
+                            }
+                            
+                            .seat-economy {
+                                background: linear-gradient(135deg, #0d6efd, #6ea8fe);
+                                color: white;
+                                border: 2px solid #0d6efd;
+                            }
+                            
+                            /* Légende */
+                            .seat-legend {
+                                display: flex;
+                                gap: 20px;
+                                margin-top: 15px;
+                                padding: 10px;
+                                background: white;
+                                border-radius: 6px;
+                            }
+                            
+                            .legend-item {
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                            }
+                            
+                            .legend-color {
+                                width: 20px;
+                                height: 20px;
+                                border-radius: 4px;
+                            }
+                        </style>
 
                         <div class="d-flex justify-content-between mt-4">
                             <a th:href="@{/avions}" class="btn btn-secondary">

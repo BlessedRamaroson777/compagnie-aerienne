@@ -20,20 +20,22 @@
                               th:object="${volProgramme}" method="post">
                             
                             <div class="alert alert-info">
-                                <i class="bi bi-info-circle"></i> Programmer un vol spécifique avec date, heure et avion
+                                <i class="bi bi-info-circle"></i> Programmer un vol spécifique avec date, heure et avion. L'heure d'arrivée sera calculée automatiquement selon la durée du vol.
                             </div>
 
                             <div class="mb-3">
                                 <label for="volId" class="form-label">Vol (Route) *</label>
-                                <select class="form-select" id="volId" name="volId" required>
+                                <select class="form-select" id="volId" name="volId" required onchange="updateDureeInfo()">
                                     <option value="">-- Sélectionner une route --</option>
                                     <option th:each="vol : ${vols}" 
                                             th:value="${vol.id}"
+                                            th:data-duree="${vol.dureeVolMinutes}"
                                             th:selected="${volProgramme.vol != null && volProgramme.vol.id == vol.id}"
-                                            th:text="${vol.numeroVol + ' - ' + vol.aeroportDepart.codeAeroport + ' → ' + vol.aeroportArrivee.codeAeroport + ' (' + vol.aeroportDepart.ville + ' → ' + vol.aeroportArrivee.ville + ')'}">
+                                            th:text="${vol.numeroVol + ' - ' + vol.aeroportDepart.codeAeroport + ' → ' + vol.aeroportArrivee.codeAeroport + ' (' + vol.aeroportDepart.ville + ' → ' + vol.aeroportArrivee.ville + ') - Durée: ' + vol.dureeFormatee}">
                                     </option>
                                 </select>
                                 <div class="form-text">Sélectionner la route (numéro de vol et aéroports)</div>
+                                <div id="dureeInfo" class="mt-2"></div>
                             </div>
 
                             <div class="mb-3">
@@ -53,13 +55,16 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="dateHeureDepart" class="form-label">Date et Heure de Départ *</label>
                                     <input type="datetime-local" class="form-control" id="dateHeureDepart" 
-                                           th:field="*{dateHeureDepart}" required>
+                                           th:field="*{dateHeureDepart}" required onchange="calculerArrivee()">
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label for="dateHeureArrivee" class="form-label">Date et Heure d'Arrivée *</label>
-                                    <input type="datetime-local" class="form-control" id="dateHeureArrivee" 
-                                           th:field="*{dateHeureArrivee}" required>
+                                    <label for="dateHeureArriveeDisplay" class="form-label">Heure d'Arrivée Estimée</label>
+                                    <input type="datetime-local" class="form-control" id="dateHeureArriveeDisplay" 
+                                           th:value="${volProgramme.dateHeureArrivee}" readonly 
+                                           style="background-color: #e9ecef;">
+                                    <input type="hidden" th:field="*{dateHeureArrivee}" id="dateHeureArrivee">
+                                    <div class="form-text text-success"><i class="bi bi-calculator"></i> Calculée automatiquement</div>
                                 </div>
                             </div>
 
@@ -93,5 +98,50 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateDureeInfo() {
+            const select = document.getElementById('volId');
+            const option = select.options[select.selectedIndex];
+            const duree = option.getAttribute('data-duree');
+            const infoDiv = document.getElementById('dureeInfo');
+            
+            if (duree && parseInt(duree) > 0) {
+                const heures = Math.floor(parseInt(duree) / 60);
+                const minutes = parseInt(duree) % 60;
+                let dureeText = '';
+                if (heures > 0) dureeText += heures + 'h ';
+                if (minutes > 0) dureeText += minutes + 'min';
+                infoDiv.innerHTML = '<span class="badge bg-info"><i class="bi bi-clock"></i> Durée du vol: ' + dureeText + '</span>';
+            } else {
+                infoDiv.innerHTML = '<span class="badge bg-warning"><i class="bi bi-exclamation-triangle"></i> Durée non définie pour ce vol</span>';
+            }
+            
+            calculerArrivee();
+        }
+        
+        function calculerArrivee() {
+            const select = document.getElementById('volId');
+            const option = select.options[select.selectedIndex];
+            const duree = option.getAttribute('data-duree');
+            const departInput = document.getElementById('dateHeureDepart');
+            const arriveeInput = document.getElementById('dateHeureArrivee');
+            const arriveeDisplay = document.getElementById('dateHeureArriveeDisplay');
+            
+            if (duree && parseInt(duree) > 0 && departInput.value) {
+                const departDate = new Date(departInput.value);
+                const arriveeDate = new Date(departDate.getTime() + (parseInt(duree) * 60000));
+                
+                // Format pour datetime-local
+                const formatted = arriveeDate.toISOString().slice(0, 16);
+                arriveeInput.value = formatted;
+                arriveeDisplay.value = formatted;
+            }
+        }
+        
+        // Initialiser au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDureeInfo();
+        });
+    </script>
 </body>
 </html>

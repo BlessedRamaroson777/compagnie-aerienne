@@ -2,6 +2,9 @@ package com.airline.airline_app.controller;
 
 import com.airline.airline_app.dto.ChiffreAffaireDTO;
 import com.airline.airline_app.service.ChiffreAffaireService;
+import com.airline.airline_app.service.CategoriePassagerService;
+import com.airline.airline_app.service.ClasseSiegeService;
+import com.airline.airline_app.service.VolProgrammeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +21,9 @@ import java.util.List;
 public class ChiffreAffaireController {
 
     private final ChiffreAffaireService chiffreAffaireService;
+    private final CategoriePassagerService categoriePassagerService;
+    private final ClasseSiegeService classeSiegeService;
+    private final VolProgrammeService volProgrammeService;
 
     /**
      * Page d'accueil des statistiques de chiffre d'affaires
@@ -133,5 +139,16 @@ public class ChiffreAffaireController {
         model.addAttribute("ca", ca);
         model.addAttribute("categories", categories);
         return "chiffre-affaire/detail-categories";
+    }
+    
+    /**
+     * Page de simulation du chiffre d'affaires
+     */
+    @GetMapping("/simulation")
+    public String simulation(Model model) {
+        model.addAttribute("categories", categoriePassagerService.findAll());
+        model.addAttribute("classes", classeSiegeService.findAll());
+        model.addAttribute("volsProgrammes", volProgrammeService.findAll());
+        return "chiffre-affaire/simulation";
     }
 }

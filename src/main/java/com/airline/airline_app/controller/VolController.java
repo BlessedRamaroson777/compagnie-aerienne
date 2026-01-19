@@ -89,6 +89,20 @@ public class VolController {
     @PostMapping
     public String save(@ModelAttribute Vol vol, RedirectAttributes redirectAttributes) {
         try {
+            // Validation: Aéroport de départ != Aéroport d'arrivée
+            if (vol.getAeroportDepart() != null && vol.getAeroportArrivee() != null 
+                && vol.getAeroportDepart().getId() != null 
+                && vol.getAeroportDepart().getId().equals(vol.getAeroportArrivee().getId())) {
+                redirectAttributes.addFlashAttribute("error", "L'aéroport de départ et d'arrivée doivent être différents!");
+                return "redirect:/vols/new";
+            }
+            
+            // Validation: Durée du vol obligatoire
+            if (vol.getDureeVolMinutes() == null || vol.getDureeVolMinutes() <= 0) {
+                redirectAttributes.addFlashAttribute("error", "La durée du vol doit être supérieure à 0!");
+                return "redirect:/vols/new";
+            }
+            
             if (vol.getId() == null) {
                 volService.save(vol);
                 redirectAttributes.addFlashAttribute("success", "Vol créé avec succès");

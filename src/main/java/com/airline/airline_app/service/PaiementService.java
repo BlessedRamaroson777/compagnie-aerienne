@@ -3,6 +3,7 @@ package com.airline.airline_app.service;
 import com.airline.airline_app.entity.MethodePaiement;
 import com.airline.airline_app.entity.Paiement;
 import com.airline.airline_app.entity.PaiementMethode;
+import com.airline.airline_app.entity.Reservation;
 import com.airline.airline_app.entity.enums.StatutPaiement;
 import com.airline.airline_app.repository.MethodePaiementRepository;
 import com.airline.airline_app.repository.PaiementMethodeRepository;
@@ -37,14 +38,56 @@ public class PaiementService extends GenericServiceImpl<Paiement, Long> {
         return paiementRepository;
     }
     
+    /**
+     * Calcule le montant total déjà payé (paiements VALIDE) pour une réservation
+     */
+    public BigDecimal getMontantDejaPaye(Reservation reservation) {
+        return paiementRepository.sumMontantByReservationAndStatut(reservation, StatutPaiement.VALIDE);
+    }
+    
+    /**
+     * Calcule le montant restant à payer pour une réservation
+     */
+    public BigDecimal getMontantRestant(Reservation reservation) {
+        BigDecimal montantTotal = reservation.getPrixTotal();
+        BigDecimal montantPaye = getMontantDejaPaye(reservation);
+        return montantTotal.subtract(montantPaye);
+    }
+    
+    /**
+     * Vérifie si la réservation est entièrement payée
+     */
+    public boolean estEntierementPayee(Reservation reservation) {
+        return getMontantRestant(reservation).compareTo(BigDecimal.ZERO) <= 0;
+    }
+    
+    /**
+     * Valide un paiement: vérifie qu'il ne dépasse pas le montant restant
+     */
+    public String validerPaiement(Reservation reservation, BigDecimal montantPaiement) {
+        if (estEntierementPayee(reservation)) {
+            return "Cette réservation est déjà entièrement payée. Montant total: " + 
+                   reservation.getPrixTotal() + " Ar, Déjà payé: " + getMontantDejaPaye(reservation) + " Ar";
+        }
+        
+        BigDecimal montantRestant = getMontantRestant(reservation);
+        if (montantPaiement.compareTo(montantRestant) > 0) {
+            return "Le montant du paiement (" + montantPaiement + " Ar) dépasse le montant restant à payer (" + 
+                   montantRestant + " Ar). Montant maximum accepté: " + montantRestant + " Ar";
+        }
+        
+        return null; // Validation OK
+    }
+    
     @Override
     @Transactional
     public Paiement save(Paiement paiement) {
         if (paiement.getDatePaiement() == null) {
             paiement.setDatePaiement(LocalDateTime.now());
         }
+        // Par défaut, le statut est VALIDE (confirmé)
         if (paiement.getStatut() == null) {
-            paiement.setStatut(StatutPaiement.EN_ATTENTE);
+            paiement.setStatut(StatutPaiement.VALIDE);
         }
         return super.save(paiement);
     }

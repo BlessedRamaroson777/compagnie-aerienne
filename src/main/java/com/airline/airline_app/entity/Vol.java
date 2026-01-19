@@ -29,7 +29,26 @@ public class Vol {
     @ManyToOne
     @JoinColumn(name = "aeroport_arrivee_id", nullable = false)
     private Aeroport aeroportArrivee;
+    
+    @Column(name = "duree_vol_minutes")
+    private Integer dureeVolMinutes; // Durée du vol en minutes
 
     @OneToMany(mappedBy = "vol", cascade = CascadeType.ALL)
     private List<VolProgramme> volsProgrammes = new ArrayList<>();
+    
+    /**
+     * Retourne la durée formatée (ex: "2h 30min")
+     */
+    public String getDureeFormatee() {
+        if (dureeVolMinutes == null || dureeVolMinutes == 0) return "N/A";
+        int heures = dureeVolMinutes / 60;
+        int minutes = dureeVolMinutes % 60;
+        if (heures > 0 && minutes > 0) {
+            return heures + "h " + minutes + "min";
+        } else if (heures > 0) {
+            return heures + "h";
+        } else {
+            return minutes + "min";
+        }
+    }
 }

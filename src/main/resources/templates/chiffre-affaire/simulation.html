@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation Chiffre d'Affaires - Airline App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="bi bi-calculator me-2"></i>
+                        Simulation de Chiffre d'Affaires
+                    </h1>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Simulez le chiffre d'affaires potentiel en entrant le nombre de billets par catégorie de passagers et classe de siège pour un vol donné.
+                </div>
+
+                <div class="row">
+                    <!-- Formulaire de simulation -->
+                    <div class="col-md-7">
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="bi bi-sliders me-2"></i>Paramètres de Simulation</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="simulationForm">
+                                    <!-- Sélection du vol -->
+                                    <div class="mb-4">
+                                        <label for="volProgrammeId" class="form-label fw-bold">Vol Programmé</label>
+                                        <select class="form-select" id="volProgrammeId" onchange="chargerPrixVol()">
+                                            <option value="">-- Sélectionner un vol (optionnel) --</option>
+                                            <option th:each="vp : ${volsProgrammes}" 
+                                                    th:value="${vp.id}"
+                                                    th:data-vol-id="${vp.vol.id}"
+                                                    th:text="${vp.vol.numeroVol + ' - ' + vp.vol.aeroportDepart.codeAeroport + ' → ' + vp.vol.aeroportArrivee.codeAeroport + ' | ' + #temporals.format(vp.dateHeureDepart, 'dd/MM/yyyy HH:mm')}">
+                                            </option>
+                                        </select>
+                                        <div class="form-text">Sélectionner un vol pour utiliser ses prix configurés (optionnel)</div>
+                                    </div>
+                                    
+                                    <!-- Tableau des catégories x classes -->
+                                    <h6 class="border-bottom pb-2 mb-3">
+                                        <i class="bi bi-grid-3x3 me-2"></i>Nombre de billets par catégorie et classe
+                                    </h6>
+                                    
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm" id="simulationTable">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Catégorie / Classe</th>
+                                                    <th th:each="classe : ${classes}" 
+                                                        th:text="${classe.libelle}"
+                                                        th:data-classe-id="${classe.id}"
+                                                        class="text-center">Classe</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="categorie : ${categories}" th:data-categorie-id="${categorie.idCategoriePassager}">
+                                                    <td>
+                                                        <strong th:text="${categorie.libelle}">Catégorie</strong>
+                                                    </td>
+                                                    <td th:each="classe : ${classes}" class="text-center">
+                                                        <div class="input-group input-group-sm">
+                                                            <input type="number" class="form-control form-control-sm qty-input" 
+                                                                   min="0" value="0"
+                                                                   th:data-categorie="${categorie.idCategoriePassager}"
+                                                                   th:data-classe="${classe.id}"
+                                                                   onchange="calculerSimulation()">
+                                                        </div>
+                                                        <!-- Prix unitaire affiché -->
+                                                        <small class="text-muted prix-display" 
+                                                               th:id="'prix_' + ${categorie.idCategoriePassager} + '_' + ${classe.id}">
+                                                            Prix: --
+                                                        </small>
+                                                        <!-- Champ caché pour le prix -->
+                                                        <input type="hidden" class="prix-input"
+                                                               th:id="'prixVal_' + ${categorie.idCategoriePassager} + '_' + ${classe.id}"
+                                                               th:data-categorie="${categorie.idCategoriePassager}"
+                                                               th:data-classe="${classe.id}"
+                                                               value="0">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <!-- Option: saisir les prix manuellement si pas de vol sélectionné -->
+                                    <div class="mt-3" id="prixManuelSection">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="prixManuelToggle" onchange="togglePrixManuel()">
+                                            <label class="form-check-label" for="prixManuelToggle">
+                                                Saisir les prix manuellement
+                                            </label>
+                                        </div>
+                                        <div id="prixManuelInputs" class="mt-3" style="display: none;">
+                                            <h6>Prix par classe (Ar)</h6>
+                                            <div class="row" th:each="classe : ${classes}">
+                                                <div class="col-md-4 mb-2">
+                                                    <label class="form-label" th:text="${classe.libelle}">Classe</label>
+                                                    <input type="number" class="form-control prix-manuel" 
+                                                           th:data-classe="${classe.id}"
+                                                           min="0" step="1000" value="0"
+                                                           onchange="appliquerPrixManuel()">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <button type="button" class="btn btn-success" onclick="calculerSimulation()">
+                                            <i class="bi bi-calculator me-2"></i>Calculer
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="reinitialiser()">
+                                            <i class="bi bi-arrow-counterclockwise me-2"></i>Réinitialiser
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Résultats -->
+                    <div class="col-md-5">
+                        <div class="card mb-4 border-success">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Résultats de la Simulation</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center mb-4">
+                                    <div class="col-6">
+                                        <h3 class="text-success" id="totalBillets">0</h3>
+                                        <p class="text-muted mb-0">Billets Total</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <h3 class="text-primary" id="caTotal">0 Ar</h3>
+                                        <p class="text-muted mb-0">CA Simulé</p>
+                                    </div>
+                                </div>
+                                
+                                <hr>
+                                
+                                <h6 class="mb-3">Détail par classe</h6>
+                                <div id="detailParClasse">
+                                    <p class="text-muted text-center">Entrez les quantités pour voir les détails</p>
+                                </div>
+                                
+                                <hr>
+                                
+                                <h6 class="mb-3">Détail par catégorie</h6>
+                                <div id="detailParCategorie">
+                                    <p class="text-muted text-center">Entrez les quantités pour voir les détails</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Comparaison avec CA réel -->
+                        <div class="card border-info" id="comparaisonCard" style="display: none;">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Comparaison</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <h5 class="text-info" id="caReel">0 Ar</h5>
+                                        <p class="text-muted mb-0">CA Réel</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <h5 id="difference">0 Ar</h5>
+                                        <p class="text-muted mb-0">Différence</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Retour -->
+                <div class="mt-4">
+                    <a href="/chiffre-affaire" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Retour
+                    </a>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const classes = /*[[${classes}]]*/ [];
+        const categories = /*[[${categories}]]*/ [];
+        const volsProgrammes = /*[[${volsProgrammes}]]*/ [];
+        
+        function chargerPrixVol() {
+            const volProgrammeId = document.getElementById('volProgrammeId').value;
+            
+            if (!volProgrammeId) {
+                // Réinitialiser les prix affichés
+                document.querySelectorAll('.prix-display').forEach(el => {
+                    el.textContent = 'Prix: --';
+                });
+                document.querySelectorAll('.prix-input').forEach(el => {
+                    el.value = 0;
+                });
+                return;
+            }
+            
+            // Charger les prix du vol via AJAX
+            fetch('/api/vols-programmes/' + volProgrammeId + '/prix')
+                .then(response => response.json())
+                .then(prixList => {
+                    // Réinitialiser tous les prix
+                    document.querySelectorAll('.prix-input').forEach(el => {
+                        el.value = 0;
+                    });
+                    document.querySelectorAll('.prix-display').forEach(el => {
+                        el.textContent = 'Prix: --';
+                    });
+                    
+                    // Appliquer les prix du vol
+                    prixList.forEach(prix => {
+                        const categorieId = prix.categoriePassagerId;
+                        const classeId = prix.classeId;
+                        const prixVal = prix.prixFinal || prix.prix;
+                        
+                        const prixInput = document.getElementById('prixVal_' + categorieId + '_' + classeId);
+                        const prixDisplay = document.getElementById('prix_' + categorieId + '_' + classeId);
+                        
+                        if (prixInput) {
+                            prixInput.value = prixVal;
+                        }
+                        if (prixDisplay) {
+                            prixDisplay.textContent = 'Prix: ' + formatNumber(prixVal) + ' Ar';
+                        }
+                    });
+                    
+                    calculerSimulation();
+                })
+                .catch(err => {
+                    console.error('Erreur lors du chargement des prix:', err);
+                    // En cas d'erreur, utiliser les prix manuels si disponibles
+                });
+        }
+        
+        function togglePrixManuel() {
+            const checked = document.getElementById('prixManuelToggle').checked;
+            document.getElementById('prixManuelInputs').style.display = checked ? 'block' : 'none';
+            if (checked) {
+                appliquerPrixManuel();
+            }
+        }
+        
+        function appliquerPrixManuel() {
+            document.querySelectorAll('.prix-manuel').forEach(input => {
+                const classeId = input.dataset.classe;
+                const prix = parseFloat(input.value) || 0;
+                
+                // Appliquer ce prix à toutes les catégories pour cette classe
+                document.querySelectorAll('.prix-input[data-classe="' + classeId + '"]').forEach(prixInput => {
+                    prixInput.value = prix;
+                    const catId = prixInput.dataset.categorie;
+                    const prixDisplay = document.getElementById('prix_' + catId + '_' + classeId);
+                    if (prixDisplay) {
+                        prixDisplay.textContent = 'Prix: ' + formatNumber(prix) + ' Ar';
+                    }
+                });
+            });
+            
+            calculerSimulation();
+        }
+        
+        function calculerSimulation() {
+            let totalBillets = 0;
+            let caTotal = 0;
+            let detailClasse = {};
+            let detailCategorie = {};
+            
+            // Initialiser les détails
+            classes.forEach(c => {
+                detailClasse[c.id] = { nom: c.libelle, billets: 0, montant: 0 };
+            });
+            categories.forEach(cat => {
+                detailCategorie[cat.idCategoriePassager] = { nom: cat.libelle, billets: 0, montant: 0 };
+            });
+            
+            // Parcourir toutes les entrées
+            document.querySelectorAll('.qty-input').forEach(input => {
+                const qty = parseInt(input.value) || 0;
+                const categorieId = input.dataset.categorie;
+                const classeId = input.dataset.classe;
+                
+                // Trouver le prix correspondant
+                const prixInput = document.getElementById('prixVal_' + categorieId + '_' + classeId);
+                const prix = prixInput ? parseFloat(prixInput.value) || 0 : 0;
+                
+                const montant = qty * prix;
+                
+                totalBillets += qty;
+                caTotal += montant;
+                
+                if (detailClasse[classeId]) {
+                    detailClasse[classeId].billets += qty;
+                    detailClasse[classeId].montant += montant;
+                }
+                
+                if (detailCategorie[categorieId]) {
+                    detailCategorie[categorieId].billets += qty;
+                    detailCategorie[categorieId].montant += montant;
+                }
+            });
+            
+            // Afficher les résultats
+            document.getElementById('totalBillets').textContent = totalBillets;
+            document.getElementById('caTotal').textContent = formatNumber(caTotal) + ' Ar';
+            
+            // Détail par classe
+            let classeHtml = '';
+            Object.values(detailClasse).forEach(d => {
+                if (d.billets > 0) {
+                    classeHtml += `
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>${d.nom}</span>
+                            <span><strong>${d.billets}</strong> billets - <strong>${formatNumber(d.montant)}</strong> Ar</span>
+                        </div>
+                    `;
+                }
+            });
+            document.getElementById('detailParClasse').innerHTML = classeHtml || '<p class="text-muted text-center">Aucun billet</p>';
+            
+            // Détail par catégorie
+            let catHtml = '';
+            Object.values(detailCategorie).forEach(d => {
+                if (d.billets > 0) {
+                    catHtml += `
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>${d.nom}</span>
+                            <span><strong>${d.billets}</strong> billets - <strong>${formatNumber(d.montant)}</strong> Ar</span>
+                        </div>
+                    `;
+                }
+            });
+            document.getElementById('detailParCategorie').innerHTML = catHtml || '<p class="text-muted text-center">Aucun billet</p>';
+        }
+        
+        function reinitialiser() {
+            document.querySelectorAll('.qty-input').forEach(input => {
+                input.value = 0;
+            });
+            document.querySelectorAll('.prix-manuel').forEach(input => {
+                input.value = 0;
+            });
+            document.getElementById('volProgrammeId').value = '';
+            document.getElementById('prixManuelToggle').checked = false;
+            document.getElementById('prixManuelInputs').style.display = 'none';
+            
+            document.querySelectorAll('.prix-display').forEach(el => {
+                el.textContent = 'Prix: --';
+            });
+            document.querySelectorAll('.prix-input').forEach(el => {
+                el.value = 0;
+            });
+            
+            calculerSimulation();
+        }
+        
+        function formatNumber(num) {
+            return new Intl.NumberFormat('fr-FR').format(num);
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            calculerSimulation();
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>
