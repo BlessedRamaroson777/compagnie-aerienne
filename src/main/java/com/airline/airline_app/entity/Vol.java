@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,7 @@ public class Vol {
     @Column(name = "duree_vol_minutes")
     private Integer dureeVolMinutes; // Durée du vol en minutes
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "vol", cascade = CascadeType.ALL)
     private List<VolProgramme> volsProgrammes = new ArrayList<>();
     

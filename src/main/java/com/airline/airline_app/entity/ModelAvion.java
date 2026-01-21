@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,9 +44,11 @@ public class ModelAvion {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
     
+    @ToString.Exclude
     @OneToMany(mappedBy = "modelAvion")
     private List<Avion> avions;
     
+    @ToString.Exclude
     @ManyToMany
     @JoinTable(
         name = "model_avion_classe_siege",

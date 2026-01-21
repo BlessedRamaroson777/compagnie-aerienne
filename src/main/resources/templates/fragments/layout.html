@@ -85,78 +85,11 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <nav class="sidebar">
-        <div class="brand">
-            <i class="bi bi-airplane-fill fs-2 text-primary mb-2"></i>
-            <h4>Airline App</h4>
-        </div>
-        <ul class="nav flex-column py-3">
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeMenu == 'dashboard' ? 'active' : ''}" href="/">
-                    <i class="bi bi-speedometer2"></i> Tableau de bord
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeMenu == 'vols' ? 'active' : ''}" href="/vols">
-                    <i class="bi bi-airplane"></i> Vols
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeMenu == 'vols-programmes' ? 'active' : ''}" href="/vols-programmes">
-                    <i class="bi bi-calendar3"></i> Vols Programmés
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeMenu == 'reservations' ? 'active' : ''}" href="/reservations">
-                    <i class="bi bi-bookmark-check"></i> Réservations
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeMenu == 'billets' ? 'active' : ''}" href="/billets">
-                    <i class="bi bi-ticket-perforated"></i> Billets
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeMenu == 'paiements' ? 'active' : ''}" href="/paiements">
-                    <i class="bi bi-credit-card"></i> Paiements
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeMenu == 'clients' ? 'active' : ''}" href="/clients">
-                    <i class="bi bi-people"></i> Clients
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeMenu == 'avions' ? 'active' : ''}" href="/avions">
-                    <i class="bi bi-cloud"></i> Avions
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeMenu == 'modeles-avion' ? 'active' : ''}" href="/modeles-avion">
-                    <i class="bi bi-diagram-3"></i> Modèles d'Avion
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeMenu == 'equipages' ? 'active' : ''}" href="/equipages">
-                    <i class="bi bi-person-badge"></i> Équipages
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeMenu == 'aeroports' ? 'active' : ''}" href="/aeroports">
-                    <i class="bi bi-pin-map"></i> Aéroports
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:classappend="${activeMenu == 'classes-siege' ? 'active' : ''}" href="/classes-siege">
-                    <i class="bi bi-grid-3x3-gap"></i> Classes de Siège
-                </a>
-            </li>
-        </ul>
-    </nav>
+    <!-- Sidebar (centralized fragment) -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content-with-sidebar">
         <div th:replace="${content}">
             <!-- Content will be inserted here -->
         </div>

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,9 +38,11 @@ public class Aeroport {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
     
+    @ToString.Exclude
     @OneToMany(mappedBy = "aeroportDepart")
     private List<Vol> volsDepart;
     
+    @ToString.Exclude
     @OneToMany(mappedBy = "aeroportArrivee")
     private List<Vol> volsArrivee;
     

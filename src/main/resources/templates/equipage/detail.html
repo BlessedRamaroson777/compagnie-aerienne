@@ -8,6 +8,11 @@
     <link rel="stylesheet" th:href="@{/css/custom.css}">
 </head>
 <body>
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    
+    <!-- Main Content -->
+    <div class="main-content-with-sidebar">
     <div class="container mt-5">
         <div class="card">
             <div class="card-header bg-primary text-white">

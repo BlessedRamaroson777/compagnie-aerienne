@@ -8,6 +8,11 @@
     <link rel="stylesheet" th:href="@{/css/custom.css}">
 </head>
 <body>
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    
+    <!-- Main Content -->
+    <div class="main-content-with-sidebar">
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8">
@@ -122,5 +127,7 @@
         document.getElementById('dureeHeures').addEventListener('change', updateDuree);
         document.getElementById('dureeMinutes').addEventListener('change', updateDuree);
     </script>
+    </div><!-- closing main-content-with-sidebar -->
+    </div><!-- closing page wrapper -->
 </body>
 </html>

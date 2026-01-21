@@ -28,6 +28,11 @@
     </style>
 </head>
 <body>
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    
+    <!-- Main Content -->
+    <div class="main-content-with-sidebar">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="/"><i class="bi bi-airplane-fill me-2"></i>Airline App</a>

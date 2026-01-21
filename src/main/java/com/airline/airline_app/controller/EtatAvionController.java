@@ -33,7 +33,9 @@ public class EtatAvionController {
     
     @GetMapping("/new")
     public String newForm(Model model) {
-        model.addAttribute("etat", new EtatAvion());
+        EtatAvion etat = new EtatAvion();
+        model.addAttribute("etat", etat);
+        model.addAttribute("etatAvion", etat);
         return "etat-avion/form";
     }
     
@@ -42,6 +44,7 @@ public class EtatAvionController {
         EtatAvion etat = etatAvionService.findById(id)
             .orElseThrow(() -> new RuntimeException("État d'avion non trouvé"));
         model.addAttribute("etat", etat);
+        model.addAttribute("etatAvion", etat);
         return "etat-avion/detail";
     }
     
@@ -50,6 +53,7 @@ public class EtatAvionController {
         EtatAvion etat = etatAvionService.findById(id)
             .orElseThrow(() -> new RuntimeException("État d'avion non trouvé"));
         model.addAttribute("etat", etat);
+        model.addAttribute("etatAvion", etat);
         return "etat-avion/form";
     }
     

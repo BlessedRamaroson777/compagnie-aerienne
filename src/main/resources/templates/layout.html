@@ -32,44 +32,8 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-2 d-md-block sidebar">
-                <div class="pt-3">
-                    <h4 class="text-white text-center mb-4">Airline System</h4>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/}">
-                                <i class="bi bi-house-door"></i> Accueil
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/avions}">
-                                <i class="bi bi-airplane"></i> Avions
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/vols}">
-                                <i class="bi bi-airplane-engines"></i> Vols
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/clients}">
-                                <i class="bi bi-people"></i> Clients
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/reservations}">
-                                <i class="bi bi-calendar-check"></i> Réservations
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/equipages}">
-                                <i class="bi bi-person-badge"></i> Équipage
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+            <!-- Sidebar (centralized fragment) -->
+            <div th:replace="~{fragments/sidebar :: sidebar}" class="col-md-2 d-md-block"></div>
 
             <!-- Main content -->
             <main class="col-md-10 ms-sm-auto content">

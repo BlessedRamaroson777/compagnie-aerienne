@@ -9,6 +9,10 @@
     <link rel="stylesheet" th:href="@{/css/custom.css}">
 </head>
 <body>
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <!-- Main Content -->
+    <div class="main-content-with-sidebar">
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-8 offset-md-2">
@@ -117,17 +121,17 @@
                         <div class="card mb-4" th:if="${avion.sieges != null and !avion.sieges.isEmpty()}">
                             <div class="card-body">
                                 <!-- Grouper les sièges par classe -->
-                                <div th:each="classe : ${classes}" class="mb-4">
+                                <div th:each="classe : ${classes}" th:with="cid=${classe.id}" class="mb-4">
                                     <h6 class="border-bottom pb-2">
                                         <span class="badge" 
                                               th:classappend="${classe.libelle.toUpperCase().contains('BUSINESS') ? 'bg-warning text-dark' : 
                                                                (classe.libelle.toUpperCase().contains('PREMIÈRE') or classe.libelle.toUpperCase().contains('FIRST') ? 'bg-danger' : 'bg-info')}"
                                               th:text="${classe.libelle}"></span>
-                                        <span class="text-muted ms-2" 
-                                              th:text="'(' + ${#lists.size(avion.sieges.?[classeSiege.id == classe.id])} + ' places)'"></span>
+                                            <span class="text-muted ms-2" 
+                                                  th:text="'(' + ${#lists.size(avion.sieges.?[classeSiege.id == #cid])} + ' places)'"></span>
                                     </h6>
                                     <div class="seat-container">
-                                        <th:block th:each="siege : ${avion.sieges}" th:if="${siege.classeSiege.id == classe.id}">
+                                        <th:block th:each="siege : ${avion.sieges}" th:if="${siege.classeSiege.id == #cid}">
                                             <div class="seat"
                                                  th:classappend="${siege.classeSiege.libelle.toUpperCase().contains('BUSINESS') ? 'seat-business' : 
                                                                   (siege.classeSiege.libelle.toUpperCase().contains('PREMIÈRE') or siege.classeSiege.libelle.toUpperCase().contains('FIRST') ? 'seat-first' : 'seat-economy')}"
@@ -307,5 +311,7 @@
         });
         /*]]>*/
     </script>
+    </div><!-- closing main-content-with-sidebar -->
+    </div>
 </body>
 </html>
