@@ -20,7 +20,8 @@ public class VolProgrammeApiController {
     private final VolProgrammeClassePrixRepository volProgrammeClassePrixRepository;
     
     /**
-     * Récupère les prix pour un vol programmé (pour la simulation)
+     * Récupère les prix par classe pour un vol programmé (pour la simulation)
+     * Note: Les prix sont par classe uniquement, pas par catégorie de passager
      */
     @GetMapping("/{id}/prix")
     public ResponseEntity<List<Map<String, Object>>> getPrixVolProgramme(@PathVariable Long id) {
@@ -28,14 +29,9 @@ public class VolProgrammeApiController {
         
         List<Map<String, Object>> result = prixList.stream().map(prix -> {
             Map<String, Object> map = new HashMap<>();
-            map.put("categoriePassagerId", prix.getCategoriePassager().getIdCategoriePassager());
             map.put("classeId", prix.getClasseSiege().getId());
             map.put("prix", prix.getPrix());
-            
-            // Calculer le prix final (après remise si applicable)
-            BigDecimal prixFinal = prix.getPrix();
-            // On pourrait ajouter la logique de remise ici si nécessaire
-            map.put("prixFinal", prixFinal);
+            map.put("prixFinal", prix.getPrix()); // Prix de base, sans remise pour l'instant
             
             return map;
         }).collect(Collectors.toList());

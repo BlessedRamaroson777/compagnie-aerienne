@@ -1,8 +1,8 @@
 package com.airline.airline_app.controller;
 
 import com.airline.airline_app.dto.ChiffreAffaireDTO;
+import com.airline.airline_app.repository.CategoriePassagerRepository;
 import com.airline.airline_app.service.ChiffreAffaireService;
-import com.airline.airline_app.service.CategoriePassagerService;
 import com.airline.airline_app.service.ClasseSiegeService;
 import com.airline.airline_app.service.VolProgrammeService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.List;
 public class ChiffreAffaireController {
 
     private final ChiffreAffaireService chiffreAffaireService;
-    private final CategoriePassagerService categoriePassagerService;
+    private final CategoriePassagerRepository categoriePassagerRepository;
     private final ClasseSiegeService classeSiegeService;
     private final VolProgrammeService volProgrammeService;
 
@@ -146,7 +146,7 @@ public class ChiffreAffaireController {
      */
     @GetMapping("/simulation")
     public String simulation(Model model) {
-        model.addAttribute("categories", categoriePassagerService.findAll());
+        model.addAttribute("categories", categoriePassagerRepository.findAll());
         model.addAttribute("classes", classeSiegeService.findAll());
         model.addAttribute("volsProgrammes", volProgrammeService.findAll());
         return "chiffre-affaire/simulation";

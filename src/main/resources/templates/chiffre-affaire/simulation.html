@@ -216,7 +216,7 @@
                 return;
             }
             
-            // Charger les prix du vol via AJAX
+            // Charger les prix du vol via AJAX (prix par classe uniquement)
             fetch('/api/vols-programmes/' + volProgrammeId + '/prix')
                 .then(response => response.json())
                 .then(prixList => {
@@ -228,21 +228,20 @@
                         el.textContent = 'Prix: --';
                     });
                     
-                    // Appliquer les prix du vol
+                    // Appliquer les prix par classe à toutes les catégories
                     prixList.forEach(prix => {
-                        const categorieId = prix.categoriePassagerId;
                         const classeId = prix.classeId;
                         const prixVal = prix.prixFinal || prix.prix;
                         
-                        const prixInput = document.getElementById('prixVal_' + categorieId + '_' + classeId);
-                        const prixDisplay = document.getElementById('prix_' + categorieId + '_' + classeId);
-                        
-                        if (prixInput) {
+                        // Appliquer ce prix à toutes les catégories pour cette classe
+                        document.querySelectorAll('.prix-input[data-classe="' + classeId + '"]').forEach(prixInput => {
                             prixInput.value = prixVal;
-                        }
-                        if (prixDisplay) {
-                            prixDisplay.textContent = 'Prix: ' + formatNumber(prixVal) + ' Ar';
-                        }
+                            const catId = prixInput.dataset.categorie;
+                            const prixDisplay = document.getElementById('prix_' + catId + '_' + classeId);
+                            if (prixDisplay) {
+                                prixDisplay.textContent = 'Prix: ' + formatNumber(prixVal) + ' Ar';
+                            }
+                        });
                     });
                     
                     calculerSimulation();
