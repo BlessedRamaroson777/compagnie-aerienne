@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head><title>Détail Diffusion Vol</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0"><i class="fas fa-plane me-2"></i>Détail Diffusion Vol</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tr><th width="30%">ID</th><td th:text="${diffusion.idDiffusionVolProgramme}"></td></tr>
+                    <tr><th>Diffusion Société</th><td th:text="${diffusion.diffusionSociete?.societe?.libelle}"></td></tr>
+                    <tr><th>Vol Programme</th><td th:text="${diffusion.volProgramme?.vol?.numeroVol}"></td></tr>
+                    <tr><th>Nombre</th><td th:text="${diffusion.nombre}"></td></tr>
+                </table>
+                <a th:href="@{/diffusion-vol-programme}" class="btn btn-secondary mt-3"><i class="fas fa-arrow-left me-2"></i>Retour</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

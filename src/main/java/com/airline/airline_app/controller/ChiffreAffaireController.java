@@ -151,4 +151,28 @@ public class ChiffreAffaireController {
         model.addAttribute("volsProgrammes", volProgrammeService.findAll());
         return "chiffre-affaire/simulation";
     }
+    
+    /**
+     * Chiffre d'affaires des diffusions pour un mois et une année donnés
+     */
+    @GetMapping("/diffusion/{mois}/{annee}")
+    public String chiffreAffaireDiffusion(@PathVariable int mois, @PathVariable int annee, Model model) {
+        ChiffreAffaireDTO caDiffusion = chiffreAffaireService.getChiffreAffaireDiffusion(mois, annee);
+        model.addAttribute("caDiffusion", caDiffusion);
+        model.addAttribute("mois", mois);
+        model.addAttribute("annee", annee);
+        return "chiffre-affaire/diffusion";
+    }
+    
+    /**
+     * Formulaire de sélection pour le CA des diffusions par mois
+     */
+    @GetMapping("/diffusion")
+    public String chiffreAffaireDiffusionForm(Model model) {
+        // Par défaut, afficher le mois et l'année actuelle
+        java.time.LocalDate now = java.time.LocalDate.now();
+        model.addAttribute("moisActuel", now.getMonthValue());
+        model.addAttribute("anneeActuelle", now.getYear());
+        return "chiffre-affaire/diffusion-form";
+    }
 }

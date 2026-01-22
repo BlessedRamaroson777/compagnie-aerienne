@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head><title>Configurations Coût</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="container-fluid mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0"><i class="fas fa-dollar-sign me-2"></i>Configurations Coût Diffusion</h4>
+                <a th:href="@{/configuration-cout-diffusion/form}" class="btn btn-light"><i class="fas fa-plus me-2"></i>Nouvelle Configuration</a>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr><th>ID</th><th>Diffusion Société</th><th>Prix</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="config : ${configurations}">
+                            <td th:text="${config.idConfigurationCoutDiffusion}"></td>
+                            <td th:text="${config.diffusionSociete?.societe?.libelle + ' - ' + config.diffusionSociete?.nombre}"></td>
+                            <td th:text="${#numbers.formatDecimal(config.prix, 1, 2)} + ' Ar'"></td>
+                            <td>
+                                <a th:href="@{/configuration-cout-diffusion/detail/{id}(id=${config.idConfigurationCoutDiffusion})}" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a th:href="@{/configuration-cout-diffusion/form/{id}(id=${config.idConfigurationCoutDiffusion})}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                                <a th:href="@{/configuration-cout-diffusion/delete/{id}(id=${config.idConfigurationCoutDiffusion})}" class="btn btn-sm btn-danger" onclick="return confirm('Confirmer?')"><i class="fas fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

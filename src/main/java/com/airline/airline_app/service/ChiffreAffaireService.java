@@ -8,6 +8,8 @@ import com.airline.airline_app.repository.AvionRepository;
 import com.airline.airline_app.repository.ReservationRepository;
 import com.airline.airline_app.repository.VolProgrammeRepository;
 import com.airline.airline_app.repository.VolRepository;
+import com.airline.airline_app.repository.DiffusionVolProgrammeRepository;
+import com.airline.airline_app.repository.ConfigurationCoutDiffusionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,8 @@ public class ChiffreAffaireService {
     private final VolProgrammeRepository volProgrammeRepository;
     private final AvionRepository avionRepository;
     private final VolRepository volRepository;
+    private final DiffusionVolProgrammeRepository diffusionVolProgrammeRepository;
+    private final ConfigurationCoutDiffusionRepository configurationCoutDiffusionRepository;
 
     /**
      * Obtenir le chiffre d'affaires global
@@ -271,5 +275,54 @@ public class ChiffreAffaireService {
         dtos.sort((a, b) -> b.getMontantTotal().compareTo(a.getMontantTotal()));
         
         return dtos;
+    }
+    
+    /**
+     * Obtenir le chiffre d'affaires des diffusions pour un mois et une année donnés
+     * @param mois Le mois (1-12)
+     * @param annee L'année (ex: 2026)
+     * @return ChiffreAffaireDTO contenant les informations du CA des diffusions
+     */
+    public ChiffreAffaireDTO getChiffreAffaireDiffusion(int mois, int annee) {
+        ChiffreAffaireDTO dto = new ChiffreAffaireDTO();
+        dto.setType("DIFFUSION");
+        dto.setDesignation(String.format("Chiffre d'affaires des diffusions - %02d/%d", mois, annee));
+        
+        // Récupérer toutes les diffusions de vol programme
+        List<com.airline.airline_app.entity.DiffusionVolProgramme> diffusions = 
+            diffusionVolProgrammeRepository.findAll();
+        
+        BigDecimal montantTotal = BigDecimal.ZERO;
+        int nombreDiffusions = 0;
+        
+        for (com.airline.airline_app.entity.DiffusionVolProgramme diffusion : diffusions) {
+            // Vérifier si la diffusion est dans le mois/année demandé
+            if (diffusion.getDiffusionSociete() != null && 
+                diffusion.getDiffusionSociete().getDate() != null) {
+                
+                int diffusionMois = diffusion.getDiffusionSociete().getDate().getMonthValue();
+                int diffusionAnnee = diffusion.getDiffusionSociete().getDate().getYear();
+                
+                if (diffusionMois == mois && diffusionAnnee == annee) {
+                    // Récupérer le prix de configuration pour cette diffusion
+                    Long idDiffusionSociete = diffusion.getDiffusionSociete().getIdDiffusionSociete();
+                    
+                    // Calculer le coût de cette diffusion et l'ajouter au total
+                    var configOpt = configurationCoutDiffusionRepository.findByDiffusionSocieteIdDiffusionSociete(idDiffusionSociete);
+                    if (configOpt.isPresent()) {
+                        BigDecimal montant = BigDecimal.valueOf(configOpt.get().getPrix())
+                            .multiply(BigDecimal.valueOf(diffusion.getNombre()));
+                        montantTotal = montantTotal.add(montant);
+                    }
+                    
+                    nombreDiffusions++;
+                }
+            }
+        }
+        
+        dto.setMontantTotal(montantTotal);
+        dto.setNombreBillets(nombreDiffusions);
+        
+        return dto;
     }
 }

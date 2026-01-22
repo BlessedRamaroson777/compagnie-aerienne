@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head><title>Détail Diffusion</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0"><i class="fas fa-broadcast-tower me-2"></i>Détail Diffusion</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tr><th width="30%">ID</th><td th:text="${diffusion.idDiffusionSociete}"></td></tr>
+                    <tr><th>Société</th><td th:text="${diffusion.societe?.libelle}"></td></tr>
+                    <tr><th>Nombre</th><td th:text="${diffusion.nombre}"></td></tr>
+                    <tr><th>Date</th><td th:text="${#temporals.format(diffusion.date, 'dd/MM/yyyy HH:mm:ss')}"></td></tr>
+                </table>
+                <a th:href="@{/diffusion-societe}" class="btn btn-secondary mt-3"><i class="fas fa-arrow-left me-2"></i>Retour</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

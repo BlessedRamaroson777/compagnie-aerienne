@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head><title>Formulaire Diffusion Vol</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-plane me-2"></i>Diffusion Vol Programme</h4>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/diffusion-vol-programme/save}" th:object="${diffusion}" method="post">
+                    <input type="hidden" th:field="*{idDiffusionVolProgramme}">
+                    <div class="mb-3">
+                        <label class="form-label">Diffusion Société</label>
+                        <select name="diffusionSocieteId" class="form-select" required>
+                            <option value="">Sélectionner...</option>
+                            <option th:each="ds : ${diffusionsSociete}" th:value="${ds.idDiffusionSociete}" 
+                                    th:text="${ds.societe?.libelle + ' (' + #temporals.format(ds.date, 'dd/MM/yyyy') + ')'}"
+                                    th:selected="${diffusion.diffusionSociete != null && diffusion.diffusionSociete.idDiffusionSociete == ds.idDiffusionSociete}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Vol Programme</label>
+                        <select name="volProgrammeId" class="form-select" required>
+                            <option value="">Sélectionner...</option>
+                            <option th:each="vp : ${volsProgrammes}" th:value="${vp.id}" 
+                                    th:text="${vp.vol?.numeroVol + ' - ' + #temporals.format(vp.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"
+                                    th:selected="${diffusion.volProgramme != null && diffusion.volProgramme.id == vp.id}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="number" th:field="*{nombre}" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save me-2"></i>Enregistrer</button>
+                    <a th:href="@{/diffusion-vol-programme}" class="btn btn-secondary"><i class="fas fa-times me-2"></i>Annuler</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

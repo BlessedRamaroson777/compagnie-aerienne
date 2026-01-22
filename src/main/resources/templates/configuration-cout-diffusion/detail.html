@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head><title>Détail Configuration</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0"><i class="fas fa-dollar-sign me-2"></i>Détail Configuration</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tr><th width="30%">ID</th><td th:text="${configuration.idConfigurationCoutDiffusion}"></td></tr>
+                    <tr><th>Diffusion Société</th><td th:text="${configuration.diffusionSociete?.societe?.libelle}"></td></tr>
+                    <tr><th>Prix</th><td th:text="${#numbers.formatDecimal(configuration.prix, 1, 2)} + ' Ar'"></td></tr>
+                </table>
+                <a th:href="@{/configuration-cout-diffusion}" class="btn btn-secondary mt-3"><i class="fas fa-arrow-left me-2"></i>Retour</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

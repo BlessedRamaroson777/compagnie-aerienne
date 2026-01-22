@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Chiffre d'Affaires Diffusion</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-broadcast-tower me-2"></i>
+                            Chiffre d'Affaires des Diffusions
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Informations de période -->
+                        <div class="alert alert-info">
+                            <h5 class="alert-heading">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                Période sélectionnée
+                            </h5>
+                            <p class="mb-0">
+                                <strong>Mois:</strong> <span th:text="${mois}"></span> / 
+                                <strong>Année:</strong> <span th:text="${annee}"></span>
+                            </p>
+                        </div>
+
+                        <!-- Résumé du CA -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card border-success">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title text-success">
+                                            <i class="fas fa-dollar-sign me-2"></i>
+                                            Montant Total
+                                        </h5>
+                                        <h2 class="display-4 text-success" th:text="${#numbers.formatDecimal(caDiffusion.montantTotal, 1, 2)} + ' Ar'"></h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-info">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title text-info">
+                                            <i class="fas fa-chart-line me-2"></i>
+                                            Nombre de Diffusions
+                                        </h5>
+                                        <h2 class="display-4 text-info" th:text="${caDiffusion.nombreBillets}"></h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informations supplémentaires -->
+                        <div class="card mt-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Détails
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th width="30%">Type</th>
+                                            <td th:text="${caDiffusion.type}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Désignation</th>
+                                            <td th:text="${caDiffusion.designation}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Montant Total</th>
+                                            <td>
+                                                <strong class="text-success" th:text="${#numbers.formatDecimal(caDiffusion.montantTotal, 1, 2)} + ' Ar'"></strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Nombre de Diffusions</th>
+                                            <td th:text="${caDiffusion.nombreBillets}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="mt-4 text-center">
+                            <a th:href="@{/chiffre-affaire}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Retour aux Statistiques
+                            </a>
+                            <button onclick="window.print()" class="btn btn-primary">
+                                <i class="fas fa-print me-2"></i>
+                                Imprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
