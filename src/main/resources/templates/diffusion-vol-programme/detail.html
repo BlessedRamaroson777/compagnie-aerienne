@@ -1,24 +1,75 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
-<head><title>Détail Diffusion Vol</title></head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail Diffusion Vol</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
 <body>
-<div layout:fragment="content">
-    <div class="container mt-4">
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h4 class="mb-0"><i class="fas fa-plane me-2"></i>Détail Diffusion Vol</h4>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    
+    <div class="main-content-with-sidebar">
+        <div class="container-fluid py-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2"><i class="bi bi-arrow-left-right"></i> Détail Diffusion Vol</h1>
+                <div>
+                    <a th:href="@{/diffusion-vol-programme}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Retour
+                    </a>
+                    <a th:href="@{/diffusion-vol-programme/form/{id}(id=${diffusion.idDiffusionVolProgramme})}" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </a>
+                </div>
             </div>
-            <div class="card-body">
-                <table class="table table-bordered">
-                    <tr><th width="30%">ID</th><td th:text="${diffusion.idDiffusionVolProgramme}"></td></tr>
-                    <tr><th>Diffusion Société</th><td th:text="${diffusion.diffusionSociete?.societe?.libelle}"></td></tr>
-                    <tr><th>Vol Programme</th><td th:text="${diffusion.volProgramme?.vol?.numeroVol}"></td></tr>
-                    <tr><th>Nombre</th><td th:text="${diffusion.nombre}"></td></tr>
-                </table>
-                <a th:href="@{/diffusion-vol-programme}" class="btn btn-secondary mt-3"><i class="fas fa-arrow-left me-2"></i>Retour</a>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th width="30%">ID</th>
+                                    <td th:text="${diffusion.idDiffusionVolProgramme}"></td>
+                                </tr>
+                                <tr>
+                                    <th>Diffusion Société</th>
+                                    <td th:text="${diffusion.diffusionSociete?.idDiffusionSociete}"></td>
+                                </tr>
+                                <tr>
+                                    <th>Société</th>
+                                    <td th:text="${diffusion.diffusionSociete?.societe?.libelle}"></td>
+                                </tr>
+                                <tr>
+                                    <th>Vol</th>
+                                    <td th:text="${diffusion.volProgramme?.vol?.numeroVol}"></td>
+                                </tr>
+                                <tr>
+                                    <th>Départ</th>
+                                    <td th:text="${diffusion.volProgramme?.vol?.aeroportDepart?.nom}"></td>
+                                </tr>
+                                <tr>
+                                    <th>Arrivée</th>
+                                    <td th:text="${diffusion.volProgramme?.vol?.aeroportArrivee?.nom}"></td>
+                                </tr>
+                                <tr>
+                                    <th>Date Vol</th>
+                                    <td th:text="${#temporals.format(diffusion.volProgramme?.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></td>
+                                </tr>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <td th:text="${diffusion.nombre}"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${paiement.idPaiementDiffusion != null ? 'Modifier paiement' : 'Nouveau paiement'}">Paiement</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    
+    <div class="main-content-with-sidebar">
+        <div class="container-fluid py-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="bi bi-cash-stack"></i> 
+                    <span th:text="${paiement.idPaiementDiffusion != null ? 'Modifier paiement' : 'Nouveau paiement'}">Paiement</span>
+                </h1>
+                <a th:href="@{/paiement-diffusion}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <!-- Alertes -->
+                    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    
+                    <!-- Informations de paiement -->
+                    <div th:if="${montantTotal != null}" class="alert alert-info mb-4">
+                        <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Informations de Paiement</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <strong>Montant Total:</strong> <span th:text="${#numbers.formatDecimal(montantTotal, 1, 2) + ' Ar'}"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Déjà Payé:</strong> <span th:text="${#numbers.formatDecimal(montantPaye, 1, 2) + ' Ar'}"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong class="text-danger">Reste à Payer:</strong> 
+                                <span class="text-danger fw-bold" th:text="${#numbers.formatDecimal(resteAPayer, 1, 2) + ' Ar'}"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <form th:action="@{/paiement-diffusion/save}" th:object="${paiement}" method="post">
+                                <input type="hidden" th:field="*{idPaiementDiffusion}" />
+                                
+                                <div class="mb-3">
+                                    <label for="diffusionSociete" class="form-label">Diffusion Société *</label>
+                                    <select class="form-select" id="diffusionSociete" th:field="*{diffusionSociete.idDiffusionSociete}" 
+                                            required onchange="updatePaymentInfo(this.value)">
+                                        <option value="">-- Sélectionner --</option>
+                                        <option th:each="d : ${diffusions}" 
+                                                th:value="${d.idDiffusionSociete}" 
+                                                th:text="${'ID: ' + d.idDiffusionSociete + ' - ' + d.societe?.libelle + ' (' + #temporals.format(d.date, 'dd/MM/yyyy') + ')'}">
+                                        </option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="montantPaye" class="form-label">Montant Payé (Ar) *</label>
+                                    <input type="number" step="0.01" class="form-control" id="montantPaye" th:field="*{montantPaye}" 
+                                           required min="0.01" placeholder="Ex: 50000.00">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="datePaiement" class="form-label">Date Paiement *</label>
+                                    <input type="date" class="form-control" id="datePaiement" th:field="*{datePaiement}" required>
+                                </div>
+                                
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a th:href="@{/paiement-diffusion}" class="btn btn-secondary">
+                                        <i class="bi bi-x-circle"></i> Annuler
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-circle"></i> Enregistrer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function updatePaymentInfo(diffusionId) {
+        if (diffusionId) {
+            window.location.href = '/paiement-diffusion/form?diffusionSocieteId=' + diffusionId;
+        }
+    }
+    </script>
+</body>
+</html>

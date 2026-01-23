@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class DiffusionSociete {
     private Integer nombre;
 
     @Column(nullable = false)
-    private LocalDateTime date;
+    private LocalDate date;
 
     @OneToMany(mappedBy = "diffusionSociete", cascade = CascadeType.ALL)
     private List<DiffusionVolProgramme> diffusionsVolProgramme = new ArrayList<>();

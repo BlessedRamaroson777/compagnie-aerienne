@@ -1,3 +1,4 @@
+@ -1,39 +0,0 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
 <head><title>Formulaire Diffusion</title></head>
@@ -26,7 +27,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Date</label>
-                        <input type="datetime-local" th:field="*{date}" class="form-control">
+                        <input type="date" th:field="*{date}" class="form-control">
                     </div>
                     <button type="submit" class="btn btn-success"><i class="fas fa-save me-2"></i>Enregistrer</button>
                     <a th:href="@{/diffusion-societe}" class="btn btn-secondary"><i class="fas fa-times me-2"></i>Annuler</a>

@@ -2,6 +2,8 @@ package com.airline.airline_app.controller;
 
 import com.airline.airline_app.entity.DiffusionSociete;
 import com.airline.airline_app.service.DiffusionSocieteService;
+import com.airline.airline_app.service.DiffusionVolProgrammeService;
+import com.airline.airline_app.service.PaiementDiffusionService;
 import com.airline.airline_app.service.SocieteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -9,7 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/diffusion-societe")
@@ -18,6 +21,8 @@ public class DiffusionSocieteController {
 
     private final DiffusionSocieteService diffusionSocieteService;
     private final SocieteService societeService;
+    private final DiffusionVolProgrammeService diffusionVolProgrammeService;
+    private final PaiementDiffusionService paiementDiffusionService;
 
     @GetMapping
     public String list(Model model) {
@@ -30,6 +35,21 @@ public class DiffusionSocieteController {
         DiffusionSociete diffusion = diffusionSocieteService.findById(id)
             .orElseThrow(() -> new RuntimeException("Diffusion non trouvée"));
         model.addAttribute("diffusion", diffusion);
+        // Récupérer les diffusions vol programme associées
+        model.addAttribute("diffusionsVol", diffusionVolProgrammeService.findByDiffusionSocieteId(id));
+        
+        // Récupérer les informations de paiement
+        BigDecimal montantTotal = diffusionSocieteService.getMontantTotal(id);
+        BigDecimal montantPaye = diffusionSocieteService.getMontantPaye(id);
+        BigDecimal resteAPayer = diffusionSocieteService.getResteAPayer(id);
+        
+        model.addAttribute("montantTotal", montantTotal);
+        model.addAttribute("montantPaye", montantPaye);
+        model.addAttribute("resteAPayer", resteAPayer);
+        
+        // Récupérer la liste des paiements
+        model.addAttribute("paiements", paiementDiffusionService.findByDiffusionSocieteId(id));
+        
         return "diffusion-societe/detail";
     }
 
@@ -54,7 +74,7 @@ public class DiffusionSocieteController {
                       @RequestParam Long societeId,
                       RedirectAttributes redirectAttributes) {
         if (diffusion.getDate() == null) {
-            diffusion.setDate(LocalDateTime.now());
+            diffusion.setDate(LocalDate.now());
         }
         diffusion.setSociete(societeService.findById(societeId).orElse(null));
         diffusionSocieteService.save(diffusion);

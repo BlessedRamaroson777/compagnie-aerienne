@@ -100,8 +100,32 @@
                         <span>Paiements</span>
                     </a>
                     <a th:href="@{/chiffre-affaire}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/chiffre-affaire') ? 'active' : ''}">
-                        <i class="bi bi-credit-card"></i>
+                        <i class="bi bi-bar-chart-line"></i>
                         <span>Chiffre d'Affaires</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Diffusion</div>
+                    <a th:href="@{/societe}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/societe') ? 'active' : ''}">
+                        <i class="bi bi-building"></i>
+                        <span>Sociétés</span>
+                    </a>
+                    <a th:href="@{/diffusion-societe}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/diffusion-societe') ? 'active' : ''}">
+                        <i class="bi bi-broadcast-tower"></i>
+                        <span>Diffusions Société</span>
+                    </a>
+                    <a th:href="@{/configuration-cout-diffusion}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/configuration-cout-diffusion') ? 'active' : ''}">
+                        <i class="bi bi-currency-dollar"></i>
+                        <span>Configuration Coût</span>
+                    </a>
+                    <a th:href="@{/diffusion-vol-programme}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/diffusion-vol-programme') ? 'active' : ''}">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span>Diffusion Vol</span>
+                    </a>
+                    <a th:href="@{/paiement-diffusion}" class="sidebar-item" th:classappend="${#strings.contains(currentUri, '/paiement-diffusion') ? 'active' : ''}">
+                        <i class="bi bi-cash-stack"></i>
+                        <span>Paiements Diffusion</span>
                     </a>
                 </div>
             </div>

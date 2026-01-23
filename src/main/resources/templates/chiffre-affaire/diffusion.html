@@ -4,6 +4,9 @@
       layout:decorate="~{layout}">
 <head>
     <title>Chiffre d'Affaires Diffusion</title>
+    <th:block layout:fragment="extra-css">
+        <link rel="stylesheet" th:href="@{/css/custom.css}">
+    </th:block>
 </head>
 <body>
 <div layout:fragment="content">
@@ -95,6 +98,10 @@
                             <a th:href="@{/chiffre-affaire}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left me-2"></i>
                                 Retour aux Statistiques
+                            </a>
+                            <a th:href="@{/chiffre-affaire/diffusion}" class="btn btn-info">
+                                <i class="fas fa-calendar me-2"></i>
+                                Choisir une autre période
                             </a>
                             <button onclick="window.print()" class="btn btn-primary">
                                 <i class="fas fa-print me-2"></i>

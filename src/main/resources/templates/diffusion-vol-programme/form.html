@@ -1,44 +1,81 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
-<head><title>Formulaire Diffusion Vol</title></head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${diffusion.idDiffusionVolProgramme != null ? 'Modifier diffusion vol' : 'Nouvelle diffusion vol'}">Diffusion Vol</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
 <body>
-<div layout:fragment="content">
-    <div class="container mt-4">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="fas fa-plane me-2"></i>Diffusion Vol Programme</h4>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    
+    <div class="main-content-with-sidebar">
+        <div class="container-fluid py-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="bi bi-arrow-left-right"></i> 
+                    <span th:text="${diffusion.idDiffusionVolProgramme != null ? 'Modifier diffusion vol' : 'Nouvelle diffusion vol'}">Diffusion Vol</span>
+                </h1>
+                <a th:href="@{/diffusion-vol-programme}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour
+                </a>
             </div>
-            <div class="card-body">
-                <form th:action="@{/diffusion-vol-programme/save}" th:object="${diffusion}" method="post">
-                    <input type="hidden" th:field="*{idDiffusionVolProgramme}">
-                    <div class="mb-3">
-                        <label class="form-label">Diffusion Société</label>
-                        <select name="diffusionSocieteId" class="form-select" required>
-                            <option value="">Sélectionner...</option>
-                            <option th:each="ds : ${diffusionsSociete}" th:value="${ds.idDiffusionSociete}" 
-                                    th:text="${ds.societe?.libelle + ' (' + #temporals.format(ds.date, 'dd/MM/yyyy') + ')'}"
-                                    th:selected="${diffusion.diffusionSociete != null && diffusion.diffusionSociete.idDiffusionSociete == ds.idDiffusionSociete}"></option>
-                        </select>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <form th:action="@{/diffusion-vol-programme/save}" th:object="${diffusion}" method="post">
+                                <input type="hidden" th:field="*{idDiffusionVolProgramme}" />
+                                
+                                <div class="mb-3">
+                                    <label for="diffusionSociete" class="form-label">Diffusion Société *</label>
+                                    <select class="form-select" id="diffusionSociete" name="diffusionSocieteId" required>
+                                        <option value="">-- Sélectionner --</option>
+                                        <option th:each="d : ${diffusionsSociete}" 
+                                                th:value="${d.idDiffusionSociete}" 
+                                                th:text="${'ID: ' + d.idDiffusionSociete + ' - ' + d.societe?.libelle}"
+                                                th:selected="${diffusion.diffusionSociete != null and d.idDiffusionSociete == diffusion.diffusionSociete.idDiffusionSociete}">
+                                        </option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="volProgramme" class="form-label">Vol Programmé *</label>
+                                    <select class="form-select" id="volProgramme" name="volProgrammeId" required>
+                                        <option value="">-- Sélectionner --</option>
+                                        <option th:each="v : ${volsProgrammes}" 
+                                                th:value="${v.id}" 
+                                                th:text="${v.vol?.numeroVol + ' - ' + #temporals.format(v.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"
+                                                th:selected="${diffusion.volProgramme != null and v.id == diffusion.volProgramme.id}">
+                                        </option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label">Nombre *</label>
+                                    <input type="number" class="form-control" id="nombre" th:field="*{nombre}" 
+                                           required min="1" placeholder="Ex: 50">
+                                </div>
+                                
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a th:href="@{/diffusion-vol-programme}" class="btn btn-secondary">
+                                        <i class="bi bi-x-circle"></i> Annuler
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-circle"></i> Enregistrer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Vol Programme</label>
-                        <select name="volProgrammeId" class="form-select" required>
-                            <option value="">Sélectionner...</option>
-                            <option th:each="vp : ${volsProgrammes}" th:value="${vp.id}" 
-                                    th:text="${vp.vol?.numeroVol + ' - ' + #temporals.format(vp.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"
-                                    th:selected="${diffusion.volProgramme != null && diffusion.volProgramme.id == vp.id}"></option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Nombre</label>
-                        <input type="number" th:field="*{nombre}" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-success"><i class="fas fa-save me-2"></i>Enregistrer</button>
-                    <a th:href="@{/diffusion-vol-programme}" class="btn btn-secondary"><i class="fas fa-times me-2"></i>Annuler</a>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
