@@ -48,4 +48,31 @@ public interface DiffusionVolProgrammeRepository extends JpaRepository<Diffusion
            "FROM DiffusionVolProgramme dvp " +
            "WHERE dvp.volProgramme.id = :idVolProgramme")
     BigDecimal calculateMontantDiffusionResteByVolProgramme(@Param("idVolProgramme") Long idVolProgramme);
+    
+    /**
+     * Calculer le montant total diffusion par mois et année
+     */
+    @Query("SELECT COALESCE(SUM(dvp.montantTotal), 0) " +
+           "FROM DiffusionVolProgramme dvp " +
+           "WHERE EXTRACT(MONTH FROM dvp.volProgramme.dateHeureDepart) = :mois " +
+           "AND EXTRACT(YEAR FROM dvp.volProgramme.dateHeureDepart) = :annee")
+    BigDecimal calculateMontantDiffusionTotalByMois(@Param("mois") Integer mois, @Param("annee") Integer annee);
+    
+    /**
+     * Calculer le montant payé diffusion par mois et année
+     */
+    @Query("SELECT COALESCE(SUM(dvp.montantPaye), 0) " +
+           "FROM DiffusionVolProgramme dvp " +
+           "WHERE EXTRACT(MONTH FROM dvp.volProgramme.dateHeureDepart) = :mois " +
+           "AND EXTRACT(YEAR FROM dvp.volProgramme.dateHeureDepart) = :annee")
+    BigDecimal calculateMontantDiffusionPayeByMois(@Param("mois") Integer mois, @Param("annee") Integer annee);
+    
+    /**
+     * Calculer le reste à payer diffusion par mois et année
+     */
+    @Query("SELECT COALESCE(SUM(dvp.resteAPayer), 0) " +
+           "FROM DiffusionVolProgramme dvp " +
+           "WHERE EXTRACT(MONTH FROM dvp.volProgramme.dateHeureDepart) = :mois " +
+           "AND EXTRACT(YEAR FROM dvp.volProgramme.dateHeureDepart) = :annee")
+    BigDecimal calculateMontantDiffusionResteByMois(@Param("mois") Integer mois, @Param("annee") Integer annee);
 }

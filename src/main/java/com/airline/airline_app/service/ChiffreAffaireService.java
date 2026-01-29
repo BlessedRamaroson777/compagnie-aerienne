@@ -1,6 +1,7 @@
 package com.airline.airline_app.service;
 
 import com.airline.airline_app.dto.ChiffreAffaireDTO;
+import com.airline.airline_app.dto.CAMensuelDTO;
 import com.airline.airline_app.entity.Avion;
 import com.airline.airline_app.entity.Vol;
 import com.airline.airline_app.entity.VolProgramme;
@@ -10,6 +11,7 @@ import com.airline.airline_app.repository.VolProgrammeRepository;
 import com.airline.airline_app.repository.VolRepository;
 import com.airline.airline_app.repository.DiffusionVolProgrammeRepository;
 import com.airline.airline_app.repository.ConfigurationCoutDiffusionRepository;
+import com.airline.airline_app.repository.VenteProduitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +34,7 @@ public class ChiffreAffaireService {
     private final VolRepository volRepository;
     private final DiffusionVolProgrammeRepository diffusionVolProgrammeRepository;
     private final ConfigurationCoutDiffusionRepository configurationCoutDiffusionRepository;
+    private final VenteProduitRepository venteProduitRepository;
 
     /**
      * Obtenir le chiffre d'affaires global
@@ -113,7 +119,15 @@ public class ChiffreAffaireService {
             dto.setMontantDiffusionTotal(montantDiffusionTotal);
             dto.setMontantDiffusionPaye(montantDiffusionPaye);
             dto.setMontantDiffusionReste(montantDiffusionReste);
-            dto.setMontantTotal(montantTickets.add(montantDiffusion));
+            
+            // Calculer le montant des ventes de produits pour ce vol
+            BigDecimal montantVenteProduits = venteProduitRepository.calculateCAVenteByVolProgramme(volProgrammeId);
+            if (montantVenteProduits == null) {
+                montantVenteProduits = BigDecimal.ZERO;
+            }
+            dto.setMontantVenteProduits(montantVenteProduits);
+            
+            dto.setMontantTotal(montantTickets.add(montantDiffusion).add(montantVenteProduits));
             dto.setNombreReservations(nombreReservations.intValue());
             dto.setNombreBillets(nombreBillets.intValue());
             dto.setDateHeureVol(vp.getDateHeureDepart());
@@ -373,5 +387,59 @@ public class ChiffreAffaireService {
         dto.setNombreBillets(nombreDiffusions);
         
         return dto;
+    }
+
+    /**
+     * Obtenir le chiffre d'affaires par mois et année
+     */
+    public List<CAMensuelDTO> getCAParMois(Integer annee) {
+        List<CAMensuelDTO> result = new ArrayList<>();
+        
+        for (int mois = 1; mois <= 12; mois++) {
+            CAMensuelDTO dto = new CAMensuelDTO();
+            dto.setMois(mois);
+            dto.setAnnee(annee);
+            
+            // Nom du mois en français
+            String moisLibelle = Month.of(mois).getDisplayName(TextStyle.FULL, Locale.FRENCH);
+            dto.setMoisLibelle(moisLibelle.substring(0, 1).toUpperCase() + moisLibelle.substring(1));
+            
+            // CA Tickets (réservations)
+            BigDecimal montantTickets = reservationRepository.calculateCAByMois(mois, annee);
+            dto.setMontantTickets(montantTickets != null ? montantTickets : BigDecimal.ZERO);
+            
+            // CA Diffusion Total
+            BigDecimal montantDiffusionTotal = diffusionVolProgrammeRepository.calculateMontantDiffusionTotalByMois(mois, annee);
+            dto.setMontantDiffusionTotal(montantDiffusionTotal != null ? montantDiffusionTotal : BigDecimal.ZERO);
+            
+            // CA Diffusion Payée
+            BigDecimal montantDiffusionPaye = diffusionVolProgrammeRepository.calculateMontantDiffusionPayeByMois(mois, annee);
+            dto.setMontantDiffusionPaye(montantDiffusionPaye != null ? montantDiffusionPaye : BigDecimal.ZERO);
+            
+            // CA Diffusion Reste
+            BigDecimal montantDiffusionReste = diffusionVolProgrammeRepository.calculateMontantDiffusionResteByMois(mois, annee);
+            dto.setMontantDiffusionReste(montantDiffusionReste != null ? montantDiffusionReste : BigDecimal.ZERO);
+            
+            // CA Vente Produits
+            BigDecimal montantVenteProduits = venteProduitRepository.calculateCAVenteByMois(mois, annee);
+            dto.setMontantVenteProduits(montantVenteProduits != null ? montantVenteProduits : BigDecimal.ZERO);
+            
+            // CA Total
+            BigDecimal total = dto.getMontantTickets()
+                    .add(dto.getMontantDiffusionTotal())
+                    .add(dto.getMontantVenteProduits());
+            dto.setMontantTotal(total);
+            
+            // Statistiques
+            Long nombreReservations = reservationRepository.countByMois(mois, annee);
+            dto.setNombreReservations(nombreReservations != null ? nombreReservations : 0L);
+            
+            Long nombreVentes = venteProduitRepository.count(); // À améliorer avec filtre par mois/année
+            dto.setNombreVentes(nombreVentes != null ? nombreVentes : 0L);
+            
+            result.add(dto);
+        }
+        
+        return result;
     }
 }

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ventes de Produits</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="bi bi-cart-check"></i> Ventes de Produits</h1>
+                    <a th:href="@{/vente-produit/form}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Nouvelle vente
+                    </a>
+                </div>
+
+                <!-- Alertes -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+                    <i class="bi bi-check-circle"></i> <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="bi bi-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Produit</th>
+                                        <th class="text-center">Quantité</th>
+                                        <th class="text-end">Prix unitaire (Ar)</th>
+                                        <th class="text-end">Total (Ar)</th>
+                                        <th>Vol Programmé</th>
+                                        <th>Date vente</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${ventes.isEmpty()}">
+                                        <td colspan="8" class="text-center text-muted">Aucune vente enregistrée</td>
+                                    </tr>
+                                    <tr th:each="vente : ${ventes}">
+                                        <td th:text="${vente.idVenteProduit}"></td>
+                                        <td th:text="${vente.produit?.libelle}"></td>
+                                        <td class="text-center">
+                                            <span class="badge bg-info" th:text="${vente.quantite}"></span>
+                                        </td>
+                                        <td class="text-end" th:text="${#numbers.formatDecimal(vente.produit?.prix ?: 0, 0, 'COMMA', 2, 'POINT')}"></td>
+                                        <td class="text-end text-success fw-bold" 
+                                            th:text="${#numbers.formatDecimal((vente.produit?.prix ?: 0) * vente.quantite, 0, 'COMMA', 2, 'POINT')}"></td>
+                                        <td>
+                                            <span th:text="${vente.volProgramme?.vol?.numeroVol}"></span>
+                                            <small class="text-muted" th:text="' - ' + ${#temporals.format(vente.volProgramme?.dateHeureDepart, 'dd/MM/yyyy')}"></small>
+                                        </td>
+                                        <td th:text="${#temporals.format(vente.dateVente, 'dd/MM/yyyy HH:mm')}"></td>
+                                        <td class="text-center">
+                                            <a th:href="@{/vente-produit/delete/{id}(id=${vente.idVenteProduit})}" 
+                                               class="btn btn-sm btn-outline-danger"
+                                               onclick="return confirm('Supprimer cette vente ?')">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

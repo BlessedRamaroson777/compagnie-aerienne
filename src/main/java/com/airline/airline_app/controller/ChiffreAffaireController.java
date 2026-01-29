@@ -278,4 +278,41 @@ public class ChiffreAffaireController {
         
         return "chiffre-affaire/suivi-diffusion-detail";
     }
+
+    /**
+     * CA par mois (tickets + diffusion + vente produits)
+     */
+    @GetMapping("/par-mois")
+    public String parMois(Model model, Integer annee) {
+        if (annee == null) {
+            annee = java.time.Year.now().getValue();
+        }
+        
+        var caList = chiffreAffaireService.getCAParMois(annee);
+        
+        BigDecimal totalTickets = caList.stream()
+                .map(ca -> ca.getMontantTickets())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        BigDecimal totalDiffusion = caList.stream()
+                .map(ca -> ca.getMontantDiffusionTotal())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        BigDecimal totalVenteProduits = caList.stream()
+                .map(ca -> ca.getMontantVenteProduits())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        BigDecimal totalGeneral = caList.stream()
+                .map(ca -> ca.getMontantTotal())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        model.addAttribute("caList", caList);
+        model.addAttribute("annee", annee);
+        model.addAttribute("totalTickets", totalTickets);
+        model.addAttribute("totalDiffusion", totalDiffusion);
+        model.addAttribute("totalVenteProduits", totalVenteProduits);
+        model.addAttribute("totalGeneral", totalGeneral);
+        
+        return "chiffre-affaire/par-mois";
+    }
 }

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ventes par Vol</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="bi bi-airplane"></i> Ventes - Vol <span th:text="${vol.vol?.numeroVol}"></span>
+                    </h1>
+                    <a th:href="@{/vente-produit}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Retour
+                    </a>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card text-bg-info">
+                            <div class="card-body">
+                                <h6>Vol</h6>
+                                <h4 th:text="${vol.vol?.numeroVol}"></h4>
+                                <small th:text="${#temporals.format(vol.dateHeureDepart, 'dd/MM/yyyy HH:mm')}"></small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-bg-primary">
+                            <div class="card-body">
+                                <h6>Trajet</h6>
+                                <h4>
+                                    <span th:text="${vol.vol?.aeroportDepart?.codeIATA}"></span>
+                                    → 
+                                    <span th:text="${vol.vol?.aeroportArrivee?.codeIATA}"></span>
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-bg-success">
+                            <div class="card-body">
+                                <h6>CA Vente Produits</h6>
+                                <h4 th:text="${#numbers.formatDecimal(caTotal, 0, 'COMMA', 0, 'POINT')} + ' Ar'"></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Produit</th>
+                                    <th class="text-center">Quantité</th>
+                                    <th class="text-end">Prix unitaire</th>
+                                    <th class="text-end">Total</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${ventes.isEmpty()}">
+                                    <td colspan="5" class="text-center text-muted">Aucune vente pour ce vol</td>
+                                </tr>
+                                <tr th:each="vente : ${ventes}">
+                                    <td th:text="${vente.produit?.libelle}"></td>
+                                    <td class="text-center" th:text="${vente.quantite}"></td>
+                                    <td class="text-end" th:text="${#numbers.formatDecimal(vente.produit?.prix ?: 0, 0, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                                    <td class="text-end text-success fw-bold" 
+                                        th:text="${#numbers.formatDecimal((vente.produit?.prix ?: 0) * vente.quantite, 0, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                                    <td th:text="${#temporals.format(vente.dateVente, 'dd/MM/yyyy HH:mm')}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

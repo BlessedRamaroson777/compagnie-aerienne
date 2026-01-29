@@ -35,6 +35,22 @@
             opacity: 1;
             color: #0d6efd;
         }
+        .filter-input {
+            width: 100%;
+            padding: 4px 6px;
+            font-size: 0.8rem;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+            margin-top: 5px;
+        }
+        .filter-input:focus {
+            outline: none;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+        }
+        .table-light th {
+            vertical-align: top;
+        }
     </style>
 </head>
 <body>
@@ -64,26 +80,72 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>#</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">Numéro de vol</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="date">Date départ</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">Heure départ</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">Aéroport départ</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">Aéroport arrivée</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">Avion</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">
+                                            Numéro de vol
+                                            <input type="text" class="filter-input" placeholder="Rechercher..." onclick="event.stopPropagation()">
+                                        </th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="date">
+                                            Date départ
+                                            <input type="text" class="filter-input" placeholder="jj/mm/aaaa" onclick="event.stopPropagation()">
+                                        </th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">
+                                            Heure départ
+                                            <input type="text" class="filter-input" placeholder="hh:mm" onclick="event.stopPropagation()">
+                                        </th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">
+                                            Aéroport départ
+                                            <input type="text" class="filter-input" placeholder="Rechercher..." onclick="event.stopPropagation()">
+                                        </th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">
+                                            Aéroport arrivée
+                                            <input type="text" class="filter-input" placeholder="Rechercher..." onclick="event.stopPropagation()">
+                                        </th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">
+                                            Avion
+                                            <input type="text" class="filter-input" placeholder="Rechercher..." onclick="event.stopPropagation()">
+                                        </th>
                                         
-                                        <th th:if="${type == 'AVION'}" class="sortable" data-type="text">Immatriculation</th>
+                                        <th th:if="${type == 'AVION'}" class="sortable" data-type="text">
+                                            Immatriculation
+                                            <input type="text" class="filter-input" placeholder="Rechercher..." onclick="event.stopPropagation()">
+                                        </th>
                                         <th th:if="${type == 'AVION'}">Période</th>
                                         
-                                        <th th:if="${type == 'VOL'}" class="sortable" data-type="text">Numéro de vol</th>
+                                        <th th:if="${type == 'VOL'}" class="sortable" data-type="text">
+                                            Numéro de vol
+                                            <input type="text" class="filter-input" placeholder="Rechercher..." onclick="event.stopPropagation()">
+                                        </th>
                                         <th th:if="${type == 'VOL'}">Trajet</th>
                                         <th th:if="${type == 'VOL'}">Période</th>
                                         
-                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-end sortable" data-type="number">Montant Tickets (Ar)</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-end sortable" data-type="number">Montant Diffusion Total (Ar)</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-end sortable" data-type="number">Diffusion Payée (Ar)</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-end sortable" data-type="number">Diffusion Reste (Ar)</th>
-                                        <th class="text-end sortable" data-type="number">CA Total (Ar)</th>
-                                        <th class="text-center sortable" data-type="number">Réservations</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-end sortable" data-type="number">
+                                            Montant Tickets (Ar)
+                                            <input type="number" class="filter-input" placeholder="Min" onclick="event.stopPropagation()">
+                                        </th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-end sortable" data-type="number">
+                                            Montant Diffusion Total (Ar)
+                                            <input type="number" class="filter-input" placeholder="Min" onclick="event.stopPropagation()">
+                                        </th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-end sortable" data-type="number">
+                                            Diffusion Payée (Ar)
+                                            <input type="number" class="filter-input" placeholder="Min" onclick="event.stopPropagation()">
+                                        </th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-end sortable" data-type="number">
+                                            Diffusion Reste (Ar)
+                                            <input type="number" class="filter-input" placeholder="Min" onclick="event.stopPropagation()">
+                                        </th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-end sortable" data-type="number">
+                                            Vente Produits (Ar)
+                                            <input type="number" class="filter-input" placeholder="Min" onclick="event.stopPropagation()">
+                                        </th>
+                                        <th class="text-end sortable" data-type="number">
+                                            CA Total (Ar)
+                                            <input type="number" class="filter-input" placeholder="Min" onclick="event.stopPropagation()">
+                                        </th>
+                                        <th class="text-center sortable" data-type="number">
+                                            Réservations
+                                            <input type="number" class="filter-input" placeholder="Min" onclick="event.stopPropagation()">
+                                        </th>
                                         <!-- <th th:if="${type == 'VOL_PROGRAMME'}" class="text-center">Billets</th> -->
                                         <th class="text-center">Actions</th>
                                     </tr>
@@ -138,6 +200,9 @@
                                         <td th:if="${type == 'VOL_PROGRAMME'}" class="text-end">
                                             <span class="text-danger" th:text="${#numbers.formatDecimal(ca.montantDiffusionReste != null ? ca.montantDiffusionReste : 0, 0, 'COMMA', 2, 'POINT')}">0.00</span>
                                         </td>
+                                        <td th:if="${type == 'VOL_PROGRAMME'}" class="text-end">
+                                            <span class="text-info" th:text="${#numbers.formatDecimal(ca.montantVenteProduits != null ? ca.montantVenteProduits : 0, 0, 'COMMA', 2, 'POINT')}">0.00</span>
+                                        </td>
                                         
                                         <td class="text-end">
                                             <strong th:text="${#numbers.formatDecimal(ca.montantTotal, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
@@ -183,11 +248,13 @@
             const table = document.querySelector('.table');
             const tbody = table.querySelector('tbody');
             const sortableHeaders = table.querySelectorAll('.sortable');
+            const filterInputs = table.querySelectorAll('.filter-input');
             
-            // Fonction pour parser les nombres formatés (avec espaces et virgules)
+            let allRows = [];
+            
+            // Fonction pour parser les nombres formatés
             function parseFormattedNumber(str) {
                 if (!str || str.trim() === '') return 0;
-                // Enlever les espaces, les virgules et convertir en nombre
                 return parseFloat(str.replace(/[\s,]/g, '').replace(/Ar/g, ''));
             }
             
@@ -196,23 +263,77 @@
                 if (!str || str.trim() === '') return new Date(0);
                 const parts = str.split('/');
                 if (parts.length === 3) {
-                    // Format: dd/MM/yyyy
                     return new Date(parts[2], parts[1] - 1, parts[0]);
                 }
                 return new Date(str);
             }
             
-            // Fonction de tri
-            function sortTable(columnIndex, dataType, currentOrder) {
+            // Fonction pour filtrer les lignes
+            function filterRows() {
+                const filters = [];
+                
+                filterInputs.forEach((input, index) => {
+                    const value = input.value.toLowerCase().trim();
+                    if (value) {
+                        const header = input.closest('th');
+                        const columnIndex = Array.from(header.parentElement.children).indexOf(header);
+                        const dataType = header.getAttribute('data-type');
+                        const isNumber = input.type === 'number' || dataType === 'number';
+                        
+                        filters.push({
+                            columnIndex: columnIndex,
+                            value: isNumber ? parseFloat(value) : value,
+                            isNumber: isNumber
+                        });
+                    }
+                });
+                
                 const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => {
-                    // Ignorer la ligne "Aucun résultat"
                     return !row.querySelector('td[colspan]');
                 });
                 
-                // Déterminer le nouvel ordre
+                let visibleCount = 0;
+                
+                rows.forEach(row => {
+                    let show = true;
+                    
+                    filters.forEach(filter => {
+                        const cell = row.cells[filter.columnIndex];
+                        if (!cell) return;
+                        
+                        const cellText = cell.textContent.toLowerCase().trim();
+                        
+                        if (filter.isNumber) {
+                            const cellValue = parseFormattedNumber(cellText);
+                            if (cellValue < filter.value) {
+                                show = false;
+                            }
+                        } else {
+                            if (!cellText.includes(filter.value)) {
+                                show = false;
+                            }
+                        }
+                    });
+                    
+                    row.style.display = show ? '' : 'none';
+                    if (show) visibleCount++;
+                });
+                
+                // Mettre à jour le compteur
+                const alertInfo = document.querySelector('.alert-info strong');
+                if (alertInfo) {
+                    alertInfo.textContent = visibleCount;
+                }
+            }
+            
+            // Fonction de tri
+            function sortTable(columnIndex, dataType, currentOrder) {
+                const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => {
+                    return !row.querySelector('td[colspan]');
+                });
+                
                 const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
                 
-                // Trier les lignes
                 rows.sort((a, b) => {
                     const cellA = a.cells[columnIndex];
                     const cellB = b.cells[columnIndex];
@@ -228,7 +349,6 @@
                         valueA = parseDate(cellA.textContent);
                         valueB = parseDate(cellB.textContent);
                     } else {
-                        // Texte
                         valueA = cellA.textContent.trim().toLowerCase();
                         valueB = cellB.textContent.trim().toLowerCase();
                     }
@@ -238,39 +358,42 @@
                     return 0;
                 });
                 
-                // Réinsérer les lignes triées
                 rows.forEach(row => tbody.appendChild(row));
                 
                 return newOrder;
             }
             
-            // Attacher les événements de clic sur les en-têtes
+            // Attacher les événements de clic sur les en-têtes pour le tri
             sortableHeaders.forEach((header, index) => {
-                header.addEventListener('click', function() {
-                    // Retirer les classes de tri des autres en-têtes
+                header.addEventListener('click', function(e) {
+                    // Ne pas trier si on clique sur l'input
+                    if (e.target.classList.contains('filter-input')) return;
+                    
                     sortableHeaders.forEach(h => {
                         if (h !== header) {
                             h.classList.remove('asc', 'desc');
                         }
                     });
                     
-                    // Obtenir l'ordre actuel
                     const currentOrder = header.classList.contains('asc') ? 'asc' : 
                                        header.classList.contains('desc') ? 'desc' : '';
-                    
-                    // Obtenir le type de données
                     const dataType = header.getAttribute('data-type');
-                    
-                    // Obtenir l'index de la colonne dans le tableau
                     const columnIndex = Array.from(header.parentElement.children).indexOf(header);
                     
-                    // Trier
                     const newOrder = sortTable(columnIndex, dataType, currentOrder);
                     
-                    // Mettre à jour les classes CSS
                     header.classList.remove('asc', 'desc');
                     header.classList.add(newOrder);
+                    
+                    // Réappliquer les filtres après le tri
+                    filterRows();
                 });
+            });
+            
+            // Attacher les événements de filtrage
+            filterInputs.forEach(input => {
+                input.addEventListener('input', filterRows);
+                input.addEventListener('keyup', filterRows);
             });
         });
     </script>

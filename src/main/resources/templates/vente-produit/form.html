@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nouvelle Vente</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="bi bi-cart-plus"></i> Nouvelle Vente de Produit
+                    </h1>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <form th:action="@{/vente-produit/save}" method="post">
+                                    <input type="hidden" th:if="${vente.idVenteProduit != null}" 
+                                           name="idVenteProduit" th:value="${vente.idVenteProduit}">
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Produit <span class="text-danger">*</span></label>
+                                        <select name="produitId" class="form-select" required id="produitSelect">
+                                            <option value="">-- Sélectionner un produit --</option>
+                                            <option th:each="p : ${produits}" 
+                                                    th:value="${p.idProduit}" 
+                                                    th:text="${p.libelle + ' - Stock: ' + p.stock + ' - ' + #numbers.formatDecimal(p.prix, 0, 'COMMA', 2, 'POINT') + ' Ar'}"
+                                                    th:data-prix="${p.prix}"
+                                                    th:data-stock="${p.stock}"></option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Vol Programmé <span class="text-danger">*</span></label>
+                                        <select name="volProgrammeId" class="form-select" required>
+                                            <option value="">-- Sélectionner un vol --</option>
+                                            <option th:each="vp : ${volsProgrammes}" 
+                                                    th:value="${vp.id}" 
+                                                    th:text="${vp.vol?.numeroVol + ' - ' + #temporals.format(vp.dateHeureDepart, 'dd/MM/yyyy HH:mm') + ' - ' + vp.vol?.aeroportDepart?.codeAeroport + ' → ' + vp.vol?.aeroportArrivee?.codeAeroport}"></option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Quantité <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" name="quantite" 
+                                               th:value="${vente.quantite}" min="1" required id="quantiteInput">
+                                        <small class="text-muted" id="stockInfo"></small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Total estimé</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="totalEstime" readonly>
+                                            <span class="input-group-text">Ar</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="bi bi-check-circle"></i> Enregistrer la vente
+                                        </button>
+                                        <a th:href="@{/vente-produit}" class="btn btn-secondary">
+                                            <i class="bi bi-arrow-left"></i> Annuler
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Aide -->
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6><i class="bi bi-info-circle"></i> Informations</h6>
+                                <ul class="mb-0">
+                                    <li>Le stock sera automatiquement décrémenté après la vente</li>
+                                    <li>Un historique de mouvement sera créé automatiquement</li>
+                                    <li>La vente sera liée au vol programmé sélectionné</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const produitSelect = document.getElementById('produitSelect');
+            const quantiteInput = document.getElementById('quantiteInput');
+            const totalEstime = document.getElementById('totalEstime');
+            const stockInfo = document.getElementById('stockInfo');
+            
+            function updateTotal() {
+                const selectedOption = produitSelect.options[produitSelect.selectedIndex];
+                const prix = parseFloat(selectedOption.dataset.prix) || 0;
+                const stock = parseInt(selectedOption.dataset.stock) || 0;
+                const quantite = parseInt(quantiteInput.value) || 0;
+                
+                const total = prix * quantite;
+                totalEstime.value = total.toLocaleString('fr-FR', {minimumFractionDigits: 2});
+                
+                if (stock > 0) {
+                    stockInfo.textContent = 'Stock disponible: ' + stock;
+                    stockInfo.className = quantite > stock ? 'text-danger' : 'text-muted';
+                    quantiteInput.max = stock;
+                } else {
+                    stockInfo.textContent = '';
+                }
+            }
+            
+            produitSelect.addEventListener('change', updateTotal);
+            quantiteInput.addEventListener('input', updateTotal);
+        });
+    </script>
+</body>
+</html>

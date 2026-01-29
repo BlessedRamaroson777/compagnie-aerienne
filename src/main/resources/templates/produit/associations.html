@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Associations Produit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="bi bi-link-45deg"></i> Associations - <span th:text="${produit.libelle}"></span>
+                    </h1>
+                    <a th:href="@{/produit}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Retour
+                    </a>
+                </div>
+
+                <!-- Alertes -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+                    <i class="bi bi-check-circle"></i> <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="bi bi-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="row">
+                    <!-- Formulaire d'ajout -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-plus-circle"></i> Nouvelle association
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/produit/{id}/associations/save(id=${produit.idProduit})}" method="post">
+                                    <div class="mb-3">
+                                        <label class="form-label">Catégorie Passager</label>
+                                        <select name="categorieId" class="form-select" required>
+                                            <option value="">-- Sélectionner --</option>
+                                            <option th:each="cat : ${categories}" 
+                                                    th:value="${cat.idCategoriePassager}" 
+                                                    th:text="${cat.libelle}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Classe Siège</label>
+                                        <select name="classeId" class="form-select" required>
+                                            <option value="">-- Sélectionner --</option>
+                                            <option th:each="cls : ${classes}" 
+                                                    th:value="${cls.idClasseSiege}" 
+                                                    th:text="${cls.libelle}"></option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-plus"></i> Ajouter
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Liste des associations -->
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-list"></i> Associations existantes
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Catégorie Passager</th>
+                                            <th>Classe Siège</th>
+                                            <th class="text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:if="${associations.isEmpty()}">
+                                            <td colspan="4" class="text-center text-muted">Aucune association</td>
+                                        </tr>
+                                        <tr th:each="assoc : ${associations}">
+                                            <td th:text="${assoc.id}"></td>
+                                            <td th:text="${assoc.categoriePassager?.libelle}"></td>
+                                            <td th:text="${assoc.classeSiege?.libelle}"></td>
+                                            <td class="text-center">
+                                                <a th:href="@{/produit/associations/delete/{id}(id=${assoc.id}, produitId=${produit.idProduit})}" 
+                                                   class="btn btn-sm btn-outline-danger"
+                                                   onclick="return confirm('Supprimer cette association ?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

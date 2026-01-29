@@ -40,4 +40,7 @@ public class ChiffreAffaireDTO {
     private BigDecimal montantDiffusionTotal; // Montant total à payer pour la diffusion
     private BigDecimal montantDiffusionPaye; // Montant déjà payé sur la diffusion
     private BigDecimal montantDiffusionReste; // Reste à payer sur la diffusion
+    
+    // Montant vente produits
+    private BigDecimal montantVenteProduits; // CA généré par la vente de produits
 }

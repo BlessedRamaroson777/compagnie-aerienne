@@ -78,5 +78,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     
     // Réservations par vol programmé (pour suivi diffusion)
     @Query("SELECT r FROM Reservation r WHERE r.volProgramme.id = :idVolProgramme")
-    List<Reservation> findByVolProgrammeIdVolProgramme(@Param("idVolProgramme") Long idVolProgramme);
+    List<Reservation> findByVolProgrammeId(@Param("idVolProgramme") Long idVolProgramme);
+    
+    // CA par mois et année (basé sur la date du vol programmé)
+    @Query("SELECT COALESCE(SUM(r.prixTotal), 0) FROM Reservation r " +
+           "WHERE EXTRACT(MONTH FROM r.volProgramme.dateHeureDepart) = :mois " +
+           "AND EXTRACT(YEAR FROM r.volProgramme.dateHeureDepart) = :annee")
+    BigDecimal calculateCAByMois(@Param("mois") Integer mois, @Param("annee") Integer annee);
+    
+    // Nombre de réservations par mois et année (basé sur la date du vol programmé)
+    @Query("SELECT COUNT(r) FROM Reservation r " +
+           "WHERE EXTRACT(MONTH FROM r.volProgramme.dateHeureDepart) = :mois " +
+           "AND EXTRACT(YEAR FROM r.volProgramme.dateHeureDepart) = :annee")
+    Long countByMois(@Param("mois") Integer mois, @Param("annee") Integer annee);
 }

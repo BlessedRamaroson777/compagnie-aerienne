@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Produits</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="bi bi-box-seam"></i> Gestion des Produits</h1>
+                    <a th:href="@{/produit/form}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Nouveau produit
+                    </a>
+                </div>
+
+                <!-- Alertes -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+                    <i class="bi bi-check-circle"></i> <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+                    <i class="bi bi-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Libellé</th>
+                                        <th class="text-end">Stock</th>
+                                        <th class="text-end">Prix (Ar)</th>
+                                        <th>Date création</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="produit : ${produits}">
+                                        <td th:text="${produit.idProduit}"></td>
+                                        <td th:text="${produit.libelle}"></td>
+                                        <td class="text-end">
+                                            <span th:classappend="${produit.stock < 10 ? 'badge bg-danger' : (produit.stock < 30 ? 'badge bg-warning' : '')}" 
+                                                  th:text="${produit.stock}"></span>
+                                        </td>
+                                        <td class="text-end" th:text="${#numbers.formatDecimal(produit.prix, 0, 'COMMA', 2, 'POINT')}"></td>
+                                        <td th:text="${#temporals.format(produit.dateCreation, 'dd/MM/yyyy HH:mm')}"></td>
+                                        <td class="text-center">
+                                            <a th:href="@{/produit/{id}/associations(id=${produit.idProduit})}" 
+                                               class="btn btn-sm btn-outline-secondary" title="Associations">
+                                                <i class="bi bi-link-45deg"></i>
+                                            </a>
+                                            <a th:href="@{/produit/form/{id}(id=${produit.idProduit})}" 
+                                               class="btn btn-sm btn-outline-primary" title="Modifier">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a th:href="@{/produit/delete/{id}(id=${produit.idProduit})}" 
+                                               class="btn btn-sm btn-outline-danger" title="Supprimer"
+                                               onclick="return confirm('Êtes-vous sûr ?')">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
