@@ -44,6 +44,6 @@ public class DiffusionVolProgrammeService {
     }
 
     public List<DiffusionVolProgramme> findByVolProgrammeId(Long idVolProgramme) {
-        return diffusionVolProgrammeRepository.findByVolProgrammeId(idVolProgramme);
+        return diffusionVolProgrammeRepository.findByVolProgramme_Id(idVolProgramme);
     }
 }

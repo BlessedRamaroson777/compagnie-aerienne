@@ -9,9 +9,11 @@
     <link rel="stylesheet" th:href="@{/css/custom.css}">
 </head>
 <body>
-    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-    
-    <div class="main-content-with-sidebar">
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            
+            <main class="col-md-10 ms-sm-auto px-md-4">
         <div class="container-fluid py-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2"><i class="bi bi-cash-stack"></i> Détail Paiement</h1>
@@ -26,35 +28,124 @@
             </div>
 
             <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="card">
+                <div class="col-lg-10">
+                    <!-- Résumé du paiement -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informations du Paiement</h5>
+                        </div>
                         <div class="card-body">
-                            <table class="table table-bordered">
-                                <tr>
-                                    <th width="30%">ID Paiement</th>
-                                    <td th:text="${paiement.idPaiementDiffusion}"></td>
-                                </tr>
-                                <tr>
-                                    <th>Diffusion Société</th>
-                                    <td th:text="${paiement.diffusionSociete?.idDiffusionSociete}"></td>
-                                </tr>
-                                <tr>
-                                    <th>Société</th>
-                                    <td th:text="${paiement.diffusionSociete?.societe?.libelle}"></td>
-                                </tr>
-                                <tr>
-                                    <th>Montant Payé</th>
-                                    <td th:text="${#numbers.formatDecimal(paiement.montantPaye, 1, 2) + ' Ar'}"></td>
-                                </tr>
-                                <tr>
-                                    <th>Date Paiement</th>
-                                    <td th:text="${#temporals.format(paiement.datePaiement, 'dd/MM/yyyy')}"></td>
-                                </tr>
-                            </table>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th width="40%">ID Paiement</th>
+                                            <td th:text="${paiement.idPaiementDiffusion}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Diffusion Société</th>
+                                            <td th:text="${paiement.diffusionSociete?.idDiffusionSociete}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Société</th>
+                                            <td th:text="${paiement.diffusionSociete?.societe?.libelle}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Date Paiement</th>
+                                            <td th:text="${#temporals.format(paiement.datePaiement, 'dd/MM/yyyy')}"></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th width="40%">Montant Total</th>
+                                            <td class="text-end">
+                                                <strong th:text="${#numbers.formatDecimal(paiement.diffusionSociete?.montantTotalAPayer ?: 0, 0, 'COMMA', 2, 'POINT')}">0.00</strong> Ar
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Montant Payé</th>
+                                            <td class="text-end">
+                                                <strong class="text-success" th:text="${#numbers.formatDecimal(paiement.diffusionSociete?.montantTotalPaye ?: 0, 0, 'COMMA', 2, 'POINT')}">0.00</strong> Ar
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Reste à Payer</th>
+                                            <td class="text-end">
+                                                <strong class="text-danger" th:text="${#numbers.formatDecimal((paiement.diffusionSociete?.montantTotalAPayer ?: 0) - (paiement.diffusionSociete?.montantTotalPaye ?: 0), 0, 'COMMA', 2, 'POINT')}">0.00</strong> Ar
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Pourcentage Payé</th>
+                                            <td>
+                                                <div class="progress" style="height: 25px;">
+                                                    <div class="progress-bar" 
+                                                         th:classappend="${(paiement.diffusionSociete?.pourcentagePaye ?: 0) >= 100 ? 'bg-success' : (paiement.diffusionSociete?.pourcentagePaye ?: 0) >= 50 ? 'bg-warning' : 'bg-danger'}"
+                                                         role="progressbar" 
+                                                         th:style="'width: ' + ${paiement.diffusionSociete?.pourcentagePaye ?: 0} + '%'"
+                                                         th:text="${#numbers.formatDecimal(paiement.diffusionSociete?.pourcentagePaye ?: 0, 0, 2)} + '%'">
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Détail par vol programmé -->
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="bi bi-airplane"></i> Détail par Vol Programmé</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Vol</th>
+                                            <th>Route</th>
+                                            <th class="text-center">Nombre</th>
+                                            <th class="text-end">Montant Total</th>
+                                            <th class="text-end">Montant Payé</th>
+                                            <th class="text-end">Reste à Payer</th>
+                                            <th class="text-center">% Payé</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:if="${#lists.isEmpty(paiement.diffusionSociete?.diffusionsVolProgramme)}">
+                                            <td colspan="7" class="text-center text-muted">
+                                                Aucune diffusion vol programmé
+                                            </td>
+                                        </tr>
+                                        <tr th:each="dvp : ${paiement.diffusionSociete?.diffusionsVolProgramme}">
+                                            <td th:text="${dvp.volProgramme?.vol?.numeroVol}"></td>
+                                            <td>
+                                                <span th:text="${dvp.volProgramme?.vol?.aeroportDepart?.nom}"></span>
+                                                <i class="bi bi-arrow-right"></i>
+                                                <span th:text="${dvp.volProgramme?.vol?.aeroportArrivee?.nom}"></span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-primary" th:text="${dvp.nombre}"></span>
+                                            </td>
+                                            <td class="text-end" th:text="${#numbers.formatDecimal(dvp.montantTotal ?: 0, 0, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                                            <td class="text-end text-success" th:text="${#numbers.formatDecimal(dvp.montantPaye ?: 0, 0, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                                            <td class="text-end text-danger" th:text="${#numbers.formatDecimal(dvp.resteAPayer ?: 0, 0, 'COMMA', 2, 'POINT')} + ' Ar'"></td>
+                                            <td class="text-center">
+                                                <small th:text="${#numbers.formatDecimal(paiement.diffusionSociete?.pourcentagePaye ?: 0, 0, 2)} + '%'"></small>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+            </main>
         </div>
     </div>
 

@@ -31,4 +31,13 @@ public class ChiffreAffaireDTO {
     // Informations sur les remises
     private BigDecimal montantRemises; // Total des remises accordées
     private BigDecimal montantAvantRemise; // Montant avant application des remises
+    
+    // Informations sur le chiffre d'affaires détaillé
+    private BigDecimal montantTickets; // Montant généré par les tickets vendus
+    private BigDecimal montantDiffusion; // Montant généré par la diffusion de publicité
+    
+    // Détails du paiement de diffusion
+    private BigDecimal montantDiffusionTotal; // Montant total à payer pour la diffusion
+    private BigDecimal montantDiffusionPaye; // Montant déjà payé sur la diffusion
+    private BigDecimal montantDiffusionReste; // Reste à payer sur la diffusion
 }

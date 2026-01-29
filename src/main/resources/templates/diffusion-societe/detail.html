@@ -9,9 +9,11 @@
     <link rel="stylesheet" th:href="@{/css/custom.css}">
 </head>
 <body>
-    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-    
-    <div class="main-content-with-sidebar">
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            
+            <main class="col-md-10 ms-sm-auto px-md-4">
         <div class="container-fluid py-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2"><i class="bi bi-broadcast-tower"></i> Détail Diffusion Société</h1>
@@ -189,6 +191,8 @@
                     </div>
                 </div>
             </div>
+        </div>
+            </main>
         </div>
     </div>
 

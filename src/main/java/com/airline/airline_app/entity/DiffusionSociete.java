@@ -30,6 +30,15 @@ public class DiffusionSociete {
 
     @Column(nullable = false)
     private LocalDate date;
+    
+    @Column(name = "montant_total_a_payer")
+    private java.math.BigDecimal montantTotalAPayer;
+    
+    @Column(name = "montant_total_paye")
+    private java.math.BigDecimal montantTotalPaye;
+    
+    @Column(name = "pourcentage_paye")
+    private java.math.BigDecimal pourcentagePaye;
 
     @OneToMany(mappedBy = "diffusionSociete", cascade = CascadeType.ALL)
     private List<DiffusionVolProgramme> diffusionsVolProgramme = new ArrayList<>();

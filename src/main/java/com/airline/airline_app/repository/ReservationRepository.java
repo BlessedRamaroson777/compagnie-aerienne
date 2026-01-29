@@ -44,6 +44,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     @Query("SELECT COUNT(b) FROM Billet b WHERE b.reservation.volProgramme.id = :volProgrammeId")
     Long countBilletsByVolProgramme(@Param("volProgrammeId") Long volProgrammeId);
     
+    // Nombre de réservations par vol programmé
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.volProgramme.id = :volProgrammeId")
+    Long countReservationsByVolProgramme(@Param("volProgrammeId") Long volProgrammeId);
+    
     // Chiffre d'affaires global
     @Query("SELECT COALESCE(SUM(r.prixTotal), 0) FROM Reservation r")
     BigDecimal calculateTotalCA();
@@ -71,4 +75,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
            "FROM ReservationCategoriePassager rcp " +
            "WHERE rcp.reservation.volProgramme.id = :volProgrammeId")
     BigDecimal calculateRemisesByVolProgramme(@Param("volProgrammeId") Long volProgrammeId);
+    
+    // Réservations par vol programmé (pour suivi diffusion)
+    @Query("SELECT r FROM Reservation r WHERE r.volProgramme.id = :idVolProgramme")
+    List<Reservation> findByVolProgrammeIdVolProgramme(@Param("idVolProgramme") Long idVolProgramme);
 }

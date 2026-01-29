@@ -8,6 +8,34 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <style>
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 20px;
+        }
+        .sortable:hover {
+            background-color: #e9ecef;
+        }
+        .sortable::after {
+            content: '\2195';
+            position: absolute;
+            right: 5px;
+            opacity: 0.3;
+            font-size: 0.8rem;
+        }
+        .sortable.asc::after {
+            content: '\2191';
+            opacity: 1;
+            color: #0d6efd;
+        }
+        .sortable.desc::after {
+            content: '\2193';
+            opacity: 1;
+            color: #0d6efd;
+        }
+    </style>
 </head>
 <body>
     <div class="container-fluid">
@@ -36,21 +64,27 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>#</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}">Numéro de vol</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}">Date/Heure</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}">Trajet</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}">Avion</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">Numéro de vol</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="date">Date départ</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">Heure départ</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">Aéroport départ</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">Aéroport arrivée</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="sortable" data-type="text">Avion</th>
                                         
-                                        <th th:if="${type == 'AVION'}">Immatriculation</th>
+                                        <th th:if="${type == 'AVION'}" class="sortable" data-type="text">Immatriculation</th>
                                         <th th:if="${type == 'AVION'}">Période</th>
                                         
-                                        <th th:if="${type == 'VOL'}">Numéro de vol</th>
+                                        <th th:if="${type == 'VOL'}" class="sortable" data-type="text">Numéro de vol</th>
                                         <th th:if="${type == 'VOL'}">Trajet</th>
                                         <th th:if="${type == 'VOL'}">Période</th>
                                         
-                                        <th class="text-end">Montant (Ar)</th>
-                                        <th class="text-center">Réservations</th>
-                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-center">Billets</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-end sortable" data-type="number">Montant Tickets (Ar)</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-end sortable" data-type="number">Montant Diffusion Total (Ar)</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-end sortable" data-type="number">Diffusion Payée (Ar)</th>
+                                        <th th:if="${type == 'VOL_PROGRAMME'}" class="text-end sortable" data-type="number">Diffusion Reste (Ar)</th>
+                                        <th class="text-end sortable" data-type="number">CA Total (Ar)</th>
+                                        <th class="text-center sortable" data-type="number">Réservations</th>
+                                        <!-- <th th:if="${type == 'VOL_PROGRAMME'}" class="text-center">Billets</th> -->
                                         <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -61,11 +95,15 @@
                                         <!-- Vol programmé -->
                                         <td th:if="${type == 'VOL_PROGRAMME'}" th:text="${ca.numeroVol}">AF001</td>
                                         <td th:if="${type == 'VOL_PROGRAMME'}">
-                                            <span th:text="${#temporals.format(ca.dateHeureVol, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span>
+                                            <span th:text="${#temporals.format(ca.dateHeureVol, 'dd/MM/yyyy')}">01/01/2024</span>
+                                        </td>
+                                        <td th:if="${type == 'VOL_PROGRAMME'}">
+                                            <span th:text="${#temporals.format(ca.dateHeureVol, 'HH:mm')}">10:00</span>
                                         </td>
                                         <td th:if="${type == 'VOL_PROGRAMME'}">
                                             <span th:text="${ca.aeroportDepart}">CDG</span>
-                                            <i class="fas fa-arrow-right mx-2"></i>
+                                        </td>
+                                        <td th:if="${type == 'VOL_PROGRAMME'}">
                                             <span th:text="${ca.aeroportArrivee}">JFK</span>
                                         </td>
                                         <td th:if="${type == 'VOL_PROGRAMME'}" th:text="${ca.immatriculation}">F-ABCD</td>
@@ -87,15 +125,29 @@
                                             <small class="text-muted">Toutes les dates</small>
                                         </td>
                                         
+                                        <!-- Montants pour VOL_PROGRAMME -->
+                                        <td th:if="${type == 'VOL_PROGRAMME'}" class="text-end">
+                                            <span class="text-success" th:text="${#numbers.formatDecimal(ca.montantTickets, 0, 'COMMA', 2, 'POINT')}">0.00</span>
+                                        </td>
+                                        <td th:if="${type == 'VOL_PROGRAMME'}" class="text-end">
+                                            <span class="text-primary" th:text="${#numbers.formatDecimal(ca.montantDiffusionTotal != null ? ca.montantDiffusionTotal : 0, 0, 'COMMA', 2, 'POINT')}">0.00</span>
+                                        </td>
+                                        <td th:if="${type == 'VOL_PROGRAMME'}" class="text-end">
+                                            <span class="text-success" th:text="${#numbers.formatDecimal(ca.montantDiffusionPaye != null ? ca.montantDiffusionPaye : 0, 0, 'COMMA', 2, 'POINT')}">0.00</span>
+                                        </td>
+                                        <td th:if="${type == 'VOL_PROGRAMME'}" class="text-end">
+                                            <span class="text-danger" th:text="${#numbers.formatDecimal(ca.montantDiffusionReste != null ? ca.montantDiffusionReste : 0, 0, 'COMMA', 2, 'POINT')}">0.00</span>
+                                        </td>
+                                        
                                         <td class="text-end">
                                             <strong th:text="${#numbers.formatDecimal(ca.montantTotal, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
                                         </td>
                                         <td class="text-center">
                                             <span class="badge bg-primary" th:text="${ca.nombreReservations}">0</span>
                                         </td>
-                                        <td th:if="${type == 'VOL_PROGRAMME'}" class="text-center">
+                                        <!-- <td th:if="${type == 'VOL_PROGRAMME'}" class="text-center">
                                             <span class="badge bg-success" th:text="${ca.nombreBillets}">0</span>
-                                        </td>
+                                        </td> -->
                                         <td class="text-center">
                                             <a th:href="@{'/chiffre-affaire/' + ${type == 'VOL_PROGRAMME' ? 'par-vol-programme' : (type == 'AVION' ? 'par-avion' : 'par-vol')} + '/' + ${ca.id}}" 
                                                class="btn btn-sm btn-info" title="Voir détails">
@@ -104,7 +156,7 @@
                                         </td>
                                     </tr>
                                     <tr th:if="${caList.isEmpty()}">
-                                        <td colspan="8" class="text-center text-muted">
+                                        <td colspan="12" class="text-center text-muted">
                                             <i class="fas fa-info-circle me-2"></i>
                                             Aucun résultat trouvé
                                         </td>
@@ -126,5 +178,101 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.querySelector('.table');
+            const tbody = table.querySelector('tbody');
+            const sortableHeaders = table.querySelectorAll('.sortable');
+            
+            // Fonction pour parser les nombres formatés (avec espaces et virgules)
+            function parseFormattedNumber(str) {
+                if (!str || str.trim() === '') return 0;
+                // Enlever les espaces, les virgules et convertir en nombre
+                return parseFloat(str.replace(/[\s,]/g, '').replace(/Ar/g, ''));
+            }
+            
+            // Fonction pour parser les dates dd/MM/yyyy
+            function parseDate(str) {
+                if (!str || str.trim() === '') return new Date(0);
+                const parts = str.split('/');
+                if (parts.length === 3) {
+                    // Format: dd/MM/yyyy
+                    return new Date(parts[2], parts[1] - 1, parts[0]);
+                }
+                return new Date(str);
+            }
+            
+            // Fonction de tri
+            function sortTable(columnIndex, dataType, currentOrder) {
+                const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => {
+                    // Ignorer la ligne "Aucun résultat"
+                    return !row.querySelector('td[colspan]');
+                });
+                
+                // Déterminer le nouvel ordre
+                const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+                
+                // Trier les lignes
+                rows.sort((a, b) => {
+                    const cellA = a.cells[columnIndex];
+                    const cellB = b.cells[columnIndex];
+                    
+                    if (!cellA || !cellB) return 0;
+                    
+                    let valueA, valueB;
+                    
+                    if (dataType === 'number') {
+                        valueA = parseFormattedNumber(cellA.textContent);
+                        valueB = parseFormattedNumber(cellB.textContent);
+                    } else if (dataType === 'date') {
+                        valueA = parseDate(cellA.textContent);
+                        valueB = parseDate(cellB.textContent);
+                    } else {
+                        // Texte
+                        valueA = cellA.textContent.trim().toLowerCase();
+                        valueB = cellB.textContent.trim().toLowerCase();
+                    }
+                    
+                    if (valueA < valueB) return newOrder === 'asc' ? -1 : 1;
+                    if (valueA > valueB) return newOrder === 'asc' ? 1 : -1;
+                    return 0;
+                });
+                
+                // Réinsérer les lignes triées
+                rows.forEach(row => tbody.appendChild(row));
+                
+                return newOrder;
+            }
+            
+            // Attacher les événements de clic sur les en-têtes
+            sortableHeaders.forEach((header, index) => {
+                header.addEventListener('click', function() {
+                    // Retirer les classes de tri des autres en-têtes
+                    sortableHeaders.forEach(h => {
+                        if (h !== header) {
+                            h.classList.remove('asc', 'desc');
+                        }
+                    });
+                    
+                    // Obtenir l'ordre actuel
+                    const currentOrder = header.classList.contains('asc') ? 'asc' : 
+                                       header.classList.contains('desc') ? 'desc' : '';
+                    
+                    // Obtenir le type de données
+                    const dataType = header.getAttribute('data-type');
+                    
+                    // Obtenir l'index de la colonne dans le tableau
+                    const columnIndex = Array.from(header.parentElement.children).indexOf(header);
+                    
+                    // Trier
+                    const newOrder = sortTable(columnIndex, dataType, currentOrder);
+                    
+                    // Mettre à jour les classes CSS
+                    header.classList.remove('asc', 'desc');
+                    header.classList.add(newOrder);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

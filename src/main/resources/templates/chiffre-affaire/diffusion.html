@@ -1,118 +1,125 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chiffre d'Affaires Diffusion</title>
-    <th:block layout:fragment="extra-css">
-        <link rel="stylesheet" th:href="@{/css/custom.css}">
-    </th:block>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
 </head>
 <body>
-<div layout:fragment="content">
-    <div class="container-fluid mt-4">
+    <div class="container-fluid">
         <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0">
-                            <i class="fas fa-broadcast-tower me-2"></i>
-                            Chiffre d'Affaires des Diffusions
-                        </h4>
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="container-fluid py-4">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">
+                            <i class="bi bi-broadcast-tower"></i> Chiffre d'Affaires Diffusion
+                        </h1>
+                        <div>
+                            <a th:href="@{/chiffre-affaire}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Retour
+                            </a>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <!-- Informations de période -->
-                        <div class="alert alert-info">
-                            <h5 class="alert-heading">
-                                <i class="fas fa-calendar-alt me-2"></i>
-                                Période sélectionnée
-                            </h5>
-                            <p class="mb-0">
-                                <strong>Mois:</strong> <span th:text="${mois}"></span> / 
+
+                    <!-- Période sélectionnée -->
+                    <div class="alert alert-info mb-4">
+                        <h5 class="alert-heading">
+                            <i class="bi bi-calendar-month"></i> Période sélectionnée
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Mois:</strong> <span th:text="${mois}"></span>
+                            </div>
+                            <div class="col-md-6">
                                 <strong>Année:</strong> <span th:text="${annee}"></span>
-                            </p>
-                        </div>
-
-                        <!-- Résumé du CA -->
-                        <div class="row mt-4">
-                            <div class="col-md-6">
-                                <div class="card border-success">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title text-success">
-                                            <i class="fas fa-dollar-sign me-2"></i>
-                                            Montant Total
-                                        </h5>
-                                        <h2 class="display-4 text-success" th:text="${#numbers.formatDecimal(caDiffusion.montantTotal, 1, 2)} + ' Ar'"></h2>
-                                    </div>
-                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="card border-info">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title text-info">
-                                            <i class="fas fa-chart-line me-2"></i>
-                                            Nombre de Diffusions
-                                        </h5>
-                                        <h2 class="display-4 text-info" th:text="${caDiffusion.nombreBillets}"></h2>
-                                    </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistiques résumées -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-success shadow-sm">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title text-success">
+                                        <i class="bi bi-cash-coin"></i> Montant Total
+                                    </h5>
+                                    <h2 class="display-5 text-success mb-0" 
+                                        th:text="${#numbers.formatDecimal(caDiffusion.montantTotal, 1, 2)} + ' Ar'">
+                                    </h2>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Informations supplémentaires -->
-                        <div class="card mt-4">
-                            <div class="card-header bg-light">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    Détails
-                                </h5>
+                        <div class="col-md-6">
+                            <div class="card border-info shadow-sm">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title text-info">
+                                        <i class="bi bi-diagram-3"></i> Nombre de Diffusions
+                                    </h5>
+                                    <h2 class="display-5 text-info mb-0" th:text="${caDiffusion.nombreBillets}">
+                                    </h2>
+                                </div>
                             </div>
-                            <div class="card-body">
+                        </div>
+                    </div>
+
+                    <!-- Détails -->
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="bi bi-info-circle"></i> Détails de la Diffusion
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
                                 <table class="table table-bordered">
                                     <tbody>
                                         <tr>
-                                            <th width="30%">Type</th>
+                                            <th width="30%" class="bg-light">Type</th>
                                             <td th:text="${caDiffusion.type}"></td>
                                         </tr>
                                         <tr>
-                                            <th>Désignation</th>
+                                            <th class="bg-light">Désignation</th>
                                             <td th:text="${caDiffusion.designation}"></td>
                                         </tr>
                                         <tr>
-                                            <th>Montant Total</th>
+                                            <th class="bg-light">Montant Total</th>
                                             <td>
-                                                <strong class="text-success" th:text="${#numbers.formatDecimal(caDiffusion.montantTotal, 1, 2)} + ' Ar'"></strong>
+                                                <strong class="text-success fs-5" 
+                                                        th:text="${#numbers.formatDecimal(caDiffusion.montantTotal, 1, 2)} + ' Ar'">
+                                                </strong>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>Nombre de Diffusions</th>
-                                            <td th:text="${caDiffusion.nombreBillets}"></td>
+                                            <th class="bg-light">Nombre de Diffusions</th>
+                                            <td>
+                                                <span class="badge bg-info fs-6" th:text="${caDiffusion.nombreBillets}"></span>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Actions -->
-                        <div class="mt-4 text-center">
-                            <a th:href="@{/chiffre-affaire}" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left me-2"></i>
-                                Retour aux Statistiques
-                            </a>
-                            <a th:href="@{/chiffre-affaire/diffusion}" class="btn btn-info">
-                                <i class="fas fa-calendar me-2"></i>
-                                Choisir une autre période
-                            </a>
-                            <button onclick="window.print()" class="btn btn-primary">
-                                <i class="fas fa-print me-2"></i>
-                                Imprimer
-                            </button>
-                        </div>
+                    <!-- Actions -->
+                    <div class="mt-4 d-flex gap-2 justify-content-center">
+                        <a th:href="@{/chiffre-affaire}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour aux Statistiques
+                        </a>
+                        <a th:href="@{/chiffre-affaire/diffusion}" class="btn btn-primary">
+                            <i class="bi bi-calendar"></i> Choisir une autre période
+                        </a>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     </div>
-</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -23,6 +23,15 @@ public class DiffusionVolProgramme {
 
     @Column(nullable = false)
     private Integer nombre;
+    
+    @Column(name = "montant_total")
+    private java.math.BigDecimal montantTotal;
+    
+    @Column(name = "montant_paye")
+    private java.math.BigDecimal montantPaye;
+    
+    @Column(name = "reste_a_payer")
+    private java.math.BigDecimal resteAPayer;
 
     @ManyToOne
     @JoinColumn(name = "id_vol_programme", nullable = false)

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi Paiements Diffusion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <style>
+        .progress-custom {
+            height: 25px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <div class="container-fluid py-4">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">
+                            <i class="bi bi-graph-up-arrow"></i> Suivi des Paiements Diffusion
+                        </h1>
+                        <div>
+                            <a th:href="@{/chiffre-affaire}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Retour
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Statistiques globales -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card border-primary shadow-sm">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title text-primary">
+                                        <i class="bi bi-cash-stack"></i> Total à Payer
+                                    </h6>
+                                    <h4 class="text-primary mb-0" 
+                                        th:text="${#numbers.formatDecimal(totalAPayer, 1, 2)} + ' Ar'">
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-success shadow-sm">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title text-success">
+                                        <i class="bi bi-check-circle"></i> Total Payé
+                                    </h6>
+                                    <h4 class="text-success mb-0" 
+                                        th:text="${#numbers.formatDecimal(totalPaye, 1, 2)} + ' Ar'">
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-danger shadow-sm">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title text-danger">
+                                        <i class="bi bi-exclamation-circle"></i> Reste à Payer
+                                    </h6>
+                                    <h4 class="text-danger mb-0" 
+                                        th:text="${#numbers.formatDecimal(resteAPayer, 1, 2)} + ' Ar'">
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-info shadow-sm">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title text-info">
+                                        <i class="bi bi-percent"></i> Pourcentage Payé
+                                    </h6>
+                                    <h4 class="text-info mb-0" 
+                                        th:text="${#numbers.formatDecimal(pourcentagePaye, 1, 2)} + ' %'">
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Liste des diffusions société -->
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="bi bi-list-check"></i> Détails par Diffusion Société
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Société</th>
+                                            <th>Date</th>
+                                            <th>Nombre</th>
+                                            <th class="text-end">Total à Payer</th>
+                                            <th class="text-end">Payé</th>
+                                            <th class="text-end">Reste</th>
+                                            <th>Progression</th>
+                                            <th class="text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:if="${#lists.isEmpty(diffusions)}">
+                                            <td colspan="9" class="text-center text-muted py-4">
+                                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                                Aucune diffusion enregistrée
+                                            </td>
+                                        </tr>
+                                        <tr th:each="diffusion : ${diffusions}">
+                                            <td th:text="${diffusion.idDiffusionSociete}"></td>
+                                            <td>
+                                                <i class="bi bi-building text-primary"></i>
+                                                <span th:text="${diffusion.societe?.libelle}"></span>
+                                            </td>
+                                            <td th:text="${#temporals.format(diffusion.date, 'dd/MM/yyyy')}"></td>
+                                            <td>
+                                                <span class="badge bg-info" th:text="${diffusion.nombre}"></span>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong th:text="${#numbers.formatDecimal(diffusion.montantTotalAPayer != null ? diffusion.montantTotalAPayer : 0, 1, 2)} + ' Ar'"></strong>
+                                            </td>
+                                            <td class="text-end text-success">
+                                                <strong th:text="${#numbers.formatDecimal(diffusion.montantTotalPaye != null ? diffusion.montantTotalPaye : 0, 1, 2)} + ' Ar'"></strong>
+                                            </td>
+                                            <td class="text-end text-danger">
+                                                <strong th:text="${#numbers.formatDecimal((diffusion.montantTotalAPayer != null ? diffusion.montantTotalAPayer : 0) - (diffusion.montantTotalPaye != null ? diffusion.montantTotalPaye : 0), 1, 2)} + ' Ar'"></strong>
+                                            </td>
+                                            <td style="width: 200px;">
+                                                <div class="progress progress-custom">
+                                                    <div class="progress-bar" 
+                                                         th:classappend="${(diffusion.pourcentagePaye != null ? diffusion.pourcentagePaye : 0) >= 100} ? 'bg-success' : (${(diffusion.pourcentagePaye != null ? diffusion.pourcentagePaye : 0) >= 50} ? 'bg-primary' : 'bg-warning')"
+                                                         role="progressbar" 
+                                                         th:style="'width: ' + ${diffusion.pourcentagePaye != null ? diffusion.pourcentagePaye : 0} + '%'"
+                                                         th:attr="aria-valuenow=${diffusion.pourcentagePaye != null ? diffusion.pourcentagePaye : 0}"
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                        <span th:text="${#numbers.formatDecimal(diffusion.pourcentagePaye != null ? diffusion.pourcentagePaye : 0, 1, 0)} + '%'"></span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <a th:href="@{/chiffre-affaire/suivi-diffusion/detail/{id}(id=${diffusion.idDiffusionSociete})}" 
+                                                   class="btn btn-sm btn-outline-info" title="Voir détails">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot th:if="${!#lists.isEmpty(diffusions)}" class="table-secondary">
+                                        <tr>
+                                            <th colspan="4" class="text-end">TOTAUX</th>
+                                            <th class="text-end" th:text="${#numbers.formatDecimal(totalAPayer, 1, 2)} + ' Ar'"></th>
+                                            <th class="text-end text-success" th:text="${#numbers.formatDecimal(totalPaye, 1, 2)} + ' Ar'"></th>
+                                            <th class="text-end text-danger" th:text="${#numbers.formatDecimal(resteAPayer, 1, 2)} + ' Ar'"></th>
+                                            <th colspan="2"></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

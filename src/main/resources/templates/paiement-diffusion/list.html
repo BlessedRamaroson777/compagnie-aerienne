@@ -9,9 +9,11 @@
     <link rel="stylesheet" th:href="@{/css/custom.css}">
 </head>
 <body>
-    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-    
-    <div class="main-content-with-sidebar">
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            
+            <main class="col-md-10 ms-sm-auto px-md-4">
         <div class="container-fluid py-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2"><i class="bi bi-cash-stack"></i> Paiements Diffusion</h1>
@@ -39,14 +41,17 @@
                                     <th>ID</th>
                                     <th>Diffusion</th>
                                     <th>Société</th>
-                                    <th>Montant Payé</th>
+                                    <th class="text-end">Montant Total</th>
+                                    <th class="text-end">Montant Payé</th>
+                                    <th class="text-end">Reste à Payer</th>
+                                    <th class="text-center">% Payé</th>
                                     <th>Date Paiement</th>
                                     <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:if="${#lists.isEmpty(paiements)}">
-                                    <td colspan="6" class="text-center text-muted">
+                                    <td colspan="9" class="text-center text-muted">
                                         <i class="bi bi-inbox fs-1 d-block mb-2"></i>
                                         Aucun paiement enregistré
                                     </td>
@@ -55,7 +60,25 @@
                                     <td th:text="${paiement.idPaiementDiffusion}"></td>
                                     <td th:text="${paiement.diffusionSociete?.idDiffusionSociete}"></td>
                                     <td th:text="${paiement.diffusionSociete?.societe?.libelle}"></td>
-                                    <td th:text="${#numbers.formatDecimal(paiement.montantPaye, 1, 2) + ' Ar'}"></td>
+                                    <td class="text-end">
+                                        <span th:text="${#numbers.formatDecimal(paiement.diffusionSociete?.montantTotalAPayer ?: 0, 0, 'COMMA', 2, 'POINT')}">0.00</span> Ar
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="text-success" th:text="${#numbers.formatDecimal(paiement.diffusionSociete?.montantTotalPaye ?: 0, 0, 'COMMA', 2, 'POINT')}">0.00</span> Ar
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="text-danger" th:text="${#numbers.formatDecimal((paiement.diffusionSociete?.montantTotalAPayer ?: 0) - (paiement.diffusionSociete?.montantTotalPaye ?: 0), 0, 'COMMA', 2, 'POINT')}">0.00</span> Ar
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar" 
+                                                 th:classappend="${(paiement.diffusionSociete?.pourcentagePaye ?: 0) >= 100 ? 'bg-success' : (paiement.diffusionSociete?.pourcentagePaye ?: 0) >= 50 ? 'bg-warning' : 'bg-danger'}"
+                                                 role="progressbar" 
+                                                 th:style="'width: ' + ${paiement.diffusionSociete?.pourcentagePaye ?: 0} + '%'"
+                                                 th:text="${#numbers.formatDecimal(paiement.diffusionSociete?.pourcentagePaye ?: 0, 0, 2)} + '%'">
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td th:text="${#temporals.format(paiement.datePaiement, 'dd/MM/yyyy')}"></td>
                                     <td class="text-end">
                                         <a th:href="@{/paiement-diffusion/detail/{id}(id=${paiement.idPaiementDiffusion})}" 
@@ -78,6 +101,8 @@
                     </div>
                 </div>
             </div>
+        </div>
+            </main>
         </div>
     </div>
 

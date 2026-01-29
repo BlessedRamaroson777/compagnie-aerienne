@@ -51,40 +51,81 @@ public class ChiffreAffaireService {
 
     /**
      * Obtenir le CA par vol programmé (avec date et heure)
+     * Affiche TOUS les vols programmés, même ceux sans réservation
      */
     public List<ChiffreAffaireDTO> getCAParVolProgramme() {
-        List<Object[]> results = reservationRepository.calculateCAByAllVolProgrammes();
+        // Récupérer TOUS les vols programmés
+        List<VolProgramme> tousLesVolsProgrammes = volProgrammeRepository.findAll();
         List<ChiffreAffaireDTO> dtos = new ArrayList<>();
         
-        for (Object[] result : results) {
-            Long volProgrammeId = (Long) result[0];
-            BigDecimal montant = (BigDecimal) result[1];
-            Long nombreReservations = (Long) result[2];
+        for (VolProgramme vp : tousLesVolsProgrammes) {
+            Long volProgrammeId = vp.getId();
             
-            VolProgramme vp = volProgrammeRepository.findById(volProgrammeId).orElse(null);
-            if (vp != null) {
-                ChiffreAffaireDTO dto = new ChiffreAffaireDTO();
-                dto.setId(volProgrammeId);
-                dto.setType("VOL_PROGRAMME");
-                dto.setDesignation("Vol programmé: " + vp.getVol().getNumeroVol());
-                dto.setNumeroVol(vp.getVol().getNumeroVol());
-                dto.setMontantTotal(montant);
-                dto.setNombreReservations(nombreReservations.intValue());
-                dto.setDateHeureVol(vp.getDateHeureDepart());
-                dto.setAeroportDepart(vp.getVol().getAeroportDepart().getNom());
-                dto.setAeroportArrivee(vp.getVol().getAeroportArrivee().getNom());
-                dto.setImmatriculation(vp.getAvion().getCodeAvion());
-                
-                // Compter les billets
-                Long nombreBillets = reservationRepository.countBilletsByVolProgramme(volProgrammeId);
-                dto.setNombreBillets(nombreBillets.intValue());
-                
-                dtos.add(dto);
+            // Calculer le montant des tickets vendus pour ce vol
+            BigDecimal montantTickets = reservationRepository.calculateCAByVolProgramme(volProgrammeId);
+            if (montantTickets == null) {
+                montantTickets = BigDecimal.ZERO;
             }
+            
+            // Calculer le montant généré par la diffusion de publicité
+            BigDecimal montantDiffusion = diffusionVolProgrammeRepository.calculateMontantDiffusionByVolProgramme(volProgrammeId);
+            if (montantDiffusion == null) {
+                montantDiffusion = BigDecimal.ZERO;
+            }
+            
+            // Calculer le montant total à payer pour la diffusion
+            BigDecimal montantDiffusionTotal = diffusionVolProgrammeRepository.calculateMontantDiffusionTotalByVolProgramme(volProgrammeId);
+            if (montantDiffusionTotal == null) {
+                montantDiffusionTotal = BigDecimal.ZERO;
+            }
+            
+            // Calculer le montant déjà payé pour la diffusion
+            BigDecimal montantDiffusionPaye = diffusionVolProgrammeRepository.calculateMontantDiffusionPayeByVolProgramme(volProgrammeId);
+            if (montantDiffusionPaye == null) {
+                montantDiffusionPaye = BigDecimal.ZERO;
+            }
+            
+            // Calculer le reste à payer pour la diffusion
+            BigDecimal montantDiffusionReste = diffusionVolProgrammeRepository.calculateMontantDiffusionResteByVolProgramme(volProgrammeId);
+            if (montantDiffusionReste == null) {
+                montantDiffusionReste = BigDecimal.ZERO;
+            }
+            
+            // Compter les réservations
+            Long nombreReservations = reservationRepository.countReservationsByVolProgramme(volProgrammeId);
+            if (nombreReservations == null) {
+                nombreReservations = 0L;
+            }
+            
+            // Compter les billets
+            Long nombreBillets = reservationRepository.countBilletsByVolProgramme(volProgrammeId);
+            if (nombreBillets == null) {
+                nombreBillets = 0L;
+            }
+            
+            ChiffreAffaireDTO dto = new ChiffreAffaireDTO();
+            dto.setId(volProgrammeId);
+            dto.setType("VOL_PROGRAMME");
+            dto.setDesignation("Vol programmé: " + vp.getVol().getNumeroVol());
+            dto.setNumeroVol(vp.getVol().getNumeroVol());
+            dto.setMontantTickets(montantTickets);
+            dto.setMontantDiffusion(montantDiffusion);
+            dto.setMontantDiffusionTotal(montantDiffusionTotal);
+            dto.setMontantDiffusionPaye(montantDiffusionPaye);
+            dto.setMontantDiffusionReste(montantDiffusionReste);
+            dto.setMontantTotal(montantTickets.add(montantDiffusion));
+            dto.setNombreReservations(nombreReservations.intValue());
+            dto.setNombreBillets(nombreBillets.intValue());
+            dto.setDateHeureVol(vp.getDateHeureDepart());
+            dto.setAeroportDepart(vp.getVol().getAeroportDepart().getNom());
+            dto.setAeroportArrivee(vp.getVol().getAeroportArrivee().getNom());
+            dto.setImmatriculation(vp.getAvion().getCodeAvion());
+            
+            dtos.add(dto);
         }
         
-        // Trier par montant décroissant
-        dtos.sort((a, b) -> b.getMontantTotal().compareTo(a.getMontantTotal()));
+        // Trier par date/heure de départ décroissant (vols les plus récents en premier)
+        dtos.sort((a, b) -> b.getDateHeureVol().compareTo(a.getDateHeureVol()));
         
         return dtos;
     }
@@ -100,12 +141,20 @@ public class ChiffreAffaireService {
         Long nombreBillets = reservationRepository.countBilletsByVolProgramme(volProgrammeId);
         BigDecimal remises = reservationRepository.calculateRemisesByVolProgramme(volProgrammeId);
         
+        // Calculer le montant généré par la diffusion de publicité
+        BigDecimal montantDiffusion = diffusionVolProgrammeRepository.calculateMontantDiffusionByVolProgramme(volProgrammeId);
+        
         ChiffreAffaireDTO dto = new ChiffreAffaireDTO();
         dto.setId(volProgrammeId);
         dto.setType("VOL_PROGRAMME");
         dto.setDesignation("Vol programmé: " + vp.getVol().getNumeroVol());
         dto.setNumeroVol(vp.getVol().getNumeroVol());
-        dto.setMontantTotal(montant);
+        
+        // Montants détaillés
+        dto.setMontantTickets(montant); // Montant des tickets vendus
+        dto.setMontantDiffusion(montantDiffusion); // Montant de la diffusion
+        dto.setMontantTotal(montant.add(montantDiffusion)); // Total = tickets + diffusion
+        
         dto.setNombreBillets(nombreBillets.intValue());
         dto.setDateHeureVol(vp.getDateHeureDepart());
         dto.setAeroportDepart(vp.getVol().getAeroportDepart().getNom());
